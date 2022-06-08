@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="../../static/prova/css/bootstrap.css">
+    <link rel="stylesheet" href="../../static/prova/css/fontawesome.css">
+    <link rel="stylesheet" href="../../static/prova/css/chat.css">
+    <link rel="stylesheet" href="../../static/prova/css/material_icon.css">
+
+    <link rel="shortcut icon" href="../../static/prova/images/brain.png"/>
+
+    <title>CAPIRCI</title>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a href="/"><i class="fas fa-arrow-circle-left fa-2x" style="color: white;"></i></a>
+    <a class="navbar-brand" href="/" style="margin-left: 20px"><i class="fas fa-home"></i> | CAPIRCI</a>
+    <div class="" style="margin-left: 68vw">
+        <a class="navbar-brand" id="dropdownMenuUser">Welcome
+            <i id="username">{{ user.get_username }}</i><span class="caret"></span></a>
+    </div>
+</nav>
+<p class="d-none" id="taskName">{{ taskName }}</p>
+
+<div class="container-fluid chat_height">
+    <div class="row justify-content-center chat-dim">
+
+        <div class="col-md-8 col-xl-6 chat" id="chat_robot">
+            <div class="card">
+                <div class="card-header msg_head">
+                    <div class="user_info" style="float: left">
+                        <button id="btn-save" onclick="changeAudio()"><i class="material-icons" id="audio_icon">volume_off</i></button>
+                    </div>
+                    <div class="user_info" style="float: right">
+                        <span id="title">Create task: {{ taskName }}</span>
+                    </div>
+
+                    <!-- BEGIN MODAL -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Robot configuration</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="ip-name" class="col-form-label">IP:</label>
+                                            <input type="text" class="form-control" id="ip-name" value="169.254.165.133">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="port-name" class="col-form-label">Port:</label>
+                                            <input type="text" class="form-control" id="port-name" value="5007">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END MODAL -->
+
+                </div>
+                <div class="card-body msg_card_body" id="card_dialog">
+
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <div class="input-group-append">
+
+									<span class="input-group-text attach_btn" id="camera_span">
+										<!--<i class="fas fa-camera"></i>-->
+									</span>
+
+                        </div>
+                        <input type="text" lang="en" name="" class="form-control type_msg" placeholder="Type your message..." id="input_text" style="margin: 0 0">
+                        <div class="input-group-append">
+									<span class="input-group-text send_btn" id="mic_btn" onclick="startConverting()">
+										<i id="microphone-icon" class="fas fa-microphone"></i>
+									</span>
+                            <span class="input-group-text send_btn d-none" id="send_btn">
+										<i id="send-icon" class="fas fa-location-arrow"></i>
+									</span>
+
+                            <div class="rec_btn d-none" id="audio_rec">
+                                {% csrf_token %}
+                                <div class="center_rec">
+                                    <i id="cancel_icon" class="far fa-times-circle"></i>
+                                    <i id="circle_icon" class="fas fa-circle"></i>
+                                    <span id="time_rec"></span>
+                                    <i id="ok_icon" class="far fa-check-circle"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE LIBRERIA NON TROVATA -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLibrariesNotFound">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Elements not found</h5>
+            </div>
+            <div class="modal-body">
+                <div id="librariesNotFound"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="okButtonLibraries" type="button" disabled class="btn btn-primary" data-dismiss="modal">Ok</button>
+                <button id="cancelButtonLibraries" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE LIBRERIA NON TROVATA -->
+
+<!-- MODALE SELECT ROBOT NEW OBJECT -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalSelectRobotNewObject">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select robot to add new object</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewObject">Select robot:</label><select name="robot" id="SelectRobotNewObject">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <label id="errorSelectRobotNewObject" style="color: red;"></label>
+                <br>
+                <br>
+                <label>Object name:</label>
+                <input type="text" id="SelectRobotObjectName"><br>
+                <label id="errorSelectRobotObjectName" style="color: red;"></label>
+                <br>
+                <br>
+                <label>Object keywords (separated by comma):</label><br>
+                <input type="text" id="SelectRobotObjectKeywords"><br>
+                <small>(Object name and its plural we'll be added automatically)</small>
+                <br>
+                <label id="errorSelectRobotObjectKeywords" style="color: red;"></label>
+                <br>
+                <br>
+                <div class="switch_box box_1">
+                    <input type="checkbox" id="checkboxSelectRobotNewObject" class="switch_1"> Shared
+                </div>
+                <br>
+                <small>(If object is "Shared", name and its keywords must be unique in all the system, not only for your profile)</small>
+            </div>
+            <div class="modal-footer">
+                <button id="SelectRobotNext" type="button" class="btn btn-primary" onclick="openModalNewObject('{{ user.get_username }}')">Next
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE SELECT ROBOT NEW OBJECT -->
+
+<!-- MODALE NEW OBJECT -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewObject">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New object</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="deleteObjectImage('{{ user.get_username }}')">
+                    {% csrf_token %}<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary" onclick="takeShot('{{ user.get_username }}')">Take shot</button>
+                <label id="spinnerNewObject"></label>
+                <img id="newObjectImg" src="../../static/prova/images/brain.png"
+                     style="opacity: 0.3; width: 80%; height: 80%; border: 2px solid black">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveObject('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        onclick="deleteObjectImage('{{ user.get_username }}')">{% csrf_token %}Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW OBJECT -->
+
+<!-- MODALE NEW LOCATION -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewLocation">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New location</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewLocation">Select robot:</label><select name="robot" id="newLocationSelectRobot">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <br>
+                <small id="newLocationErrorSelectRobot" style="color: red"></small>
+                <br><br>
+                <label>Name:</label>
+                <input type="text" id="newLocationName">
+                <br>
+                <small id="newLocationErrorName" style="color: red"></small>
+                <br><br>
+                <button class="btn btn-primary" id="btnTakePositionLocation" onclick="takePosition('{{ user.get_username }}')">{% csrf_token %}Take
+                    position
+                </button>
+                <br>
+                <small style="color: red;" id="errorPosition"></small>
+                <br><br>
+                <div class="switch_box box_1">
+                    <input type="checkbox" id="checkboxSharedNewLocation" class="switch_1">Shared
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveLocation('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW LOCATION -->
+
+<!-- MODALE NEW ACTION -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewAction">Select robot:</label><select name="robot" id="newActionSelectRobot">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <br>
+                <small id="newActionErrorSelectRobot" style="color: red"></small>
+                <br><br>
+                <label>Name:</label>
+                <input type="text" id="newActionName">
+                <br>
+                <small id="newActionErrorName" style="color: red"></small>
+                <br><br>
+                <button class="btn btn-primary" id="btnTakePositionAction" onclick="takePositionAction('{{ user.get_username }}')">{% csrf_token %}Take
+                    point
+                </button>
+                <br>
+                <small style="color: red;" id="errorPosition"></small>
+                <br><br>
+                <div class="switch_box box_1">
+                    <input type="checkbox" id="checkboxSharedNewAction" class="switch_1">Shared
+                </div>
+            </div>
+            <div class="card-body contacts_body card_body_action">
+                <ul class="contacts action_list_point">
+
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveAction('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW ACTION -->
+
+
+</body>
+<script src="../../static/prova/js/jquery.js"></script>
+<script src="../../static/prova/js/popper.js"></script>
+<script src="../../static/prova/js/bootstrap.js"></script>
+<script src="../../static/prova/js/chat.js"></script>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="../../static/prova/css/bootstrap.css">
+    <link rel="stylesheet" href="../../static/prova/css/fontawesome.css">
+    <link rel="stylesheet" href="../../static/prova/css/task.css">
+    <link rel="stylesheet" href="../../static/prova/css/jquery.css">
+    <link rel="stylesheet" href="../../static/prova/css/material_icon.css">
+
+    <link rel="shortcut icon" href="../../static/prova/images/brain.png"/>
+
+    <script src="../../static/prova/js/jquery.js"></script>
+    <script src="../../static/prova/js/popper.js"></script>
+    <script src="../../static/prova/js/bootstrap.js"></script>
+    <script src="../../static/prova/js/jquery-ui.js"></script>
+    <script src="../../static/prova/js/pluralize.js"></script>
+    <script src="../../static/prova/js/chat.js"></script>
+
+
+    <title>CAPIRCI</title>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a href="/"><i class="fas fa-arrow-circle-left fa-2x" style="color: white;"></i></a>
+    <a class="navbar-brand" href="/" style="margin-left: 20px"><i class="fas fa-home"></i> | CAPIRCI</a>
+    <div class="" style="margin-left: 68vw">
+        <a class="navbar-brand" id="dropdownMenuUser">Welcome
+            <i id="username">{{ user.get_username }}</i><span class="caret"></span></a>
+    </div>
+</nav>
+<p class="d-none" id="taskName">{{ taskName }}</p>
+{% csrf_token %}
+
+
+<div class="row">
+    <div class="column column1">
+        <div class="chat card_utilities row" id="card_utilities">
+            <div class="card contacts_card">
+                <!--<div class="card-header header_utiities"></div>-->
+                <div class="card-body contacts_body">
+                    <div class="tab column">
+                        <button class="tablinks" id="tabTasks" onclick="openUtils(event, 'Tasks')">Tasks</button>
+                        <button class="tablinks" id="tabSupervision" onclick="openUtils(event, 'Controls')">Controls</button>
+                        <button class="tablinks" id="tabEvents" onclick="openUtils(event, 'Events')">Events</button>
+                        <button class="tablinks" id="tabMotion" onclick="openUtils(event, 'Actions')">Actions</button>
+                        <button class="tablinks" id="tabObjects" onclick="openUtils(event, 'Objects')">Objects</button>
+                        <button class="tablinks" id="tabLocations" onclick="openUtils(event, 'Locations')">Locations</button>
+                    </div>
+
+                    <div class="column col_blocchi">
+                        <div class="user_info" id="task_building">
+                            <span>Create your task </span>
+                            <br>
+                            <span>by dragging the blocks</span>
+                            <br>
+                            <span>in the project area</span>
+                        </div>
+
+                        <div id="Actions" class="tabcontent">
+                            <p></p>
+
+                            <div id="pick" class="act drag ui-draggable ui-draggable-handle library" data-accept=".obj"
+                                 data-toggle="popover" data-content="This action tells the robot to take an object." data-placement="right">
+                                Pick
+                                <div class="drop_pick_obj"><p class="drop_obj">Drop here an object</p></div>
+                            </div>
+
+                            <div id="place" class="act drag ui-draggable ui-draggable-handle library" data-accept=".loc"
+                                 data-toggle="popover" data-content="This action tells the robot to release an object." data-placement="right">
+                                Place
+                                <div class="drop_pick_obj"><p class="drop_obj">Drop here a location</p></div>
+                            </div>
+
+                            <div id="action_list"></div>
+
+                        </div>
+
+                        <div id="Controls" class="tabcontent">
+                            <p></p>
+                            <div id="event_list">
+                                <div id="for" class="repeat drag ui-draggable ui-draggable-handle library" data-accept=".act, .repeat"
+                                     data-toggle="popover"
+                                     data-content="This instruction performs an actions sequence exactly the specified number of times."
+                                     data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th>Repeat for</th>
+                                            <th><input type="number" id="qty_input" class="form-control form-control-sm small" value="1" min="1"></th>
+                                            <th>times</th>
+                                        </tr>
+                                    </table>
+                                    <div class="drop_motion margin-style"><p class="drop_act">Drop here actions or controls</p></div>
+                                </div>
+                                <div id="while" class="repeat drag ui-draggable ui-draggable-handle library"
+                                     data-accept=".act, .repeat" data-toggle="popover" data-container="body"
+                                     data-content="This instruction repeatedly performs an action sequence." data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th>Loop</th>
+                                        </tr>
+                                    </table>
+                                    <div class="drop_motion margin-style"><p class="drop_act">Drop here actions or controls</p></div>
+                                </div>
+
+
+                                <div id="if" class="repeat ifCondition drag ui-draggable ui-draggable-handle library"
+                                     data-toggle="popover" data-content="This instruction performs an action sequence if a certain event occurs."
+                                     data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th class="add_padding">When</th>
+                                            <th>
+                                                <div class="drop_event" data-accept=".event"><p class="drop_act">Drop here an event</p></div>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                    <div class="drop_motion margin-style" data-accept=".act, .repeat"><p class="drop_act">Drop here actions or
+                                        controls</p></div>
+                                </div>
+
+                                <!--
+                                <div id="if-else" class="repeat ifCondition drag ui-draggable ui-draggable-handle library" data-toggle="popover"
+                                     data-content="This instruction performs an action sequence if a certain event occurs, otherwise it performs another set of actions."
+                                     data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th class="add_padding">When</th>
+                                            <th>
+                                                <div class="drop_event" data-accept=".event"><p class="drop_act">Drop here an event</p></div>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <div class="drop_motion margin-style" data-accept=".act, .repeat"><p class="drop_act">Drop here
+                                                    actions or
+                                                    controls</p></div>
+                                            </th>
+                                        </tr>
+                                        <tr class="raw_left">
+                                            <th>Otherwise</th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <div class="drop_motion margin-style" data-accept=".act, .repeat"><p class="drop_act">Drop here
+                                                    actions or
+                                                    controls</p></div>
+                                            </th>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                                -->
+
+                                <div id="stop_when" class="repeat ifCondition drag ui-draggable ui-draggable-handle library" data-toggle="popover"
+                                     data-content="This instruction stops the actions sequence when a specific event occurs." data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th class="add_padding">Stop when</th>
+                                            <th>
+                                                <div class="drop_event" data-accept=".event"><p class="drop_act">Drop here an event</p></div>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                    <div class="drop_motion margin-style" data-accept=".act, .repeat"><p class="drop_act">Drop here actions or
+                                        controls</p></div>
+                                </div>
+
+                                <div id="do_when" class="repeat ifCondition drag ui-draggable ui-draggable-handle library"
+                                     data-toggle="popover"
+                                     data-content="This instruction repeatedly performs an action sequence until a certain event occurs."
+                                     data-placement="right">
+                                    <table style="width:100%">
+                                        <tr class="raw_left">
+                                            <th class="add_padding">Do when</th>
+                                            <th>
+                                                <div class="drop_event" data-accept=".event"><p class="drop_act">Drop here an event</p></div>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                    <div class="drop_motion margin-style" data-accept=".act, .repeat"><p class="drop_act">Drop here actions or
+                                        controls</p></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div id="Objects" class="tabcontent">
+                            <!--<h3 class="text_dark">Objects</h3>-->
+                            <p></p>
+
+                            <div id="object_list"></div>
+
+                        </div>
+
+                        <div id="Locations" class="tabcontent">
+                            <!--<h3 class="text_dark">Objects</h3>-->
+                            <p></p>
+
+                            <div id="location_list"></div>
+
+                        </div>
+
+                        <div id="Events" class="tabcontent">
+                            <!--<h3 class="text_dark">Events</h3>-->
+                            <p></p>
+                            <div id="exist" class="event drag ui-draggable ui-draggable-handle library" data-accept=".obj"
+                                 data-toggle="popover" data-placement="right"
+                                 data-content="This event represents the recognition of a specific object.">
+                                <table style="width:100%">
+                                    <tr class="raw_left">
+                                        <th>Find</th>
+                                        <th>
+                                            <div class="drop_pick_obj"><p class="drop_obj">Drop here an object</p></div>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="sensor" class="event drag ui-draggable ui-draggable-handle library" data-accept=".obj"
+                                 data-toggle="popover" data-placement="right"
+                                 data-content="This event represents the detection of a signal coming from a generic sensor.">
+                                <table style="width:100%">
+                                    <tr class="raw_left">
+                                        <th>Sensor signal</th>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div id="detect" class="event drag ui-draggable ui-draggable-handle library" data-accept=".obj"
+                                 data-toggle="popover" data-placement="right"
+                                 data-content="This event represents the detection of the presence of a generic object.">
+                                <table style="width:100%">
+                                    <tr class="raw_left">
+                                        <th>Detect an object</th>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </div>
+
+                        <div id="Tasks" class="tabcontent">
+                            <!--<h3 class="text_dark">Tasks</h3>-->
+                            <p id="messaggio_tasks"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer footer_utilities">
+                </div>
+            </div>
+        </div>
+        <div class="chat card_utilities row" id="card_error">
+            <div class="card contacts_card">
+                <p id="indications_tasks" class="indications d-none">These blocks represent existing tasks that you can reuse in the new program.</p>
+                <p id="indications_controls" class="indications d-none">Some of these blocks allow you to write tasks that perform
+                    actions repeatedly, others to perform different actions depending on the occurrence of an event.
+                    Remember, drag only other Controls or Actions into Control blocks.</p>
+                <p id="indications_events" class="indications d-none">These blocks represent the conditions that can be used to
+                    define controls. Click them to see more!</p>
+                <p id="indications_actions" class="indications d-none">These blocks represent the actions that the robot can execute on objects.
+                    Remember, drag only one object at a time into Actions! The robot has only one arm!</p>
+                <p id="indications_objects" class="indications d-none">These blocks represent the objects that the robot can manipulate.
+                    Remember that you can drop objects only on Action and Event blocks.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column column2">
+        <div class="chat card_paper" id="chat_robot">
+            <div class="card">
+                <div class="card-header msg_head">
+                    <div class="user_info" style="float: right">
+                        <span id="title">Create Robot task: {{ taskName }}</span>
+                        <button id="btn-save">{% csrf_token %}<i class="material-icons">save</i></button>
+                        <button id="btn-reload" onclick="location.reload()"><i class="material-icons">refresh</i>
+                        </button>
+                    </div>
+
+                    <!-- BEGIN MODAL -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Robot configuration</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="ip-name" class="col-form-label">IP:</label>
+                                            <input type="text" class="form-control" id="ip-name" value="169.254.165.133">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="port-name" class="col-form-label">Port:</label>
+                                            <input type="text" class="form-control" id="port-name" value="5007">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END MODAL -->
+
+                </div>
+
+                <div class="card-body msg_card_body ui-draggable ui-sortable" id="droppable">
+                    <div class="" id="task_building_area">
+                        <span>Project area</span>
+                    </div>
+                    {% load static %}
+
+                </div>
+                <div class="card-footer footer_graphic">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE SELECT ROBOT NEW OBJECT -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalSelectRobotNewObject">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select robot to add new object</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewObject">Select robot:</label><select name="robot" id="SelectRobotNewObject">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <label id="errorSelectRobotNewObject" style="color: red;"></label>
+                <br>
+                <label>Object name:</label>
+                <input type="text" id="SelectRobotObjectName"><br>
+                <label id="errorSelectRobotObjectName" style="color: red;"></label>
+                <br>
+                <label>Object keywords:</label><br>
+                <div class="tags-input" data-name="tags-input"></div>
+                <br>
+                <small>(Object name and its plural we'll be added automatically)</small>
+                <br>
+                <label id="errorSelectRobotObjectKeywords" style="color: red;"></label>
+                <br>
+                <label for="newObjectForceRange">Force intensity:</label>
+                <input type="range" class="custom-range" min="1" max="3" step="1" value="2" id="newObjectForceRange">
+                <br>
+                <small>Weak&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Medium&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Strong</small>
+                <br><br>
+                <button class="btn btn-primary" id="takePositionObjectButton" onclick="takePositionObject('{{ user.get_username }}')">{% csrf_token %}Define
+                    approach
+                </button>
+                <br><small style="color: red;" id="errorPositionApproachNewObject"></small>
+                <br><br>
+                <div class="switch_box box_1">
+                    <input id="checkboxSelectRobotNewObject" type="checkbox" class="switch_1">&nbsp;&nbsp;Shared
+                </div>
+                <br>
+                <small>(If "Shared", name and its keywords must be unique in all the system, not only for your profile)</small>
+            </div>
+            <div class="modal-footer">
+                <button id="SelectRobotNext" type="button" class="btn btn-primary" onclick="openModalNewObject('{{ user.get_username }}')">Next
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE SELECT ROBOT NEW OBJECT -->
+
+<!-- MODALE NEW OBJECT -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewObject">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New object</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="deleteObjectImage('{{ user.get_username }}')">
+                    {% csrf_token %}<span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary" onclick="takeShot('{{ user.get_username }}')">Take shot</button>
+                <label id="spinnerNewObject"></label>
+                <img id="newObjectImg" src="../../static/prova/images/brain.png"
+                     style="opacity: 0.3; width: 80%; height: 80%; border: 2px solid black">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveObject('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        onclick="deleteObjectImage('{{ user.get_username }}')">{% csrf_token %}Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW OBJECT -->
+
+<!-- MODALE OBJECT CREATO CON SUCCESSO -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewObjectConfirm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Operation details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="getObjectList('{{ user.get_username }}')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>Object created succesfully</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getObjectList('{{ user.get_username }}')">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE OBJECT CREATO CON SUCCESSO -->
+
+<!-- MODALE NEW LOCATION -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewLocation">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New location</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewLocation">Select robot:</label><select name="robot" id="newLocationSelectRobot">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <br>
+                <small id="newLocationErrorSelectRobot" style="color: red"></small>
+                <br><br>
+                <label>Name:</label>
+                <input type="text" id="newLocationName">
+                <br>
+                <small id="newLocationErrorName" style="color: red"></small>
+                <br><br>
+                <button class="btn btn-primary" id="btnTakePositionLocation" onclick="takePosition('{{ user.get_username }}')">{% csrf_token %}Take
+                    position
+                </button>
+                <br>
+                <small style="color: red;" id="errorPositionLocation"></small>
+                <br><br>
+                <div class="switch_box box_1">
+                    <input type="checkbox" id="checkboxSharedNewLocation" class="switch_1">Shared
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveLocation('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW LOCATION -->
+
+<!-- MODALE LOCATION MODIFICATA CON SUCCESSO -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewLocationConfirm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Operation details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="getLocationList('{{ user.get_username }}')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>Location created succesfully</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getLocationList('{{ user.get_username }}')">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE LOCATION MODIFICATA CON SUCCESSO -->
+
+<!-- MODALE LIBRERIA NON TROVATA -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLibrariesNotFound">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Elements not found</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="librariesNotFound"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE LIBRERIA NON TROVATA -->
+
+<!-- MODALE NEW ACTION -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewAction">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New action</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="SelectRobotNewAction">Select robot:</label><select name="robot" id="newActionSelectRobot">
+                <option disabled selected value hidden>Select robot ...</option>
+            </select>
+                <br>
+                <small id="newActionErrorSelectRobot" style="color: red"></small>
+                <br><br>
+                <label>Name:</label>
+                <input type="text" id="newActionName">
+                <br>
+                <small id="newActionErrorName" style="color: red"></small>
+                <br><br>
+                <button class="btn btn-primary" id="btnTakePositionAction" onclick="takePositionAction('{{ user.get_username }}')">{% csrf_token %}Take
+                    point
+                </button>
+                <br>
+                <small style="color: red;" id="errorPosition"></small>
+                <br><br>
+                <div class="switch_box box_1">
+                    <input type="checkbox" id="checkboxSharedNewAction" class="switch_1">Shared
+                </div>
+            </div>
+            <div class="card-body contacts_body card_body_action">
+                <ul class="contacts action_list_point">
+
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="saveAction('{{ user.get_username }}')">{% csrf_token %}Save
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW ACTION -->
+
+<!-- MODALE NEW ACTION CREATO CON SUCCESSO -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNewActionConfirm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Operation details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="getActionList('{{ user.get_username }}')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>Action created succesfully</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getActionList('{{ user.get_username }}')">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE NEW ACTION CREATO CON SUCCESSO -->
+
+<!-- MODALE TASK MODIFICATO CON SUCCESSO -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalModifyTaskConfirm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Operation details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="window.location.href = '/';">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>Task saved succesfully</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href = '/'">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODALE TASK MODIFICATO CON SUCCESSO -->
+
+</body>
+<script src="../../static/prova/js/parsing_xml_to_graphic.js"></script>
+<script src="../../static/prova/js/task.js"></script>
+
+</html>
