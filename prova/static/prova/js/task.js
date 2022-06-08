@@ -21,7 +21,6 @@ function getTaskFromName(nameTask) {
         },
         success: function (result) {
             let json = JSON.parse(result);
-
             let xml_file = json.file;
             if (json.file !== 'new') {
                 let mode = json.mode;

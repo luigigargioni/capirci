@@ -1,5 +1,7 @@
 # capirci
 
+poetry run python manage.py runserver
+
 Procedura installazione CAPIRCI:
 
 1) Installare Python 3.7.4-64 bit: qualsiasi versione del filone 3.7.x dovrebbe andare bene, ma la 3.7.4 dovrebbe essere quella che ho usato effettivamente. Usare le impostazioni d'installazione di default, controllando che venga aggiunto il PATH alle variabili di sistema ("Add Python 3.7 to PATH")(non sempre è incluso nelle impostazioni di default) e venga installato "pip".

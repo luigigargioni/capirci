@@ -26,7 +26,7 @@ class Location:
 
 
 # Pick(Object)
-# Se trovo un dobj controllo se è un pick (dictionary) allora istanzio la classe Pick
+# Se trovo un obj controllo se è un pick (dictionary) allora istanzio la classe Pick
 class Pick:
     def __init__(self, object):
         self.object = object
@@ -85,25 +85,25 @@ class PickAndPlace:
         # CASO 1: take the obj and put it on place
         for i in range(0, len(lista)):
             print("qui leggo LISTA:", lista[i])
-            if lista[i][0] == "dobj" or lista[i][0] == "dep" or lista[i][0] == "compound":
+            if lista[i][0] == "obj" or lista[i][0] == "dep" or lista[i][0] == "compound":
                 print('TROV COMPOUND?')
                 print('TROV COMPOUND?:', lista[i], lista[i][1] - 1, tokens[lista[i][1] - 1])
                 if lista[i][0] == "compound":
                     if dictionary.pick_sinonimi.__contains__(tokens[lista[i][2] - 1]):
                         # take-ball
-                        print("ho trovato dobj or dep:", lista[i])
+                        print("ho trovato obj or dep:", lista[i])
                         self.define_direct_object2(lista, tokens, i, username)
                 else:
                     if dictionary.pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
                         # take-ball
-                        print("ho trovato dobj or dep:", lista[i])
+                        print("ho trovato obj or dep:", lista[i])
                         if self.pick == None:
                             self.define_direct_object(lista, tokens, i, username)
                         print(self.pick.object.name)
 
                 ##############
-                # dobj(place, it)  or  dobj(place, the box)
-            elif (lista[i][0] == "dobj") and (dictionary.place_sinonimi.__contains__(tokens[lista[i][1] - 1])):
+                # obj(place, it)  or  obj(place, the box)
+            elif (lista[i][0] == "obj") and (dictionary.place_sinonimi.__contains__(tokens[lista[i][1] - 1])):
                 print('Place=Place()')
                 object = tokens[lista[i][2] - 1]
                 print("word da cercare", object)
