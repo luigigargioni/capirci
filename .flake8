@@ -1,2 +1,7 @@
 [flake8]
 max-line-length = 130
+exclude =
+    **/site-packages/**/*.py
+    .vscode/*.py
+    .venv/**/*.py
+    prova/pybcapclient/*.py
