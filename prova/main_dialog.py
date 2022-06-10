@@ -2,7 +2,7 @@ from nltk import word_tokenize, pos_tag
 import prova.relation_states as relation_states
 from .XML_utilities import *
 from .models import *
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from .dictionary import *
 from word2number import w2n
 import prova.dictionary as dictionary
