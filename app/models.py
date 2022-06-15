@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.db.models import CharField, Model
+from django.db.models import CharField
 from django_mysql.models import ListCharField
 from django.utils.timezone import now
 

@@ -324,13 +324,3 @@ def main_dialog(text_to_parse, username):
             pickle.dump(pickPlace, output, pickle.HIGHEST_PROTOCOL)
 
         return result, end, card
-
-
-def readcontent(fname):
-    file_content = open(fname, 'r').read()
-    return file_content
-
-
-def deletecontent(fname):
-    with open(fname, "w"):
-        pass

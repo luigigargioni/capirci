@@ -1,11 +1,11 @@
 import xml.etree.ElementTree as ET
 import pickle
-from .dictionary import *
+from .dictionary import all_sinonimi
 import os
 
 
 def readcontent(fname):
-    file_content = open(fname, 'r').read()
+    file_content = open(fname, "r").read()
     return file_content
 
 
@@ -32,27 +32,27 @@ def add_external_tag_XML(fileName, newExtTag, newExtTagText):
     for child in root:
         # solo figli diretti
         tag = child.tag
-        if (tag != 'program'):
+        if tag != "program":
             children.append(child)
 
     iterator(root, False)
 
     c = ET.Element(newExtTag)
 
-    if (newExtTag == 'repeat'):
-        c.set('times', str(newExtTagText))
+    if newExtTag == "repeat":
+        c.set("times", str(newExtTagText))
     root.insert(0, c)
 
     repeat = root.find(newExtTag)
 
     for i in range(0, len(children)):
         tag = children[i].tag
-        if (tag != 'program'):
+        if tag != "program":
             repeat.insert(i, children[i])
             i = i + 1
 
     ET.dump(root)
-    mydata = ET.tostring(root, encoding='unicode')
+    mydata = ET.tostring(root, encoding="unicode")
     myfile = open(fileName + ".xml", "w")
     myfile.write(mydata)
 
@@ -62,31 +62,35 @@ def create_XML_program(fileName, username):
     task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
     program_name_xml = str(username) + "_" + readcontent(fileName) + ".xml"
 
-    data = ET.Element('program')
-    pick = ET.SubElement(data, 'pick')
-    place = ET.SubElement(data, 'place')
+    data = ET.Element("program")
+    pick = ET.SubElement(data, "pick")
+    place = ET.SubElement(data, "place")
     # attributo name
     # pick.set('name', 'pick1')
     # place.set('name', 'place1')
 
     if os.path.isfile(task_name_pkl):
-        with open(task_name_pkl, 'rb') as input:
+        with open(task_name_pkl, "rb") as input:
             pick_place_data = pickle.load(input)
             pick_data = pick_place_data.pick
             place_data = pick_place_data.place
 
-    pick.set('adj', pick_data.object.adjective)
+    pick.set("adj", pick_data.object.adjective)
     card = pick_data.object.cardinality
-    if card == '1' or (not card.isnumeric() and all_sinonimi.__contains__(card)) or card == '0':
-        card = ''
+    if (
+        card == "1"
+        or (not card.isnumeric() and all_sinonimi.__contains__(card))
+        or card == "0"
+    ):
+        card = ""
 
-    pick.set('card', card)
-    place.set('adj', place_data.location.adjective)
-    place.set('card', place_data.location.cardinality)
+    pick.set("card", card)
+    place.set("adj", place_data.location.adjective)
+    place.set("card", place_data.location.cardinality)
 
     pick.text = pick_data.object.name
     place.text = place_data.location.name
-    mydata = ET.tostring(data, encoding='unicode')
+    mydata = ET.tostring(data, encoding="unicode")
     myfile = open(program_name_xml, "w")
     myfile.write(mydata)
 
@@ -96,9 +100,9 @@ def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
     root = ET.parse(fileName + ".xml").getroot()
     c = ET.Element(newExtTag)
 
-    if newExtTagType == 'obj':
-        c.set('obj', newExtTagText)
-    c.set('type', newExtTagType)
+    if newExtTagType == "obj":
+        c.set("obj", newExtTagText)
+    c.set("type", newExtTagType)
     root.insert(0, c)
 
     children = []
@@ -106,7 +110,7 @@ def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
     for child in root:
         # solo figli diretti
         tag = child.tag
-        if tag != 'program' and tag != newExtTag:
+        if tag != "program" and tag != newExtTag:
             children.append(child)
             root.remove(child)
 
@@ -114,11 +118,11 @@ def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
 
     for i in range(0, len(children)):
         tag = children[i].tag
-        if tag != 'program' and tag != newExtTag:
+        if tag != "program" and tag != newExtTag:
             event.insert(i, children[i])
             i = i + 1
 
     ET.dump(root)
-    mydata = ET.tostring(root, encoding='unicode')
+    mydata = ET.tostring(root, encoding="unicode")
     myfile = open(fileName + ".xml", "w")
     myfile.write(mydata)

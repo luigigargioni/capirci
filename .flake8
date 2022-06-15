@@ -1,5 +1,8 @@
 [flake8]
-max-line-length = 130
+max-line-length = 150
+ignore = 
+    E203 # Whitespace before ':'
+    W503 # line break before binary operator
 exclude =
     **/site-packages/**/*.py
     .vscode/*.py

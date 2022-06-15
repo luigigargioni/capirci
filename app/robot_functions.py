@@ -1,7 +1,6 @@
 from numpy import pi
 import math
-import app.pybcapclient.bcapclient as bcapclient
-from app.pybcapclient.bcapclient import BCAPClient
+from pybcapclient.bcapclient import BCAPClient
 import win32com.client
 from PIL import Image
 import io
@@ -22,7 +21,9 @@ def polar_to_robot_coordinates(angle, robot_x, robot_y, module=CAMERA_ROBOT_DIST
     return robot_x + offset_x, robot_y + offset_y
 
 
-def pixels_to_cartesian(img_x, img_y, width=1920, height=1080):  # per coordinate di opencv, non numpy
+def pixels_to_cartesian(
+    img_x, img_y, width=1920, height=1080
+):  # per coordinate di opencv, non numpy
     cartesian_x = img_x - width / 2.0
     cartesian_y = -img_y + height / 2.0
     return cartesian_x, cartesian_y
@@ -32,43 +33,67 @@ def find_polar_coordinates(angle, camera_x, camera_y):
     (x, y) = pixels_to_cartesian(camera_x, camera_y)
 
     if np.absolute(x) > math.ceil(PIX_MM_RATIO):
-        L2 = math.sqrt(x ** 2 + y ** 2) / PIX_MM_RATIO
+        L2 = math.sqrt(x**2 + y**2) / PIX_MM_RATIO
 
         alpha2 = math.atan2(y, x) * (180.0 / pi)
 
         if x > 0 and y < 0:
             alpha3 = 90 - np.absolute(alpha2)
 
-            L3 = math.sqrt(CAMERA_ROBOT_DISTANCE ** 2 + L2 ** 2 - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3)))
+            L3 = math.sqrt(
+                CAMERA_ROBOT_DISTANCE**2
+                + L2**2
+                - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3))
+            )
 
-            alpha4 = math.degrees(math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3)))))
+            alpha4 = math.degrees(
+                math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3))))
+            )
 
             alpha5 = angle + alpha4
 
         if x > 0 and y >= 0:
             alpha3 = 90 + alpha2
 
-            L3 = math.sqrt(CAMERA_ROBOT_DISTANCE ** 2 + L2 ** 2 - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3)))
+            L3 = math.sqrt(
+                CAMERA_ROBOT_DISTANCE**2
+                + L2**2
+                - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3))
+            )
 
-            alpha4 = math.degrees(math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3)))))
+            alpha4 = math.degrees(
+                math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3))))
+            )
 
             alpha5 = angle + alpha4
 
         if x < 0 and y >= 0:
             alpha3 = 360 - (np.absolute(alpha2) + 90)
 
-            L3 = math.sqrt(CAMERA_ROBOT_DISTANCE ** 2 + L2 ** 2 - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3)))
+            L3 = math.sqrt(
+                CAMERA_ROBOT_DISTANCE**2
+                + L2**2
+                - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3))
+            )
 
-            alpha4 = math.degrees(math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3)))))
+            alpha4 = math.degrees(
+                math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3))))
+            )
 
             alpha5 = angle - alpha4
 
         if x < 0 and y < 0:
             alpha3 = np.absolute(alpha2 + 90)
 
-            L3 = math.sqrt(CAMERA_ROBOT_DISTANCE ** 2 + L2 ** 2 - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3)))
+            L3 = math.sqrt(
+                CAMERA_ROBOT_DISTANCE**2
+                + L2**2
+                - 2 * L2 * CAMERA_ROBOT_DISTANCE * math.cos(math.radians(alpha3))
+            )
 
-            alpha4 = math.degrees(math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3)))))
+            alpha4 = math.degrees(
+                math.asin((float(L2) / L3) * (math.sin(math.radians(alpha3))))
+            )
 
             alpha5 = angle - alpha4
 
@@ -106,12 +131,12 @@ def find_orientation(contour, robot_angle):
 
 
 def connect(host, port, timeout, provider="CaoProv.DENSO.VRC"):
-    client = bcapclient.BCAPClient(host, port, timeout)
+    client = BCAPClient(host, port, timeout)
     client.service_start("")
     Name = ""
     Provider = provider
-    Machine = ("localhost")
-    Option = ("")
+    Machine = "localhost"
+    Option = ""
     hCtrl = client.controller_connect(Name, Provider, Machine, Option)
     hRobot = client.controller_getrobot(hCtrl, "Arm0", "")
     client.robot_execute(hRobot, "TakeArm", [0, 0])
@@ -136,7 +161,9 @@ def robot_getvar(client, hRobot, name):
 
 def take_img(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
     eng = win32com.client.Dispatch("CAO.CaoEngine")
-    ctrl = eng.Workspaces(0).AddController("", "CaoProv.Canon.N10-W02", "", "Server=" + str(cameraip) + ", Timeout=5000")
+    ctrl = eng.Workspaces(0).AddController(
+        "", "CaoProv.Canon.N10-W02", "", "Server=" + str(cameraip) + ", Timeout=5000"
+    )
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:
         ctrl.Execute("OneShotWhiteBalance")
