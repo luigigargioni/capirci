@@ -1,4 +1,4 @@
-import prova.dictionary as dictionary
+import app.dictionary as dictionary
 import pickle
 import os
 from word2number import w2n

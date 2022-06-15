@@ -1,7 +1,7 @@
 from numpy import pi
 import math
-import prova.pybcapclient.bcapclient as bcapclient
-from prova.pybcapclient.bcapclient import BCAPClient
+import app.pybcapclient.bcapclient as bcapclient
+from app.pybcapclient.bcapclient import BCAPClient
 import win32com.client
 from PIL import Image
 import io

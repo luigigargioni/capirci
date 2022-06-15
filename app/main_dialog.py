@@ -1,11 +1,11 @@
 from nltk import word_tokenize, pos_tag
-import prova.relation_states as relation_states
+import app.relation_states as relation_states
 from .XML_utilities import *
 from .models import *
 from django.contrib.auth.models import User
 from .dictionary import *
 from word2number import w2n
-import prova.dictionary as dictionary
+import app.dictionary as dictionary
 import xml.etree.ElementTree as ET
 from django.db.models import Q
 from stanza import Pipeline

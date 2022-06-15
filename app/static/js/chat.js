@@ -1,5 +1,5 @@
-avatarMe = "../../static/prova/images/User_chat.png";
-avatarYou = "../../static/prova/images/Robot_chat.png";
+avatarMe = "../../static/images/User_chat.png";
+avatarYou = "../../static/images/Robot_chat.png";
 let audio = false;
 let recording = false;
 let speechRecognizer;
@@ -1001,7 +1001,7 @@ function takeShot(getUsername) {
 
         success: function () {
             $('#newObjectImg').css('opacity', '1');
-            $('#newObjectImg').attr("src", "../../static/prova/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
+            $('#newObjectImg').attr("src", "../../static/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
             $('#spinnerNewObject').html("");
         },
 

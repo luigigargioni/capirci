@@ -928,7 +928,7 @@ function getObjectsList($this) {
                     });
                     var object_image = pkToUsername.toString() + "_" + object_name.toString() + ".png";
                     dest.append('<div class="column column_img" data-toggle="tooltip" data-placement="bottom" title="' + object_name + '"> ' +
-                        '<img src="../../static/prova/images/objects/' + object_image + '" name="' + object_name + '" ' +
+                        '<img src="../../static/images/objects/' + object_image + '" name="' + object_name + '" ' +
                         'alt="' + object_name + '" onclick="objectDetails(this, \'' + usernameVal + '\');" data-toggle="modal" ' +
                         'data-target="#modalObjectDetails" heightObject="' + object_height + '" owner="' + pkToUsername + '" keywords="' + object_keywords + '" shared="' + object_shared + '" force="' + object_force + '"></div>');
 
@@ -2228,7 +2228,7 @@ function takeShot(getUsername) {
             } else {
                 $('#newObjectImg').css('opacity', '1');
                 $("#newObjectImg").css('padding','');
-                $('#newObjectImg').attr("src", "../../static/prova/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
+                $('#newObjectImg').attr("src", "../../static/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
                 $('#spinnerNewObject').html("");
             }
 
@@ -2564,7 +2564,7 @@ function useCamera() {
         $('#errorQRCodeReturn').html("<i class='fas fa-check-circle'></i> Information acquired");
         $('#errorQRCodeReturn').css('color','green');
         scanner.stop();
-        $("previewVideoQr").attr('poster','../../static/prova/images/camera.png');
+        $("previewVideoQr").attr('poster','../../static/images/camera.png');
     });
     Instascan.Camera.getCameras().then(function (cameras) {
         if (cameras.length > 0) {
@@ -3318,5 +3318,5 @@ function openModalNewMyRobot() {
 function openModalSearchQR() {
     $('#errorQRCodeReturn').html('');
     $('#descriptionSearchQr').html('');
-    $('#qrCodeImg').attr('src', '../../static/prova/images/image.png');
+    $('#qrCodeImg').attr('src', '../../static/images/image.png');
 }

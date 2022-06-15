@@ -17,7 +17,7 @@ import win32com.client
 import numpy as np
 from django.views.decorators.cache import never_cache
 
-from prova.robot_functions import *
+from app.robot_functions import *
 
 # Create your views here.
 
@@ -26,19 +26,19 @@ from prova.robot_functions import *
 @never_cache
 @login_required(login_url='/accounts/login/')
 def home(request):
-    template_name = 'prova/home.html'
+    template_name = 'home.html'
     return render(request, template_name)
 
 @never_cache
 @login_required(login_url='/accounts/login/')
 def chat(request, taskName):
-    template_name = 'prova/chat.html'
+    template_name = 'chat.html'
     return render(request, template_name, {'taskName': taskName})
 
 @never_cache
 @login_required(login_url='/accounts/login/')
 def task(request, taskName):
-    template_name = 'prova/task.html'
+    template_name = 'task.html'
     return render(request, template_name, {'taskName': taskName})
 
 
@@ -271,9 +271,9 @@ def deleteObject(request):
         user = User.objects.get(username=username)
         instance = Object.objects.filter(name=objectname).filter(owner=user.pk)
         instance.delete()
-        os.remove("prova\\static\\prova\\images\\objects\\" + username + "_" + objectname + ".png")
-        os.remove("prova\\static\\prova\\images\\objects\\" + username + "_" + objectname + "_contour.png")
-        os.remove("prova\\static\\prova\\images\\objects\\" + username + "_" + objectname + "_shape.png")
+        os.remove("app\\static\\images\\objects\\" + username + "_" + objectname + ".png")
+        os.remove("app\\static\\images\\objects\\" + username + "_" + objectname + "_contour.png")
+        os.remove("app\\static\\images\\objects\\" + username + "_" + objectname + "_shape.png")
         return HttpResponse('oki')
     else:
         return HttpResponse('ERROR')
@@ -506,7 +506,7 @@ def takeShot(request):
                               "SPEED=100")
             disconnect(client, hCtrl, hRobot)
             image = take_img(wb=True, cameraip=robot[0].cameraip)
-            cv2.imwrite("prova\\static\\prova\\images\\objects\\" + str(username) + "_" + str(object) + ".png", image)
+            cv2.imwrite("app\\static\\images\\objects\\" + str(username) + "_" + str(object) + ".png", image)
 
             shifted = cv2.pyrMeanShiftFiltering(image, 51, 71)
             gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
@@ -524,7 +524,7 @@ def takeShot(request):
 
             copy = image.copy()
             cv2.drawContours(copy, cnts, areaMaxi, (0, 0, 255), 3)
-            cv2.imwrite("prova\\static\\prova\\images\\objects\\" + str(username) + "_" + str(object) + "_contour.png",
+            cv2.imwrite("app\\static\\images\\objects\\" + str(username) + "_" + str(object) + "_contour.png",
                         copy)
 
             outline = np.zeros(image.shape, dtype="uint8")
@@ -532,7 +532,7 @@ def takeShot(request):
             cv2.drawContours(outline, cnts, areaMaxi, (255, 255, 255), -1)
             roi = outline[y:y + height, x:x + width]
             roi = cv2.copyMakeBorder(roi, 15, 15, 15, 15, cv2.BORDER_CONSTANT, value=0)
-            cv2.imwrite("prova\\static\\prova\\images\\objects\\" + str(username) + "_" + str(object) + "_shape.png",
+            cv2.imwrite("app\\static\\images\\objects\\" + str(username) + "_" + str(object) + "_shape.png",
                         roi)
 
             return HttpResponse('Ok')
@@ -887,7 +887,7 @@ def deleteImageObject(request):
     if request.method == 'POST':
         object_owner = request.POST.get('object_owner')
         object_name = request.POST.get('object_name')
-        dir = 'prova\\static\\prova\\images\\objects'
+        dir = 'app\\static\\images\\objects'
         files = os.listdir(dir)
         for file in files:
             if file.startswith(object_owner + "_" + object_name):
@@ -1352,7 +1352,7 @@ def search_object(client, hRobot, username, object_name, force, lastFind, camera
     ctrl = eng.Workspaces(0).AddController("", "CaoProv.DENSO.RC8", "", "Server=" + str(ip))
     caoRobot = ctrl.AddRobot("robot0", "")
 
-    original = cv2.imread("prova\\static\\prova\\images\\objects\\" + username + "_" + object_name + "_shape.png", cv2.IMREAD_GRAYSCALE)
+    original = cv2.imread("app\\static\\images\\objects\\" + username + "_" + object_name + "_shape.png", cv2.IMREAD_GRAYSCALE)
     (cnts, _) = cv2.findContours(original.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     areaOriginal = cv2.contourArea(cnts[0])
 

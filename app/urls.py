@@ -1,8 +1,6 @@
 from django.urls import path, include
 from . import views
 
-app_name = 'prova'
-
 urlpatterns = [
     path('', views.home, name='home'),
     path('chat/<str:taskName>/', views.chat, name='chat'),

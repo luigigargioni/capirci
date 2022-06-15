@@ -1615,7 +1615,7 @@ function takeShot(getUsername) {
 
         success: function (result) {
             $('#newObjectImg').css('opacity', '1');
-            $('#newObjectImg').attr("src", "../../static/prova/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
+            $('#newObjectImg').attr("src", "../../static/images/objects/" + username + "_" + object + "_contour.png?" + Date.now());
             $('#spinnerNewObject').html("");
         },
 

@@ -4,4 +4,4 @@ exclude =
     **/site-packages/**/*.py
     .vscode/*.py
     .venv/**/*.py
-    prova/pybcapclient/*.py
+    app/pybcapclient/*.py

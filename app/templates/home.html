@@ -3,22 +3,22 @@
 <head>
     {% load  filters %}
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../../static/prova/css/bootstrap.css">
-    <link rel="stylesheet" href="../../static/prova/css/fontawesome.css">
-    <link rel="stylesheet" href="../../static/prova/css/home.css">
-    <link rel="stylesheet" href="../../static/prova/css/bootstrap-slider.min.css">
-    <link rel="stylesheet" href="../../static/prova/css/tags.css">
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../../static/css/fontawesome.css">
+    <link rel="stylesheet" href="../../static/css/home.css">
+    <link rel="stylesheet" href="../../static/css/bootstrap-slider.min.css">
+    <link rel="stylesheet" href="../../static/css/tags.css">
 
-    <link rel="shortcut icon" href="../../static/prova/images/brain.png"/>
+    <link rel="shortcut icon" href="../../static/images/brain.png"/>
 
-    <script src="../../static/prova/js/jquery.js"></script>
-    <script src="../../static/prova/js/popper.js"></script>
-    <script src="../../static/prova/js/bootstrap.js"></script>
-    <script src="../../static/prova/js/qrcodeMaker.js"></script>
-    <script src="../../static/prova/js/instascan.js"></script>
-    <script src="../../static/prova/js/pluralize.js"></script>
-    <script src="../../static/prova/js/home.js"></script>
-    <script src="../../static/prova/js/bootstrap-slider.min.js"></script>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/popper.js"></script>
+    <script src="../../static/js/bootstrap.js"></script>
+    <script src="../../static/js/qrcodeMaker.js"></script>
+    <script src="../../static/js/instascan.js"></script>
+    <script src="../../static/js/pluralize.js"></script>
+    <script src="../../static/js/home.js"></script>
+    <script src="../../static/js/bootstrap-slider.min.js"></script>
 
 
     <title>CAPIRCI</title>
@@ -86,7 +86,7 @@
     <!-- CONTAINER SCHEDE PROGRAMMING -->
     <div id="row_programming_cards" class="col-lg-11 row justify-content-center d-none">
         <div class="card" id="card1" data-toggle="modal" data-target="#newChatModal">
-            <img class="card-img-top" src="{% static 'prova/images/Card_Chat.png' %}" alt="Card image Chat">
+            <img class="card-img-top" src="{% static 'images/Card_Chat.png' %}" alt="Card image Chat">
             <div class="card-body">
                 <h5 class="card-title">Chat</h5>
                 <p class="card-text">Build the robot program by talking<br>in a chat</p>
@@ -94,7 +94,7 @@
         </div>
 
         <div class="card" id="card2" data-toggle="modal" data-target="#newChatModal" style="height: 300px;">
-            <img class="card-img-top" src="{% static 'prova/images/Card_Graphic.png' %}" alt="Card image Graphic">
+            <img class="card-img-top" src="{% static 'images/Card_Graphic.png' %}" alt="Card image Graphic">
             <div class="card-body">
                 <h5 class="card-title">Graphic Interface</h5>
                 <p class="card-text">Build the robot program using<br>drag and drop interface</p>
@@ -107,7 +107,7 @@
     <div id="row_cards" class="col-lg-11 row justify-content-center">
         {% if request.user|has_group:"Manager" or user.is_staff %}
             <div class="card" id="card3" onclick="showUser($('#usermanagement_menu'))">
-                <img class="card-img-top" src="{% static 'prova/images/Card_UserManagement.jpg' %}" alt="Card image UserManagement">
+                <img class="card-img-top" src="{% static 'images/Card_UserManagement.jpg' %}" alt="Card image UserManagement">
                 <div class="card-body">
                     <h5 class="card-title">User management</h5>
                     <p class="card-text">Manage system user</p>
@@ -115,7 +115,7 @@
             </div>
 
             <div class="card" id="card4" onclick="showRobot($('#robotmanagement_menu'))">
-                <img class="card-img-top" src="{% static 'prova/images/Card_Robot.jpeg' %}" alt="Card image Robot">
+                <img class="card-img-top" src="{% static 'images/Card_Robot.jpeg' %}" alt="Card image Robot">
                 <div class="card-body">
                     <h5 class="card-title">Robot management</h5>
                     <p class="card-text">Manage the robots supported by the system</p>
@@ -124,7 +124,7 @@
         {% endif %}
 
         <div class="card" id="card5" onclick="showMyRobot($('#myrobot_menu'))">
-            <img class="card-img-top" src="{% static 'prova/images/Card_myRobot.jpg' %}" alt="Card image myRobot">
+            <img class="card-img-top" src="{% static 'images/Card_myRobot.jpg' %}" alt="Card image myRobot">
             <div class="card-body">
                 <h5 class="card-title">My robot</h5>
                 <p class="card-text">Associate the robot to your profile</p>
@@ -132,7 +132,7 @@
         </div>
 
         <div class="card" id="card6" onclick="selectProgramming($('#programming_menu'))">
-            <img class="card-img-top" src="{% static 'prova/images/Card_Programming.jpeg' %}" alt="Card image Programming">
+            <img class="card-img-top" src="{% static 'images/Card_Programming.jpeg' %}" alt="Card image Programming">
             <div class="card-body">
                 <h5 class="card-title">Programming</h5>
                 <p class="card-text">Create new task with Chat or Graphical interface</p>
@@ -914,7 +914,7 @@
             <div class="modal-body">
                 <button type="button" class="btn btn-primary" onclick="takeShot('{{ user.get_username }}')">Take shot</button>
                 &nbsp;<label id="spinnerNewObject"></label><br><br>
-                <img id="newObjectImg" src="../../static/prova/images/brain.png"
+                <img id="newObjectImg" src="../../static/images/brain.png"
                      style="padding: 0px 100px 0px 100px; opacity: 0.3; width: 556px; height: 314.5px; border: 2px solid black">
             </div>
             <div class="modal-footer">
@@ -1041,13 +1041,13 @@
                     <input type="file" class="custom-file-input" accept="image/x-png" id="choosenImgQr" onchange="readImgQr(this);"
                            style="float: left">{% csrf_token %}Choose file
                 </span>
-                <script src="../../static/prova/js/qrcodeReader.js"></script>
+                <script src="../../static/js/qrcodeReader.js"></script>
                 <label style="display: inline-block; margin-left: 23%; margin-right: 23%; "><i>alternately</i></label>
                 <button class="btn btn-primary" onclick="useCamera()" style="float: right">{% csrf_token %}Use camera</button>
                 <br><br>
-                <img id="qrCodeImg" src="../../static/prova/images/image.png" style="width: 45%; height: 40%; border: 2px solid black">
+                <img id="qrCodeImg" src="../../static/images/image.png" style="width: 45%; height: 40%; border: 2px solid black">
                 <video id="previewVideoQr" style="float: right; width: 45%; height: 40%; border: 2px solid black"
-                       poster="../../static/prova/images/camera.png"></video>
+                       poster="../../static/images/camera.png"></video>
                 <br><br><label>Information decoded:&nbsp;</label><i><label id="descriptionSearchQr"></label></i><br>
                 <label style="color: red" id="errorQRCodeReturn"></label>
             </div>
@@ -1645,5 +1645,5 @@
 <!-- MODALE ESECUZIONE TASK -->
 
 </body>
-<script src="../../static/prova/js/tags.js"></script>
+<script src="../../static/js/tags.js"></script>
 </html>
