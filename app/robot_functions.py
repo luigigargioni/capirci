@@ -1,6 +1,6 @@
 from numpy import pi
 import math
-from pybcapclient.bcapclient import BCAPClient
+from .pybcapclient.bcapclient import BCAPClient
 import win32com.client
 from PIL import Image
 import io
