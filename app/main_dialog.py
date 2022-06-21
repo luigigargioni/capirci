@@ -42,7 +42,11 @@ def get_tagged_sentence(sentence):
 
 
 def calcDependencies(program):
-    nlp = Pipeline('en', processors='tokenize, pos, lemma, depparse', download_method=DownloadMethod.REUSE_RESOURCES)
+    nlp = Pipeline(
+        "en",
+        processors="tokenize, pos, lemma, depparse",
+        download_method=DownloadMethod.REUSE_RESOURCES,
+    )
     doc = nlp(program)
     dependencies = []
 
@@ -70,15 +74,17 @@ def main_dialog_condition(text_to_parse, program_name):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print('TOKENS:', tokens)
-    print('DEP:', dependencies)
-    print('TAG:', tagged)
+    print("TOKENS:", tokens)
+    print("DEP:", dependencies)
+    print("TAG:", tagged)
 
     for i in range(0, len(tokens)):
         print(tokens[i])
         if all_sinonimi.__contains__(tokens[i].lower()):
-            times = 'while'
-            add_external_tag_XML(fileName=program_name, newExtTag='repeat', newExtTagText=str(times))
+            times = "while"
+            add_external_tag_XML(
+                fileName=program_name, newExtTag="repeat", newExtTagText=str(times)
+            )
             result = "ok"
             end = "2"
             return result, end
@@ -91,16 +97,18 @@ def main_dialog_condition(text_to_parse, program_name):
 
     if find == 0:
         for i in range(0, len(tagged)):
-            if tagged[i][1] == 'CD':
+            if tagged[i][1] == "CD":
                 times = tagged[i][0]
                 find = 1
                 break
     print("TIMES", str(times))
     if find == 1:
-        add_external_tag_XML(fileName=program_name, newExtTag='repeat', newExtTagText=str(times))
+        add_external_tag_XML(
+            fileName=program_name, newExtTag="repeat", newExtTagText=str(times)
+        )
         result = "ok"
     else:
-        result = 'ko'
+        result = "ko"
     end = "2"
 
     return result, end
@@ -116,30 +124,38 @@ def main_dialog_action(text_to_parse, program_name):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print('TOKENS:', tokens)
-    print('DEP:', dependencies)
-    print('TAG:', tagged)
+    print("TOKENS:", tokens)
+    print("DEP:", dependencies)
+    print("TAG:", tagged)
 
     for j in range(0, len(tokens)):
         if negative_response.__contains__(tokens[j].lower()):
-            result = 'no'
+            result = "no"
             end = "3"
             return result, end
 
     for i in range(0, len(tagged)):
-        if tagged[i][1] == "NN" or tagged[i][1] == "VB" or tagged[i][1] == "VBD" or tagged[i][1] == "VBG" or tagged[i][1] == "VBN":
+        if (
+            tagged[i][1] == "NN"
+            or tagged[i][1] == "VB"
+            or tagged[i][1] == "VBD"
+            or tagged[i][1] == "VBG"
+            or tagged[i][1] == "VBN"
+        ):
             if find == 0:
                 action = tagged[i][0]
 
-                #actionExist
+                # actionExist
                 nameExist = False
                 action_name = action
-                username = program_name.split('_')[0]
+                username = program_name.split("_")[0]
                 user = User.objects.get(username=username)
 
                 actions = Action.objects.filter(name=action_name)
                 if not actions:
-                    actions = Action.objects.filter(Q(owner=user) | Q(shared=True)).filter(name=action_name)
+                    actions = Action.objects.filter(
+                        Q(owner=user) | Q(shared=True)
+                    ).filter(name=action_name)
 
                 if actions:
                     nameExist = True
@@ -167,7 +183,7 @@ def main_dialog_action(text_to_parse, program_name):
 
         for element in root:
             print(element.tag)
-            if element.tag == 'repeat':
+            if element.tag == "repeat":
                 if repeat != "":
                     element.insert(1, r)
                     r.insert(0, c)
@@ -176,7 +192,7 @@ def main_dialog_action(text_to_parse, program_name):
                 break
 
         ET.dump(root)
-        mydata = ET.tostring(root, encoding='unicode')
+        mydata = ET.tostring(root, encoding="unicode")
         myfile = open(program_name + ".xml", "w")
         myfile.write(mydata)
         result = "ok"
@@ -199,22 +215,23 @@ def main_dialog_end(text_to_parse, program_name):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print('TOKENS:', tokens)
-    print('DEP:', dependencies)
-    print('TAG:', tagged)
+    print("TOKENS:", tokens)
+    print("DEP:", dependencies)
+    print("TAG:", tagged)
 
     for i in range(0, len(tagged)):
-        print('tagged:', tagged[i])
+        print("tagged:", tagged[i])
         if sensor.__contains__(tagged[i][0].lower()):
             word = tagged[i][0].lower()
             find = 1
             break
-    print('FIND:', find)
+    print("FIND:", find)
     if find == 0:
         for i in range(0, len(dependencies)):
             print("DDD:", tokens[dependencies[i][2] - 1])
-            if dependencies[i][0] == "obj" and findInlList(dictionary.find_sinonimi,
-                                                            tokens[dependencies[i][1] - 1]):
+            if dependencies[i][0] == "obj" and findInlList(
+                dictionary.find_sinonimi, tokens[dependencies[i][1] - 1]
+            ):
                 obj = tokens[dependencies[i][2] - 1]
                 find = 1
             if dependencies[i][0] == "amod":
@@ -227,11 +244,21 @@ def main_dialog_end(text_to_parse, program_name):
     print("WORD SENS", str(word))
     if find == 1:
         if word != "":
-            add_end_tag_XML(fileName=program_name, newExtTag='event', newExtTagText=str(word), newExtTagType='sens')
+            add_end_tag_XML(
+                fileName=program_name,
+                newExtTag="event",
+                newExtTagText=str(word),
+                newExtTagType="sens",
+            )
         else:
             if adj != "":
                 obj = adj + " " + obj
-            add_end_tag_XML(fileName=program_name, newExtTag='event', newExtTagText=str(obj), newExtTagType='obj')
+            add_end_tag_XML(
+                fileName=program_name,
+                newExtTag="event",
+                newExtTagText=str(obj),
+                newExtTagType="obj",
+            )
 
         result = "ok"
 
@@ -240,10 +267,10 @@ def main_dialog_end(text_to_parse, program_name):
             if negative_response.__contains__(tokens[j].lower()):
                 negative = 1
                 break
-        result = 'no'
+        result = "no"
 
     if negative == 0 and find == 0:
-        result = 'ko'
+        result = "ko"
     end = "4"
 
     return result, end
@@ -268,9 +295,9 @@ def main_dialog_assert(text_to_parse, program_name):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print('TOKENS:', tokens)
-    print('DEP:', dependencies)
-    print('TAG:', tagged)
+    print("TOKENS:", tokens)
+    print("DEP:", dependencies)
+    print("TAG:", tagged)
 
     for i in range(0, len(tokens)):
         if assert_response.__contains__(tokens[i].lower()):
@@ -300,15 +327,17 @@ def main_dialog_assert(text_to_parse, program_name):
 # pick place
 def main_dialog(text_to_parse, username):
     task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
-    '''Se non c'è ancora il file lo creo -> non ho ancora un pick place, quindi lo creo'''
-    '''Se ho il file ho il pickPlace() , ma è completo?'''
+    """Se non c'è ancora il file lo creo -> non ho ancora un pick place, quindi lo creo"""
+    """Se ho il file ho il pickPlace() , ma è completo?"""
 
     if os.path.isfile(task_name_pkl):
-        with open(task_name_pkl, 'rb') as input:
+        with open(task_name_pkl, "rb") as input:
             pickPlace = pickle.load(input)  # carico il contenuto
         # leggo il file, se è un pick place completo dovrei poter aggiungere un altro pick place al file
     else:
-        pickPlace = relation_states.PickAndPlace()  # creo il nuovo oggetto PickPlace perchè non ho file .pkl
+        pickPlace = (
+            relation_states.PickAndPlace()
+        )  # creo il nuovo oggetto PickPlace perchè non ho file .pkl
 
     print("I'm ready to execute the program:", text_to_parse)
     program_list = about(text_to_parse)
@@ -319,8 +348,10 @@ def main_dialog(text_to_parse, username):
         print("Dependency parser Parse:", dependencies)
         parseDependencies(dependencies, tokens)
         print("PRINT PICK PLACE", pickPlace)
-        result, end, card = pickPlace.process_dependencies(lista=dependencies, tokens=tokens, tagged=tagged, username=username)
-        with open(task_name_pkl, 'wb') as output:
+        result, end, card = pickPlace.process_dependencies(
+            lista=dependencies, tokens=tokens, tagged=tagged, username=username
+        )
+        with open(task_name_pkl, "wb") as output:
             pickle.dump(pickPlace, output, pickle.HIGHEST_PROTOCOL)
 
         return result, end, card

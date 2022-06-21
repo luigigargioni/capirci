@@ -1,14 +1,10 @@
-import app.dictionary as dictionary
-import pickle
-import os
+from .dictionary import place_sinonimi, pick_sinonimi
+from .XML_utilities import readcontent
+from pickle import load, dump, HIGHEST_PROTOCOL
+from os import path
 from word2number import w2n
 
 fileName = "current_dialogue.txt"
-
-
-def readcontent(fname):
-    file_content = open(fname, "r").read()
-    return file_content
 
 
 class Object:
@@ -25,14 +21,11 @@ class Location:
         self.adjective = adjective
 
 
-# Pick(Object)
-# Se trovo un obj controllo se è un pick (dictionary) allora istanzio la classe Pick
 class Pick:
     def __init__(self, object):
         self.object = object
 
 
-# Place(Object,Location)
 class Place:
     def __init__(self, pick, location):
         self.pick = pick
@@ -100,14 +93,16 @@ class PickAndPlace:
                     tokens[lista[i][1] - 1],
                 )
                 if lista[i][0] == "compound":
-                    if dictionary.pick_sinonimi.__contains__(tokens[lista[i][2] - 1]):
+                    if pick_sinonimi.__contains__(tokens[lista[i][2] - 1]):
                         # take-ball
-                        print("ho trovato obj or dep:", lista[i])
+                        print(
+                            "define_direct_object2 - ho trovato obj or dep:", lista[i]
+                        )
                         self.define_direct_object2(lista, tokens, i, username)
                 else:
-                    if dictionary.pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
+                    if pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
                         # take-ball
-                        print("ho trovato obj or dep:", lista[i])
+                        print("define_direct_object - ho trovato obj or dep:", lista[i])
                         if self.pick is None:
                             self.define_direct_object(lista, tokens, i, username)
                         print(self.pick.object.name)
@@ -115,7 +110,7 @@ class PickAndPlace:
                 ##############
                 # obj(place, it)  or  obj(place, the box)
             elif (lista[i][0] == "obj") and (
-                dictionary.place_sinonimi.__contains__(tokens[lista[i][1] - 1])
+                place_sinonimi.__contains__(tokens[lista[i][1] - 1])
             ):
                 print("Place=Place()")
                 object = tokens[lista[i][2] - 1]
@@ -138,9 +133,9 @@ class PickAndPlace:
         # pick_data = None
         # place_data = None
 
-        if os.path.isfile(task_name_pkl):
+        if path.isfile(task_name_pkl):
             with open(task_name_pkl, "rb") as input:
-                pick_place_data = pickle.load(input)
+                pick_place_data = load(input)
                 pick_data = pick_place_data.pick
                 place_data = pick_place_data.place
 
@@ -223,7 +218,7 @@ class PickAndPlace:
         # with open('pick.pkl', 'wb') as output:
         #    pickle.dump(self.pick, output, pickle.HIGHEST_PROTOCOL)
         with open(task_name_pkl, "wb") as output:
-            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            dump(self, output, HIGHEST_PROTOCOL)
 
         if self.pick is not None:
             print("Object to pick:", self.pick.object.name)
@@ -244,7 +239,7 @@ class PickAndPlace:
         # with open('pick.pkl', 'wb') as output:
         #    pickle.dump(self.pick, output, pickle.HIGHEST_PROTOCOL)
         with open(task_name_pkl, "wb") as output:
-            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            dump(self, output, HIGHEST_PROTOCOL)
 
         if self.pick is not None:
             print("Object to pick:", self.pick.object.name)
@@ -266,7 +261,7 @@ class PickAndPlace:
         print("LOCATION adj: ", self.place.location.adjective)
 
         with open(task_name_pkl, "wb") as output:
-            pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+            dump(self, output, HIGHEST_PROTOCOL)
 
         """ salvo place """
         # with open('place.pkl', 'wb') as output:
@@ -283,6 +278,3 @@ class PickAndPlace:
             if tagged[i][0] == word:
                 print("search in tagged", tagged[i][1])
                 return tagged[i][1]
-
-
-# devo controllare che ci sia un place per un pick

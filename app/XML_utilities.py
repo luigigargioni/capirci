@@ -1,7 +1,7 @@
-import xml.etree.ElementTree as ET
-import pickle
+from xml.etree.ElementTree import parse, Element, tostring, SubElement, dump
+from pickle import load
 from .dictionary import all_sinonimi
-import os
+from os import path
 
 
 def readcontent(fname):
@@ -25,7 +25,7 @@ def iterator(parents, nested=False):
 
 # This method add an external tag to existing XML file
 def add_external_tag_XML(fileName, newExtTag, newExtTagText):
-    root = ET.parse(fileName + ".xml").getroot()
+    root = parse(fileName + ".xml").getroot()
 
     children = []
 
@@ -37,7 +37,7 @@ def add_external_tag_XML(fileName, newExtTag, newExtTagText):
 
     iterator(root, False)
 
-    c = ET.Element(newExtTag)
+    c = Element(newExtTag)
 
     if newExtTag == "repeat":
         c.set("times", str(newExtTagText))
@@ -51,8 +51,8 @@ def add_external_tag_XML(fileName, newExtTag, newExtTagText):
             repeat.insert(i, children[i])
             i = i + 1
 
-    ET.dump(root)
-    mydata = ET.tostring(root, encoding="unicode")
+    dump(root)
+    mydata = tostring(root, encoding="unicode")
     myfile = open(fileName + ".xml", "w")
     myfile.write(mydata)
 
@@ -62,16 +62,13 @@ def create_XML_program(fileName, username):
     task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
     program_name_xml = str(username) + "_" + readcontent(fileName) + ".xml"
 
-    data = ET.Element("program")
-    pick = ET.SubElement(data, "pick")
-    place = ET.SubElement(data, "place")
-    # attributo name
-    # pick.set('name', 'pick1')
-    # place.set('name', 'place1')
+    data = Element("program")
+    pick = SubElement(data, "pick")
+    place = SubElement(data, "place")
 
-    if os.path.isfile(task_name_pkl):
+    if path.isfile(task_name_pkl):
         with open(task_name_pkl, "rb") as input:
-            pick_place_data = pickle.load(input)
+            pick_place_data = load(input)
             pick_data = pick_place_data.pick
             place_data = pick_place_data.place
 
@@ -90,15 +87,15 @@ def create_XML_program(fileName, username):
 
     pick.text = pick_data.object.name
     place.text = place_data.location.name
-    mydata = ET.tostring(data, encoding="unicode")
+    mydata = tostring(data, encoding="unicode")
     myfile = open(program_name_xml, "w")
     myfile.write(mydata)
 
 
 # This method add an end tag to existing XML file
 def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
-    root = ET.parse(fileName + ".xml").getroot()
-    c = ET.Element(newExtTag)
+    root = parse(fileName + ".xml").getroot()
+    c = Element(newExtTag)
 
     if newExtTagType == "obj":
         c.set("obj", newExtTagText)
@@ -122,7 +119,7 @@ def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
             event.insert(i, children[i])
             i = i + 1
 
-    ET.dump(root)
-    mydata = ET.tostring(root, encoding="unicode")
+    dump(root)
+    mydata = tostring(root, encoding="unicode")
     myfile = open(fileName + ".xml", "w")
     myfile.write(mydata)

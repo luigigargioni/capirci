@@ -1,7 +1,7 @@
-import os
+from os import path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "pe=ipw6q4g-2d+*7n76g70c#ps+!n=i3-d91i^l9adjh@o)8+!"
@@ -40,7 +40,7 @@ ROOT_URLCONF = "project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "app/templates")],
+        "DIRS": [path.join(BASE_DIR, "app/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -56,17 +56,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "sqlite.db"),
+        "NAME": path.join(BASE_DIR, "sqlite.db"),
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,7 +95,6 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = "/static/"
 
