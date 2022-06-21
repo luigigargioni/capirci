@@ -4,16 +4,6 @@ from .dictionary import all_sinonimi
 from os import path
 
 
-def readcontent(fname):
-    file_content = open(fname, "r").read()
-    return file_content
-
-
-def deletecontent(fname):
-    with open(fname, "w"):
-        pass
-
-
 def iterator(parents, nested=False):
     for child in reversed(parents):
         if nested:
@@ -58,9 +48,9 @@ def add_external_tag_XML(fileName, newExtTag, newExtTagText):
 
 
 # this method read info about pickPlace task from .pkl file and write corresponding tags in .xml file
-def create_XML_program(fileName, username):
-    task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
-    program_name_xml = str(username) + "_" + readcontent(fileName) + ".xml"
+def create_XML_program(taskname, username):
+    task_name_pkl = str(username) + "_" + taskname + ".pkl"
+    program_name_xml = str(username) + "_" + taskname + ".xml"
 
     data = Element("program")
     pick = SubElement(data, "pick")

@@ -1,10 +1,7 @@
 from .dictionary import place_sinonimi, pick_sinonimi
-from .XML_utilities import readcontent
 from pickle import load, dump, HIGHEST_PROTOCOL
 from os import path
 from word2number import w2n
-
-fileName = "current_dialogue.txt"
 
 
 class Object:
@@ -74,8 +71,8 @@ class PickAndPlace:
         return cardinality
 
     # define all the elements of a pick and place task
-    def process_dependencies(self, lista, tokens, tagged, username):
-        task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
+    def process_dependencies(self, lista, tokens, tagged, username, taskname):
+        task_name_pkl = str(username) + "_" + taskname + ".pkl"
         # definizione pick
         # CASO 1: take the obj and put it on place
         for i in range(0, len(lista)):
@@ -98,13 +95,15 @@ class PickAndPlace:
                         print(
                             "define_direct_object2 - ho trovato obj or dep:", lista[i]
                         )
-                        self.define_direct_object2(lista, tokens, i, username)
+                        self.define_direct_object2(lista, tokens, i, username, taskname)
                 else:
                     if pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
                         # take-ball
                         print("define_direct_object - ho trovato obj or dep:", lista[i])
                         if self.pick is None:
-                            self.define_direct_object(lista, tokens, i, username)
+                            self.define_direct_object(
+                                lista, tokens, i, username, taskname
+                            )
                         print(self.pick.object.name)
 
                 ##############
@@ -120,14 +119,14 @@ class PickAndPlace:
                     print("preposition")  # l'oggetto è definito da altre parti
                 elif word != "PRP":  # and (self.pick==None):
                     print("cerco l'oggetto : ho put the obj on place")
-                    self.define_direct_object(lista, tokens, i, username)
+                    self.define_direct_object(lista, tokens, i, username, taskname)
 
                 else:
                     print("non cerco: ripete nome obj")
 
             elif lista[i][0] == "case":
                 print("loc destination")
-                self.define_location(lista, tokens, i, username)
+                self.define_location(lista, tokens, i, username, taskname)
 
         """Leggo pick and place"""
         # pick_data = None
@@ -202,9 +201,9 @@ class PickAndPlace:
                 return msg, end, card
 
     # search and define the class object -> manipulable
-    def define_direct_object(self, lista, tokens, i, username):
+    def define_direct_object(self, lista, tokens, i, username, taskname):
 
-        task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
+        task_name_pkl = str(username) + "_" + taskname + ".pkl"
 
         object_name = tokens[lista[i][2] - 1]
         object_adjective = self.find_object_adj(object_name, lista, tokens)
@@ -223,9 +222,9 @@ class PickAndPlace:
         if self.pick is not None:
             print("Object to pick:", self.pick.object.name)
 
-    def define_direct_object2(self, lista, tokens, i, username):
+    def define_direct_object2(self, lista, tokens, i, username, taskname):
 
-        task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
+        task_name_pkl = str(username) + "_" + taskname + ".pkl"
 
         object_name = tokens[lista[i][1] - 1]
         object_adjective = self.find_object_adj(object_name, lista, tokens)
@@ -244,9 +243,9 @@ class PickAndPlace:
         if self.pick is not None:
             print("Object to pick:", self.pick.object.name)
 
-    def define_location(self, lista, tokens, i, username):
+    def define_location(self, lista, tokens, i, username, taskname):
 
-        task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
+        task_name_pkl = str(username) + "_" + taskname + ".pkl"
 
         location_name = tokens[lista[i][1] - 1]
         location_adjective = self.find_object_adj(location_name, lista, tokens)

@@ -1,9 +1,9 @@
-import datetime
-import math
-import pytz
-import os
+from datetime import datetime
+from math import inf
+from pytz import timezone as pytzTimezone
+from os import remove, path, listdir
 import cv2
-import pickle
+from pickle import load
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -17,21 +17,18 @@ from .main_dialog import (
 )
 from django.core import serializers
 from .XML_utilities import (
-    readcontent,
-    deletecontent,
     add_external_tag_XML,
     create_XML_program,
 )
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from pythonping import ping
-import pythoncom
-import xml.etree.ElementTree as ET
-import json
-import win32com.client
-import numpy as np
+from pythoncom import CoInitialize
+from xml.etree.ElementTree import parse
+from json import dumps, loads
+from win32com.client import Dispatch
+from numpy import zeros
 from .dictionary import all_sinonimi
-from .main_dialog import fileName
 from django.views.decorators.cache import never_cache
 from .robot_functions import (
     polar_to_robot_coordinates,
@@ -101,7 +98,7 @@ def checkTaskName(request):
 
         if tasks:
             data_result["nameExist"] = True
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR: checkTaskName")
@@ -125,7 +122,7 @@ def checkTaskNameModify(request):
 
         if tasks:
             data_result["nameExist"] = True
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR: checkTaskName")
@@ -276,7 +273,7 @@ def checkEditMyRobot(request):
         else:
             response["nameExist"] = False
 
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(dumps(response), content_type="application/json")
     else:
         return HttpResponse("ERROR")
 
@@ -319,17 +316,15 @@ def deleteObject(request):
         user = User.objects.get(username=username)
         instance = Object.objects.filter(name=objectname).filter(owner=user.pk)
         instance.delete()
-        os.remove(
-            "app\\static\\images\\objects\\" + username + "_" + objectname + ".png"
-        )
-        os.remove(
+        remove("app\\static\\images\\objects\\" + username + "_" + objectname + ".png")
+        remove(
             "app\\static\\images\\objects\\"
             + username
             + "_"
             + objectname
             + "_contour.png"
         )
-        os.remove(
+        remove(
             "app\\static\\images\\objects\\"
             + username
             + "_"
@@ -348,12 +343,12 @@ def deleteTask(request):
         instance = Task.objects.filter(name=taskname).filter(owner=username)
         instance.delete()
         taskname = str(username) + "_" + taskname
-        if os.path.exists(taskname + ".txt"):
-            os.remove(taskname + ".txt")
-        if os.path.exists(taskname + ".xml"):
-            os.remove(taskname + ".xml")
-        if os.path.exists(taskname + ".pkl"):
-            os.remove(taskname + ".pkl")
+        if path.exists(taskname + ".txt"):
+            remove(taskname + ".txt")
+        if path.exists(taskname + ".xml"):
+            remove(taskname + ".xml")
+        if path.exists(taskname + ".pkl"):
+            remove(taskname + ".pkl")
         return HttpResponse("oki")
     else:
         return HttpResponse("ERROR")
@@ -428,7 +423,7 @@ def checkUser(request):
             response["usernameExist"] = True
         else:
             response["usernameExist"] = False
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(dumps(response), content_type="application/json")
     else:
         return HttpResponse("ERROR")
 
@@ -447,7 +442,7 @@ def checkRobot(request):
             response["IPExist"] = True
         else:
             response["IPExist"] = False
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(dumps(response), content_type="application/json")
     else:
         return HttpResponse("ERROR")
 
@@ -475,7 +470,7 @@ def checkMyRobot(request):
         else:
             response["nameAssigned"] = False
 
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(dumps(response), content_type="application/json")
     else:
         return HttpResponse("ERROR")
 
@@ -508,7 +503,7 @@ def checkEditRobot(request):
             response["IPExist"] = True
         else:
             response["IPExist"] = False
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(dumps(response), content_type="application/json")
     else:
         return HttpResponse("ERROR")
 
@@ -557,7 +552,7 @@ def takeShot(request):
             username = request.POST.get("username")
             robot_name = request.POST.get("robot_name")
             object = request.POST.get("object_name")
-            pythoncom.CoInitialize()
+            CoInitialize()
             user = User.objects.get(username=username)
             myRobot = UserRobot.objects.filter(user=user).filter(name=robot_name)
             robot = Robot.objects.filter(name=myRobot[0].robot)
@@ -612,7 +607,7 @@ def takeShot(request):
                 copy,
             )
 
-            outline = np.zeros(image.shape, dtype="uint8")
+            outline = zeros(image.shape, dtype="uint8")
             (x, y, width, height) = cv2.boundingRect(cnts[areaMaxi])
             cv2.drawContours(outline, cnts, areaMaxi, (255, 255, 255), -1)
             roi = outline[y : y + height, x : x + width]
@@ -677,7 +672,7 @@ def objectExist(request):
             for keyword in keywordsList:
                 if keyword == object_name:
                     data_result["keywordExist"] = True
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -714,7 +709,7 @@ def keywordExist(request):
                         keywordsFound.append(keywordNew)
                         data_result["keywordFound"] = keywordsFound
                         data_result["keywordExist"] = True
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -754,7 +749,7 @@ def keywordExistSaveChanges(request):
                         keywordsFound.append(keywordNew)
                         data_result["keywordFound"] = keywordsFound
                         data_result["keywordExist"] = True
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -805,8 +800,8 @@ def modifyTask(request):
     if request.method == "POST":
         taskname = request.POST.get("taskname")
         shared = request.POST.get("shared")
-        timezone = pytz.timezone("Europe/Rome")
-        date = timezone.localize(datetime.datetime.now())
+        timezone = pytzTimezone("Europe/Rome")
+        date = timezone.localize(datetime.now())
         date.strftime("%H:%M %d-%m-%Y")
         Task.objects.filter(name=taskname).update(shared=shared, last_modified=date)
         return HttpResponse("OK")
@@ -836,7 +831,7 @@ def takePositionLocation(request):
                 "RZ": "" + str(curr_pos[5]) + "",
                 "FIG": "" + str(curr_pos[6]) + "",
             }
-            json_result = json.dumps(position)
+            json_result = dumps(position)
             disconnect(client, hCtrl, hRobot)
             return HttpResponse(json_result)
         except Exception as e:
@@ -921,7 +916,7 @@ def locationExist(request):
         if locations:
             data_result["nameExist"] = True
 
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -944,7 +939,7 @@ def actionExist(request):
         if actions:
             data_result["nameExist"] = True
 
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -971,7 +966,7 @@ def locationExistModify(request):
         if locations:
             data_result["nameExist"] = True
 
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1020,7 +1015,7 @@ def myRobotNameFromId(request):
         robot = request.POST.get("robot")
         robot_name = UserRobot.objects.get(pk=robot)
         result = {"robot_name": robot_name.name}
-        json_result = json.dumps(result)
+        json_result = dumps(result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1045,10 +1040,10 @@ def deleteImageObject(request):
         object_owner = request.POST.get("object_owner")
         object_name = request.POST.get("object_name")
         dir = "app\\static\\images\\objects"
-        files = os.listdir(dir)
+        files = listdir(dir)
         for file in files:
             if file.startswith(object_owner + "_" + object_name):
-                os.remove(os.path.join(dir, file))
+                remove(path.join(dir, file))
         return HttpResponse("OK")
     else:
         return HttpResponse("ERROR")
@@ -1063,23 +1058,23 @@ def getTaskFile(request):
         username = request.POST.get("username", "")
         taskToSend = str(username) + "_" + taskToSend
         # prima provo ad aprire il .txt, se non c'è vuol dire che è .xml
-        if os.path.exists(taskToSend + ".txt"):
+        if path.exists(taskToSend + ".txt"):
             f = open(taskToSend + ".txt", "r")
             contents = f.read()
             data_result = {"file": contents, "mode": "txt"}
-            json_result = json.dumps(data_result)
+            json_result = dumps(data_result)
             return HttpResponse(json_result)
         else:
-            if os.path.exists(taskToSend + ".xml"):
-                xml = ET.parse(taskToSend + ".xml")
+            if path.exists(taskToSend + ".xml"):
+                xml = parse(taskToSend + ".xml")
                 parsed = parseXmlToJson(xml.getroot())
                 print(parsed)
                 data_result = {"file": parsed, "mode": "xml"}
-                json_result = json.dumps(data_result)
+                json_result = dumps(data_result)
                 return HttpResponse(json_result)
             else:
                 data_result = {"file": "new"}
-                json_result = json.dumps(data_result)
+                json_result = dumps(data_result)
                 return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1138,11 +1133,6 @@ def ajaxCreateDialogue(request):
         dialogue_owner = request.POST.get("dialogue_owner", "")
         dialogue_description = request.POST.get("dialogue_description", "")
         dialogue_shared = request.POST.get("dialogue_shared", "")
-        # scrivo nel file current_dialogue il nome del programma
-        deletecontent("current_dialogue.txt")
-        file = open("current_dialogue.txt", "w")
-        file.write(dialogue_name)
-        file.close()
         # creo la nuova riga del db
         p = Task(
             name=dialogue_name,
@@ -1163,14 +1153,14 @@ def ajaxCallParserAction(request):
         data_result = {}
         text_to_parse = request.POST.get("text")
         program_name = request.POST.get("program_name")
-        files = os.listdir(".")
+        files = listdir(".")
         for file in files:
             if file.startswith(program_name + ".pkl"):
-                os.remove(os.path.join(".", file))
+                remove(path.join(".", file))
         response, end = main_dialog_action(text_to_parse.lower(), program_name)
         data_result["response"] = response
         data_result["end"] = end
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1187,7 +1177,7 @@ def ajaxCallParserTimes(request):
         response, end = main_dialog_condition(text_to_parse.lower(), program_name)
         data_result["response"] = response
         data_result["end"] = end
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1204,7 +1194,7 @@ def ajaxCallParserEnd(request):
         response, end = main_dialog_end(text_to_parse.lower(), program_name)
         data_result["response"] = response
         data_result["end"] = end
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1221,7 +1211,7 @@ def ajaxCallParserAssert(request):
         response, end = main_dialog_assert(text_to_parse.lower(), program_name)
         data_result["response"] = response
         data_result["end"] = end
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1233,8 +1223,9 @@ def ajaxCallParser(request):
         data_result = {}
         text_to_parse = request.POST.get("text")
         username = request.POST.get("username")
+        taskname = request.POST.get("taskname")
         # pick place recognition
-        response, end, card = main_dialog(text_to_parse.lower(), username)
+        response, end, card = main_dialog(text_to_parse.lower(), username, taskname)
         data_result["response"] = response
         data_result["end"] = end
         print("CARD " + card)
@@ -1247,11 +1238,11 @@ def ajaxCallParser(request):
         else:
             data_result["card"] = card
         if end == "1":
-            create_XML_program(fileName, username)
-            task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
-            if os.path.isfile(task_name_pkl):
+            create_XML_program(taskname, username)
+            task_name_pkl = str(username) + "_" + taskname + ".pkl"
+            if path.isfile(task_name_pkl):
                 with open(task_name_pkl, "rb") as input:
-                    pick_place_data = pickle.load(input)
+                    pick_place_data = load(input)
                     pick_data = pick_place_data.pick
                     # place_data = pick_place_data.place
 
@@ -1264,16 +1255,16 @@ def ajaxCallParser(request):
                     and all_sinonimi.__contains__(pick_data.object.cardinality)
                 ):
                     add_external_tag_XML(
-                        str(username) + "_" + readcontent(fileName), "repeat", "while"
+                        str(username) + "_" + taskname, "repeat", "while"
                     )
                     data_result["card"] = "while"
                 elif pick_data.object.cardinality.isnumeric():
                     add_external_tag_XML(
-                        str(username) + "_" + readcontent(fileName),
+                        str(username) + "_" + taskname,
                         "repeat",
                         pick_data.object.cardinality,
                     )
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1287,8 +1278,8 @@ def getHtmlText(request):
         f = open(taskOwner + "_" + taskToSave + ".xml", "w+")
         f.write(taskText)
         f.close()
-        timezone = pytz.timezone("Europe/Rome")
-        date = timezone.localize(datetime.datetime.now())
+        timezone = pytzTimezone("Europe/Rome")
+        date = timezone.localize(datetime.now())
         date.strftime("%H:%M %d-%m-%Y")
         Task.objects.filter(name=taskToSave).filter(owner=taskOwner).update(
             last_modified=date
@@ -1303,7 +1294,7 @@ def checkLibrariesXML(request):
         data_result = {"pickExist": False, "placeExist": False, "actionExist": False}
         fileName = request.POST.get("fileName")
         username = request.POST.get("username")
-        file = ET.parse(fileName).getroot()
+        file = parse(fileName).getroot()
         if file.find("event") is None:
             search = "repeat/"
         else:
@@ -1353,7 +1344,7 @@ def checkLibrariesXML(request):
                     data_result["actionExist"] = True
                     break
 
-        json_result = json.dumps(data_result)
+        json_result = dumps(data_result)
         return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1373,8 +1364,8 @@ def runTask(request):
             port = robot.port
             camera = robot.cameraip
 
-            pythoncom.CoInitialize()
-            eng = win32com.client.Dispatch("CAO.CaoEngine")
+            CoInitialize()
+            eng = Dispatch("CAO.CaoEngine")
             ctrl = eng.Workspaces(0).AddController(
                 "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
             )
@@ -1393,7 +1384,7 @@ def runTask(request):
             force = None
 
             fileName = username + "_" + taskName + ".xml"
-            file = ET.parse(fileName).getroot()
+            file = parse(fileName).getroot()
 
             if file.find("event") is None:
                 search = "repeat/"
@@ -1461,11 +1452,11 @@ def runTask(request):
                 or not pickExist
                 or not placeExist
             ):
-                json_result = json.dumps(data_result)
+                json_result = dumps(data_result)
                 return HttpResponse(json_result)
 
             # Can access with: place_position['X'], place_position['Y'],... Z, RX, RY, RZ, FIG
-            place_position = json.loads(place_position)
+            place_position = loads(place_position)
 
             if action is not None:
                 action_point = action_point.split("::")
@@ -1495,7 +1486,7 @@ def runTask(request):
             if times != "while":
                 times = int(times)
             else:
-                times = math.inf
+                times = inf
 
             data_result["objectNotFound"] = False
             data_result["finishTask"] = False
@@ -1584,11 +1575,11 @@ def runTask(request):
             if data_result["objectNotFound"] is False:
                 data_result["finishTask"] = True
 
-            json_result = json.dumps(data_result)
+            json_result = dumps(data_result)
             return HttpResponse(json_result)
         except Exception as e:
             data_result = {"exception": type(e).__name__, "codeException": str(e)}
-            json_result = json.dumps(data_result)
+            json_result = dumps(data_result)
             return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
@@ -1612,7 +1603,7 @@ def search_object(
     Q5 = "@0 P(133.63413919141982, -131.393237172843, 254.87885013312, 179.9599341526348, -0.027773416827480392, 179.97129867455095, 261.0)"
     Q = [Q0, Q1, Q2, Q3, Q4, Q5]
 
-    eng = win32com.client.Dispatch("CAO.CaoEngine")
+    eng = Dispatch("CAO.CaoEngine")
     ctrl = eng.Workspaces(0).AddController(
         "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
     )
@@ -1662,7 +1653,7 @@ def search_object(
                 pos = 0
             continue
 
-        outline = np.zeros(test.shape, dtype="uint8")
+        outline = zeros(test.shape, dtype="uint8")
         (x, y, width, height) = cv2.boundingRect(cnts[areaMaxi])
         cv2.drawContours(outline, cnts, areaMaxi, (255, 255, 255), -1)
         roi = outline[y : y + height, x : x + width]

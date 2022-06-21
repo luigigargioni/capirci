@@ -1,23 +1,31 @@
 from nltk import word_tokenize, pos_tag
-import app.relation_states as relation_states
-from .XML_utilities import *
-from .models import *
+from .relation_states import PickAndPlace
 from django.contrib.auth.models import User
-from .dictionary import *
+from .dictionary import (
+    find_sinonimi,
+    pick_sinonimi,
+    place_sinonimi,
+    all_sinonimi,
+    negative_response,
+    assert_response,
+    sensor,
+)
 from word2number import w2n
-import app.dictionary as dictionary
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element, parse, dump as xmlDump, tostring
 from django.db.models import Q
 from stanza import Pipeline
 from stanza.pipeline.core import DownloadMethod
+from os import path
+from .XML_utilities import add_external_tag_XML, add_end_tag_XML
+from .models import Action
+from pickle import load, dump as pickleDump, HIGHEST_PROTOCOL
 
 server = None
-fileName = "current_dialogue.txt"
 
 
 def about(program):
     print("Wait...")
-    pickandplace = dictionary.pick_sinonimi + dictionary.place_sinonimi
+    pickandplace = pick_sinonimi + place_sinonimi
     program_list = program.split(".")
 
     print("program list:", program_list)
@@ -160,7 +168,7 @@ def main_dialog_action(text_to_parse, program_name):
                 if actions:
                     nameExist = True
 
-                if nameExist == True:
+                if nameExist is True:
                     find = 1
 
         if tagged[i][1] == "CD" or tagged[i][0] == "twice" or tagged[i][0] == "thrice":
@@ -174,10 +182,10 @@ def main_dialog_action(text_to_parse, program_name):
                     repeat = str(w2n.word_to_num(repeat))
 
     if find == 1:
-        root = ET.parse(program_name + ".xml").getroot()
-        c = ET.Element("action")
+        root = parse(program_name + ".xml").getroot()
+        c = Element("action")
         c.text = action
-        r = ET.Element("repeat")
+        r = Element("repeat")
         if repeat != "":
             r.set("times", repeat)
 
@@ -191,8 +199,8 @@ def main_dialog_action(text_to_parse, program_name):
                     element.insert(1, c)
                 break
 
-        ET.dump(root)
-        mydata = ET.tostring(root, encoding="unicode")
+        xmlDump(root)
+        mydata = tostring(root, encoding="unicode")
         myfile = open(program_name + ".xml", "w")
         myfile.write(mydata)
         result = "ok"
@@ -230,7 +238,7 @@ def main_dialog_end(text_to_parse, program_name):
         for i in range(0, len(dependencies)):
             print("DDD:", tokens[dependencies[i][2] - 1])
             if dependencies[i][0] == "obj" and findInlList(
-                dictionary.find_sinonimi, tokens[dependencies[i][1] - 1]
+                find_sinonimi, tokens[dependencies[i][1] - 1]
             ):
                 obj = tokens[dependencies[i][2] - 1]
                 find = 1
@@ -325,18 +333,18 @@ def main_dialog_assert(text_to_parse, program_name):
 
 
 # pick place
-def main_dialog(text_to_parse, username):
-    task_name_pkl = str(username) + "_" + readcontent(fileName) + ".pkl"
+def main_dialog(text_to_parse, username, taskname):
+    task_name_pkl = str(username) + "_" + taskname + ".pkl"
     """Se non c'è ancora il file lo creo -> non ho ancora un pick place, quindi lo creo"""
     """Se ho il file ho il pickPlace() , ma è completo?"""
 
-    if os.path.isfile(task_name_pkl):
+    if path.isfile(task_name_pkl):
         with open(task_name_pkl, "rb") as input:
-            pickPlace = pickle.load(input)  # carico il contenuto
+            pickPlace = load(input)  # carico il contenuto
         # leggo il file, se è un pick place completo dovrei poter aggiungere un altro pick place al file
     else:
         pickPlace = (
-            relation_states.PickAndPlace()
+            PickAndPlace()
         )  # creo il nuovo oggetto PickPlace perchè non ho file .pkl
 
     print("I'm ready to execute the program:", text_to_parse)
@@ -349,9 +357,13 @@ def main_dialog(text_to_parse, username):
         parseDependencies(dependencies, tokens)
         print("PRINT PICK PLACE", pickPlace)
         result, end, card = pickPlace.process_dependencies(
-            lista=dependencies, tokens=tokens, tagged=tagged, username=username
+            lista=dependencies,
+            tokens=tokens,
+            tagged=tagged,
+            username=username,
+            taskname=taskname,
         )
         with open(task_name_pkl, "wb") as output:
-            pickle.dump(pickPlace, output, pickle.HIGHEST_PROTOCOL)
+            pickleDump(pickPlace, output, HIGHEST_PROTOCOL)
 
         return result, end, card

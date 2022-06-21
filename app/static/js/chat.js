@@ -165,6 +165,7 @@ $(".type_msg").on("keydown", function (e) {
 function parse_ajax(e) {
     let text_to_parse = current_sentence;
     let username = $('#username').html();
+    let taskname = $('#taskName').html();
     e.preventDefault();
     $.ajax({
         type: 'POST',
@@ -172,6 +173,7 @@ function parse_ajax(e) {
         data: {
             text: text_to_parse,
             username: username,
+            taskname: taskname,
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },
 
