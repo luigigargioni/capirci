@@ -24,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from pythonping import ping
 from pythoncom import CoInitialize
-from xml.etree.ElementTree import parse
+from xml.etree.ElementTree import fromstring
 from json import dumps, loads
 from win32com.client import Dispatch
 from numpy import zeros
@@ -343,10 +343,6 @@ def deleteTask(request):
         instance = Task.objects.filter(name=taskname).filter(owner=username)
         instance.delete()
         taskname = str(username) + "_" + taskname
-        if path.exists(taskname + ".txt"):
-            remove(taskname + ".txt")
-        if path.exists(taskname + ".xml"):
-            remove(taskname + ".xml")
         if path.exists(taskname + ".pkl"):
             remove(taskname + ".pkl")
         return HttpResponse("oki")
@@ -1054,28 +1050,26 @@ def deleteImageObject(request):
 
 def getTaskFile(request):
     if request.method == "POST":
-        taskToSend = request.POST.get("fileName", "")
+        taskname = request.POST.get("fileName", "")
         username = request.POST.get("username", "")
-        taskToSend = str(username) + "_" + taskToSend
-        # prima provo ad aprire il .txt, se non c'è vuol dire che è .xml
-        if path.exists(taskToSend + ".txt"):
-            f = open(taskToSend + ".txt", "r")
-            contents = f.read()
-            data_result = {"file": contents, "mode": "txt"}
+        taskToSend = str(username) + "_" + taskname
+        if Task.objects.filter(name=taskname).filter(owner=username).exists():
+            taskCode = (
+                Task.objects.filter(name=taskname)
+                .filter(owner=username)
+                .values_list("code", flat=True)
+                .first()
+            )
+            root = fromstring(taskCode)
+            parsed = parseXmlToJson(root)
+            print(parsed)
+            data_result = {"file": parsed, "mode": "xml"}
             json_result = dumps(data_result)
             return HttpResponse(json_result)
         else:
-            if path.exists(taskToSend + ".xml"):
-                xml = parse(taskToSend + ".xml")
-                parsed = parseXmlToJson(xml.getroot())
-                print(parsed)
-                data_result = {"file": parsed, "mode": "xml"}
-                json_result = dumps(data_result)
-                return HttpResponse(json_result)
-            else:
-                data_result = {"file": "new"}
-                json_result = dumps(data_result)
-                return HttpResponse(json_result)
+            data_result = {"file": "new"}
+            json_result = dumps(data_result)
+            return HttpResponse(json_result)
     else:
         return HttpResponse("ERROR")
 
@@ -1152,12 +1146,14 @@ def ajaxCallParserAction(request):
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text")
-        program_name = request.POST.get("program_name")
+        taskname = request.POST.get("taskname", "")
+        username = request.POST.get("username", "")
+        filepkl = username + "_" + taskname + ".pkl"
         files = listdir(".")
         for file in files:
-            if file.startswith(program_name + ".pkl"):
+            if file.startswith(filepkl):
                 remove(path.join(".", file))
-        response, end = main_dialog_action(text_to_parse.lower(), program_name)
+        response, end = main_dialog_action(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
         json_result = dumps(data_result)
@@ -1172,9 +1168,10 @@ def ajaxCallParserTimes(request):
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
-        program_name = request.POST.get("program_name", "")
+        taskname = request.POST.get("taskname", "")
+        username = request.POST.get("username", "")
         # condition recognition
-        response, end = main_dialog_condition(text_to_parse.lower(), program_name)
+        response, end = main_dialog_condition(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
         json_result = dumps(data_result)
@@ -1189,9 +1186,10 @@ def ajaxCallParserEnd(request):
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
-        program_name = request.POST.get("program_name", "")
+        taskname = request.POST.get("taskname", "")
+        username = request.POST.get("username", "")
         # condition recognition
-        response, end = main_dialog_end(text_to_parse.lower(), program_name)
+        response, end = main_dialog_end(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
         json_result = dumps(data_result)
@@ -1206,9 +1204,10 @@ def ajaxCallParserAssert(request):
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
-        program_name = request.POST.get("program_name", "")
+        taskname = request.POST.get("taskname", "")
+        username = request.POST.get("username", "")
         # condition recognition
-        response, end = main_dialog_assert(text_to_parse.lower(), program_name)
+        response, end = main_dialog_assert(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
         json_result = dumps(data_result)
@@ -1254,13 +1253,12 @@ def ajaxCallParser(request):
                     not pick_data.object.cardinality.isnumeric()
                     and all_sinonimi.__contains__(pick_data.object.cardinality)
                 ):
-                    add_external_tag_XML(
-                        str(username) + "_" + taskname, "repeat", "while"
-                    )
+                    add_external_tag_XML(taskname, username, "repeat", "while")
                     data_result["card"] = "while"
                 elif pick_data.object.cardinality.isnumeric():
                     add_external_tag_XML(
-                        str(username) + "_" + taskname,
+                        taskname,
+                        username,
                         "repeat",
                         pick_data.object.cardinality,
                     )
@@ -1272,17 +1270,14 @@ def ajaxCallParser(request):
 
 def getHtmlText(request):
     if request.method == "POST":
-        taskToSave = request.POST.get("fileName", "")
+        taskname = request.POST.get("taskname", "")
         taskText = request.POST.get("text", "")
         taskOwner = request.POST.get("username", "")
-        f = open(taskOwner + "_" + taskToSave + ".xml", "w+")
-        f.write(taskText)
-        f.close()
         timezone = pytzTimezone("Europe/Rome")
         date = timezone.localize(datetime.now())
         date.strftime("%H:%M %d-%m-%Y")
-        Task.objects.filter(name=taskToSave).filter(owner=taskOwner).update(
-            last_modified=date
+        Task.objects.filter(name=taskname).filter(owner=taskOwner).update(
+            last_modified=date, code=taskText
         )
         return HttpResponse("oki")
     else:
@@ -1292,9 +1287,16 @@ def getHtmlText(request):
 def checkLibrariesXML(request):
     if request.method == "POST":
         data_result = {"pickExist": False, "placeExist": False, "actionExist": False}
-        fileName = request.POST.get("fileName")
+        taskname = request.POST.get("taskname")
         username = request.POST.get("username")
-        file = parse(fileName).getroot()
+        # file = parse(fileName).getroot()
+        taskCode = (
+            Task.objects.filter(name=taskname)
+            .filter(owner=username)
+            .values_list("code", flat=True)
+            .first()
+        )
+        file = fromstring(taskCode)
         if file.find("event") is None:
             search = "repeat/"
         else:
@@ -1354,7 +1356,7 @@ def runTask(request):
     if request.method == "POST":
         try:
 
-            taskName = request.POST.get("taskName")
+            taskname = request.POST.get("taskName")
             username = request.POST.get("username")
             robot = request.POST.get("robot")
             user = User.objects.get(username=username)
@@ -1383,8 +1385,13 @@ def runTask(request):
             action_position = None
             force = None
 
-            fileName = username + "_" + taskName + ".xml"
-            file = parse(fileName).getroot()
+            taskCode = (
+                Task.objects.filter(name=taskname)
+                .filter(owner=username)
+                .values_list("code", flat=True)
+                .first()
+            )
+            file = fromstring(taskCode)
 
             if file.find("event") is None:
                 search = "repeat/"

@@ -1,5 +1,7 @@
-from xml.etree.ElementTree import parse, Element, tostring, SubElement, dump
+from xml.etree.ElementTree import Element, tostring, SubElement, dump, fromstring
 from pickle import load
+
+from app.models import Task
 from .dictionary import all_sinonimi
 from os import path
 
@@ -14,9 +16,14 @@ def iterator(parents, nested=False):
 
 
 # This method add an external tag to existing XML file
-def add_external_tag_XML(fileName, newExtTag, newExtTagText):
-    root = parse(fileName + ".xml").getroot()
-
+def add_external_tag_XML(taskname, username, newExtTag, newExtTagText):
+    taskCode = (
+        Task.objects.filter(name=taskname)
+        .filter(owner=username)
+        .values_list("code", flat=True)
+        .first()
+    )
+    root = fromstring(taskCode)
     children = []
 
     for child in root:
@@ -43,14 +50,12 @@ def add_external_tag_XML(fileName, newExtTag, newExtTagText):
 
     dump(root)
     mydata = tostring(root, encoding="unicode")
-    myfile = open(fileName + ".xml", "w")
-    myfile.write(mydata)
+    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
 
 
 # this method read info about pickPlace task from .pkl file and write corresponding tags in .xml file
 def create_XML_program(taskname, username):
     task_name_pkl = str(username) + "_" + taskname + ".pkl"
-    program_name_xml = str(username) + "_" + taskname + ".xml"
 
     data = Element("program")
     pick = SubElement(data, "pick")
@@ -78,13 +83,20 @@ def create_XML_program(taskname, username):
     pick.text = pick_data.object.name
     place.text = place_data.location.name
     mydata = tostring(data, encoding="unicode")
-    myfile = open(program_name_xml, "w")
-    myfile.write(mydata)
+    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
+    # myfile = open(program_name_xml, "w")
+    # myfile.write(mydata)
 
 
 # This method add an end tag to existing XML file
-def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
-    root = parse(fileName + ".xml").getroot()
+def add_end_tag_XML(taskname, username, newExtTag, newExtTagText, newExtTagType):
+    taskCode = (
+        Task.objects.filter(name=taskname)
+        .filter(owner=username)
+        .values_list("code", flat=True)
+        .first()
+    )
+    root = fromstring(taskCode)
     c = Element(newExtTag)
 
     if newExtTagType == "obj":
@@ -111,5 +123,4 @@ def add_end_tag_XML(fileName, newExtTag, newExtTagText, newExtTagType):
 
     dump(root)
     mydata = tostring(root, encoding="unicode")
-    myfile = open(fileName + ".xml", "w")
-    myfile.write(mydata)
+    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)

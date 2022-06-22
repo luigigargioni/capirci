@@ -1731,7 +1731,7 @@ $('#btn-save').click(function () {
         url: '/getHtmlText/',
         data: {
             username: username,
-            fileName: current_task_name,
+            taskname: current_task_name,
             text: (new XMLSerializer()).serializeToString(resultParser),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },

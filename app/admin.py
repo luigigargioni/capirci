@@ -12,7 +12,15 @@ class ActionOption(admin.ModelAdmin):
 
 
 class TaskOption(admin.ModelAdmin):
-    list_display = ("id", "name", "owner", "description", "last_modified", "shared")
+    list_display = (
+        "id",
+        "name",
+        "owner",
+        "description",
+        "last_modified",
+        "shared",
+        "code",
+    )
 
 
 class ObjectOption(admin.ModelAdmin):

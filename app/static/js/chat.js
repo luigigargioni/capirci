@@ -217,14 +217,15 @@ function parse_ajax(e) {
 /**Parsing numero di volte che deve essere eseguito il compito*/
 function parse_ajax_times(e) {
     let text_to_parse = current_sentence;
-    let task_name = $('#username').html() + "_" + current_task_name;
+    let username = $('#username').html();
     e.preventDefault();
     $.ajax({
         type: 'POST',
         url: '/ajaxCallParserTimes/',
         data: {
             text: text_to_parse,
-            program_name: task_name,
+            taskname: current_task_name,
+            username: username,
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },
 
@@ -267,7 +268,8 @@ function parse_ajax_action(e) {
         url: '/ajaxCallParserAction/',
         data: {
             text: text_to_parse,
-            program_name: task_name,
+            username: $('#username').html(),
+            taskname: current_task_name,
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },
 
@@ -320,7 +322,8 @@ function parse_ajax_end_prog(e) {
         url: '/ajaxCallParserEnd/',
         data: {
             text: text_to_parse,
-            program_name: task_name,
+            taskname: current_task_name,
+            username: $('#username').html(),
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
         },
 
@@ -366,7 +369,7 @@ function parse_ajax_end_prog(e) {
 /**Parsing: vedere il programma in forma grafica*/
 function parse_ajax_assert(e) {
     let text_to_parse = current_sentence;
-    let username = $('#username');
+    let username = $('#username').html();
     e.preventDefault();
     $.ajax({
         type: 'POST',
@@ -385,15 +388,14 @@ function parse_ajax_assert(e) {
                 question = 5;
                 insertChat("you", OPEN_GRAPHIC);
                 say(OPEN_GRAPHIC);
-                let fileName = username.html() + "_" + current_task_name + ".xml";
                 $.ajax({
                     type: 'POST',
                     url: '/checkLibrariesXML/',
                     async: false,
                     dataType: 'json',
                     data: {
-                        fileName: fileName,
-                        username: username.html(),
+                        taskname: current_task_name,
+                        username: username,
                         csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     },
 
@@ -439,20 +441,14 @@ function parse_ajax_assert(e) {
                 question = 5;
                 insertChat("you", NOT_OPEN_GRAPHIC);
                 say(NOT_OPEN_GRAPHIC);
-                /*setTimeout(function () {
-                    insertChat("you", NOT_OPEN_GRAPHIC_2);
-                    say(NOT_OPEN_GRAPHIC_2);
-                }, 2000);*/
-
-                let fileName = username.html() + "_" + current_task_name + ".xml";
                 $.ajax({
                     type: 'POST',
                     url: '/checkLibrariesXML/',
                     async: false,
                     dataType: 'json',
                     data: {
-                        fileName: fileName,
-                        username: username.html(),
+                        taskname: current_task_name,
+                        username: username,
                         csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     },
 

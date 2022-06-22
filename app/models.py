@@ -8,16 +8,17 @@ from django.utils.timezone import now
 # Create your models here.
 
 # For update the database and create table
-# python manage.py makemigrations && python manage.py migrate --run-syncdb
+# python manage.py makemigrations app && python manage.py migrate --run-syncdb
 
 
 class Task(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
-    owner = models.CharField(max_length=200, default="null")
-    description = models.CharField(max_length=200, default="null")
-    last_modified = models.DateTimeField(default=now, editable=True)
+    owner = models.CharField(max_length=200, default=None, null=True, blank=True)
+    description = models.CharField(max_length=200, default=None, null=True, blank=True)
+    last_modified = models.DateTimeField(default=now)
     shared = models.BooleanField(default=False)
+    code = models.TextField(default=None, null=True, editable=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Tasks"
@@ -30,7 +31,14 @@ class Object(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    keywords = ListCharField(base_field=CharField(max_length=50), size=20, max_length=1019, default='null')
+    keywords = ListCharField(
+        base_field=CharField(max_length=50),
+        size=20,
+        max_length=1019,
+        default=None,
+        null=True,
+        blank=True,
+    )
     shared = models.BooleanField(default=False)
     force = models.IntegerField(default=2)
     height = models.FloatField(default=50)
@@ -47,8 +55,8 @@ class Robot(models.Model):
     name = models.CharField(max_length=100)
     ip = models.GenericIPAddressField()
     MODEL_CHOICES = (
-        ('C', 'Cobotta'),
-        ('V', 'VS-060'),
+        ("C", "Cobotta"),
+        ("V", "VS-060"),
     )
     model = models.CharField(max_length=1, choices=MODEL_CHOICES)
     port = models.IntegerField(default=0)
@@ -80,7 +88,9 @@ class Location(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     shared = models.BooleanField(default=False)
     position = models.CharField(max_length=1000)
-    robot = models.ForeignKey(UserRobot, on_delete=models.CASCADE, default=None)
+    robot = models.ForeignKey(
+        UserRobot, on_delete=models.CASCADE, default=None, null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Locations"
@@ -95,7 +105,9 @@ class Action(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     point = models.CharField(max_length=10000)
     shared = models.BooleanField(default=False)
-    robot = models.ForeignKey(UserRobot, on_delete=models.CASCADE, default=None)
+    robot = models.ForeignKey(
+        UserRobot, on_delete=models.CASCADE, default=None, null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Actions"

@@ -11,13 +11,13 @@ from .dictionary import (
     sensor,
 )
 from word2number import w2n
-from xml.etree.ElementTree import Element, parse, dump as xmlDump, tostring
+from xml.etree.ElementTree import Element, dump as xmlDump, tostring, fromstring
 from django.db.models import Q
 from stanza import Pipeline
 from stanza.pipeline.core import DownloadMethod
 from os import path
 from .XML_utilities import add_external_tag_XML, add_end_tag_XML
-from .models import Action
+from .models import Action, Task
 from pickle import load, dump as pickleDump, HIGHEST_PROTOCOL
 
 server = None
@@ -73,8 +73,8 @@ def parseDependencies(lista_dep, tokens):
 
 
 # Quante volte devo eseguire il compito
-def main_dialog_condition(text_to_parse, program_name):
-    print("PROGRAM NAME IN DIALOG COND:", program_name)
+def main_dialog_condition(text_to_parse, taskname, username):
+    print("PROGRAM NAME IN DIALOG COND")
     times = 0
     result = ""
     end = ""
@@ -91,7 +91,7 @@ def main_dialog_condition(text_to_parse, program_name):
         if all_sinonimi.__contains__(tokens[i].lower()):
             times = "while"
             add_external_tag_XML(
-                fileName=program_name, newExtTag="repeat", newExtTagText=str(times)
+                taskname, username, newExtTag="repeat", newExtTagText=str(times)
             )
             result = "ok"
             end = "2"
@@ -112,7 +112,7 @@ def main_dialog_condition(text_to_parse, program_name):
     print("TIMES", str(times))
     if find == 1:
         add_external_tag_XML(
-            fileName=program_name, newExtTag="repeat", newExtTagText=str(times)
+            taskname, username, newExtTag="repeat", newExtTagText=str(times)
         )
         result = "ok"
     else:
@@ -123,7 +123,7 @@ def main_dialog_condition(text_to_parse, program_name):
 
 
 # ending condition
-def main_dialog_action(text_to_parse, program_name):
+def main_dialog_action(text_to_parse, taskname, username):
     action = ""
     repeat = ""
     result = ""
@@ -156,7 +156,6 @@ def main_dialog_action(text_to_parse, program_name):
                 # actionExist
                 nameExist = False
                 action_name = action
-                username = program_name.split("_")[0]
                 user = User.objects.get(username=username)
 
                 actions = Action.objects.filter(name=action_name)
@@ -182,7 +181,13 @@ def main_dialog_action(text_to_parse, program_name):
                     repeat = str(w2n.word_to_num(repeat))
 
     if find == 1:
-        root = parse(program_name + ".xml").getroot()
+        xmlCode = (
+            Task.objects.filter(name=taskname)
+            .filter(owner=username)
+            .values_list("code", flat=True)
+            .first()
+        )
+        root = fromstring(xmlCode)
         c = Element("action")
         c.text = action
         r = Element("repeat")
@@ -201,8 +206,7 @@ def main_dialog_action(text_to_parse, program_name):
 
         xmlDump(root)
         mydata = tostring(root, encoding="unicode")
-        myfile = open(program_name + ".xml", "w")
-        myfile.write(mydata)
+        Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
         result = "ok"
 
     end = "3"
@@ -211,8 +215,8 @@ def main_dialog_action(text_to_parse, program_name):
 
 
 # ending condition
-def main_dialog_end(text_to_parse, program_name):
-    print("PROGRAM NAME IN DIALOG END:", program_name)
+def main_dialog_end(text_to_parse, taskname, username):
+    print("PROGRAM NAME IN DIALOG END")
     obj = ""
     adj = ""
     word = ""
@@ -253,7 +257,8 @@ def main_dialog_end(text_to_parse, program_name):
     if find == 1:
         if word != "":
             add_end_tag_XML(
-                fileName=program_name,
+                taskname=taskname,
+                username=username,
                 newExtTag="event",
                 newExtTagText=str(word),
                 newExtTagType="sens",
@@ -262,7 +267,8 @@ def main_dialog_end(text_to_parse, program_name):
             if adj != "":
                 obj = adj + " " + obj
             add_end_tag_XML(
-                fileName=program_name,
+                taskname=taskname,
+                username=username,
                 newExtTag="event",
                 newExtTagText=str(obj),
                 newExtTagType="obj",
@@ -293,8 +299,8 @@ def findInlList(lista, word):
 
 
 # assert or deny
-def main_dialog_assert(text_to_parse, program_name):
-    print("PROGRAM NAME IN DIALOG END:", program_name)
+def main_dialog_assert(text_to_parse, taskname, username):
+    print("PROGRAM NAME IN DIALOG END")
 
     result = ""
     end = ""

@@ -80,7 +80,6 @@ function getTaskFromName(nameTask) {
 
                 }
             } else {
-                // se è nuovo e faccio SAVE devo andare a scrivere il .txt
                 $('.progress-div').remove();
                 $('#task_building_area').removeClass('d-none');
             }
