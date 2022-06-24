@@ -18,6 +18,7 @@ input[type=text], select {
 
 body {
     font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    overflow: hidden;
 }
 
 #dropdownMenuUser {
