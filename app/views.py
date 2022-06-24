@@ -1052,7 +1052,6 @@ def getTaskFile(request):
     if request.method == "POST":
         taskname = request.POST.get("fileName", "")
         username = request.POST.get("username", "")
-        taskToSend = str(username) + "_" + taskname
         if Task.objects.filter(name=taskname).filter(owner=username).exists():
             taskCode = (
                 Task.objects.filter(name=taskname)
