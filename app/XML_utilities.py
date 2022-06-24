@@ -1,6 +1,5 @@
 from xml.etree.ElementTree import Element, tostring, SubElement, dump, fromstring
 from pickle import load
-
 from app.models import Task
 from .dictionary import all_sinonimi
 from os import path

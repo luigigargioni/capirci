@@ -3,8 +3,6 @@ from .relation_states import PickAndPlace
 from django.contrib.auth.models import User
 from .dictionary import (
     find_sinonimi,
-    pick_sinonimi,
-    place_sinonimi,
     all_sinonimi,
     negative_response,
     assert_response,
@@ -19,28 +17,6 @@ from os import path
 from .XML_utilities import add_external_tag_XML, add_end_tag_XML
 from .models import Action, Task
 from pickle import load, dump as pickleDump, HIGHEST_PROTOCOL
-
-server = None
-
-
-def about(program):
-    print("Wait...")
-    pickandplace = pick_sinonimi + place_sinonimi
-    program_list = program.split(".")
-
-    print("program list:", program_list)
-    for sentence in program_list:
-        tokenized_sentence = word_tokenize(sentence)
-        tagged = pos_tag(tokens=tokenized_sentence)
-        print("tagged:", tagged)
-        for i in range(0, len(tagged)):
-            if tagged[i][1] == "VB" or tagged[i][1] == "VBD":
-                verbo = tagged[i][0]
-                if pickandplace.__contains__(verbo):
-                    print("about pick and place")
-                else:
-                    print("not found")
-    return program_list
 
 
 def get_tagged_sentence(sentence):
@@ -66,15 +42,8 @@ def calcDependencies(program):
     return tokens, dependencies
 
 
-def parseDependencies(lista_dep, tokens):
-    for i in range(0, len(lista_dep)):
-        print("relazione:", lista_dep[i])
-        print(tokens[lista_dep[i][1] - 1] + "-" + tokens[lista_dep[i][2] - 1])
-
-
 # Quante volte devo eseguire il compito
 def main_dialog_condition(text_to_parse, taskname, username):
-    print("PROGRAM NAME IN DIALOG COND")
     times = 0
     result = ""
     end = ""
@@ -82,12 +51,8 @@ def main_dialog_condition(text_to_parse, taskname, username):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print("TOKENS:", tokens)
-    print("DEP:", dependencies)
-    print("TAG:", tagged)
 
     for i in range(0, len(tokens)):
-        print(tokens[i])
         if all_sinonimi.__contains__(tokens[i].lower()):
             times = "while"
             add_external_tag_XML(
@@ -109,7 +74,6 @@ def main_dialog_condition(text_to_parse, taskname, username):
                 times = tagged[i][0]
                 find = 1
                 break
-    print("TIMES", str(times))
     if find == 1:
         add_external_tag_XML(
             taskname, username, newExtTag="repeat", newExtTagText=str(times)
@@ -132,9 +96,6 @@ def main_dialog_action(text_to_parse, taskname, username):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print("TOKENS:", tokens)
-    print("DEP:", dependencies)
-    print("TAG:", tagged)
 
     for j in range(0, len(tokens)):
         if negative_response.__contains__(tokens[j].lower()):
@@ -195,7 +156,6 @@ def main_dialog_action(text_to_parse, taskname, username):
             r.set("times", repeat)
 
         for element in root:
-            print(element.tag)
             if element.tag == "repeat":
                 if repeat != "":
                     element.insert(1, r)
@@ -216,7 +176,6 @@ def main_dialog_action(text_to_parse, taskname, username):
 
 # ending condition
 def main_dialog_end(text_to_parse, taskname, username):
-    print("PROGRAM NAME IN DIALOG END")
     obj = ""
     adj = ""
     word = ""
@@ -227,20 +186,14 @@ def main_dialog_end(text_to_parse, taskname, username):
 
     tokens, dependencies = calcDependencies(text_to_parse)
     tagged = get_tagged_sentence(text_to_parse)
-    print("TOKENS:", tokens)
-    print("DEP:", dependencies)
-    print("TAG:", tagged)
 
     for i in range(0, len(tagged)):
-        print("tagged:", tagged[i])
         if sensor.__contains__(tagged[i][0].lower()):
             word = tagged[i][0].lower()
             find = 1
             break
-    print("FIND:", find)
     if find == 0:
         for i in range(0, len(dependencies)):
-            print("DDD:", tokens[dependencies[i][2] - 1])
             if dependencies[i][0] == "obj" and findInlList(
                 find_sinonimi, tokens[dependencies[i][1] - 1]
             ):
@@ -251,9 +204,6 @@ def main_dialog_end(text_to_parse, taskname, username):
             if dependencies[i][0] == "compound":
                 adj = tokens[dependencies[i][2] - 1]
 
-    print("OBJ", str(obj))
-    print("ADJ", str(adj))
-    print("WORD SENS", str(word))
     if find == 1:
         if word != "":
             add_end_tag_XML(
@@ -300,18 +250,12 @@ def findInlList(lista, word):
 
 # assert or deny
 def main_dialog_assert(text_to_parse, taskname, username):
-    print("PROGRAM NAME IN DIALOG END")
-
     result = ""
     end = ""
     yes = 0
     negative = 0
 
     tokens, dependencies = calcDependencies(text_to_parse)
-    tagged = get_tagged_sentence(text_to_parse)
-    print("TOKENS:", tokens)
-    print("DEP:", dependencies)
-    print("TAG:", tagged)
 
     for i in range(0, len(tokens)):
         if assert_response.__contains__(tokens[i].lower()):
@@ -353,15 +297,10 @@ def main_dialog(text_to_parse, username, taskname):
             PickAndPlace()
         )  # creo il nuovo oggetto PickPlace perchè non ho file .pkl
 
-    print("I'm ready to execute the program:", text_to_parse)
-    program_list = about(text_to_parse)
+    program_list = text_to_parse.split(".")
     for sentence in program_list:
         tokens, dependencies = calcDependencies(sentence)
         tagged = get_tagged_sentence(sentence)
-        print("Tokens Parse:", tokens)
-        print("Dependency parser Parse:", dependencies)
-        parseDependencies(dependencies, tokens)
-        print("PRINT PICK PLACE", pickPlace)
         result, end, card = pickPlace.process_dependencies(
             lista=dependencies,
             tokens=tokens,

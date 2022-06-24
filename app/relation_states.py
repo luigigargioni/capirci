@@ -76,56 +76,30 @@ class PickAndPlace:
         # definizione pick
         # CASO 1: take the obj and put it on place
         for i in range(0, len(lista)):
-            print("qui leggo LISTA:", lista[i])
             if (
                 lista[i][0] == "obj"
                 or lista[i][0] == "dep"
                 or lista[i][0] == "compound"
             ):
-                print("TROV COMPOUND?")
-                print(
-                    "TROV COMPOUND?:",
-                    lista[i],
-                    lista[i][1] - 1,
-                    tokens[lista[i][1] - 1],
-                )
                 if lista[i][0] == "compound":
                     if pick_sinonimi.__contains__(tokens[lista[i][2] - 1]):
-                        # take-ball
-                        print(
-                            "define_direct_object2 - ho trovato obj or dep:", lista[i]
-                        )
                         self.define_direct_object2(lista, tokens, i, username, taskname)
                 else:
                     if pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
-                        # take-ball
-                        print("define_direct_object - ho trovato obj or dep:", lista[i])
                         if self.pick is None:
                             self.define_direct_object(
                                 lista, tokens, i, username, taskname
                             )
-                        print(self.pick.object.name)
 
-                ##############
-                # obj(place, it)  or  obj(place, the box)
             elif (lista[i][0] == "obj") and (
                 place_sinonimi.__contains__(tokens[lista[i][1] - 1])
             ):
-                print("Place=Place()")
                 object = tokens[lista[i][2] - 1]
-                print("word da cercare", object)
                 word = self.search_in_tagged(tagged, object)
-                if word == "PRP":
-                    print("preposition")  # l'oggetto è definito da altre parti
-                elif word != "PRP":  # and (self.pick==None):
-                    print("cerco l'oggetto : ho put the obj on place")
+                if word != "PRP":
                     self.define_direct_object(lista, tokens, i, username, taskname)
 
-                else:
-                    print("non cerco: ripete nome obj")
-
             elif lista[i][0] == "case":
-                print("loc destination")
                 self.define_location(lista, tokens, i, username, taskname)
 
         """Leggo pick and place"""
@@ -138,10 +112,7 @@ class PickAndPlace:
                 pick_data = pick_place_data.pick
                 place_data = pick_place_data.place
 
-            # print("from data place: --->", place_data.location.name)  # -> banana
-
             if pick_data is None and place_data is not None:
-                print("NO PICK 1")
                 msg = "which is the object to be taken?"
                 end = "0"
                 card = ""
@@ -172,7 +143,6 @@ class PickAndPlace:
                 return msg, end, card
         else:
             if self.pick is None and self.place is not None:
-                print("NO PICK")
                 msg = "which is the object to be taken?"
                 end = "0"
                 card = ""
@@ -210,17 +180,9 @@ class PickAndPlace:
         object_cardinality = self.find_object_cardinality(object_name, lista, tokens)
         object = Object(object_name, object_cardinality, object_adjective)
         self.pick = Pick(object)
-        print("Pick=Pick()")
 
-        """ salvo pick """
-
-        # with open('pick.pkl', 'wb') as output:
-        #    pickle.dump(self.pick, output, pickle.HIGHEST_PROTOCOL)
         with open(task_name_pkl, "wb") as output:
             dump(self, output, HIGHEST_PROTOCOL)
-
-        if self.pick is not None:
-            print("Object to pick:", self.pick.object.name)
 
     def define_direct_object2(self, lista, tokens, i, username, taskname):
 
@@ -231,17 +193,9 @@ class PickAndPlace:
         object_cardinality = self.find_object_cardinality(object_name, lista, tokens)
         object = Object(object_name, object_cardinality, object_adjective)
         self.pick = Pick(object)
-        print("Pick=Pick()")
 
-        """ salvo pick """
-
-        # with open('pick.pkl', 'wb') as output:
-        #    pickle.dump(self.pick, output, pickle.HIGHEST_PROTOCOL)
         with open(task_name_pkl, "wb") as output:
             dump(self, output, HIGHEST_PROTOCOL)
-
-        if self.pick is not None:
-            print("Object to pick:", self.pick.object.name)
 
     def define_location(self, lista, tokens, i, username, taskname):
 
@@ -254,26 +208,12 @@ class PickAndPlace:
         )
         location = Location(location_name, location_cardinality, location_adjective)
         self.place = Place(self.pick, location)
-        print("IN DEFINE LOCATION")
-        print("LOCATION name: ", self.place.location.name)
-        print("LOCATION card: ", self.place.location.cardinality)
-        print("LOCATION adj: ", self.place.location.adjective)
 
         with open(task_name_pkl, "wb") as output:
             dump(self, output, HIGHEST_PROTOCOL)
-
-        """ salvo place """
-        # with open('place.pkl', 'wb') as output:
-        #   pickle.dump(self.place, output, pickle.HIGHEST_PROTOCOL)
-
-        if self.pick is not None:
-            print("OBJECT name: ", self.place.pick.object.name)
-            print("OBJECT card: ", self.place.pick.object.cardinality)
-            print("OBJECT adj: ", self.place.pick.object.adjective)
 
     # search and return the tag of a word
     def search_in_tagged(self, tagged, word):
         for i in range(0, len(tagged)):
             if tagged[i][0] == word:
-                print("search in tagged", tagged[i][1])
                 return tagged[i][1]

@@ -1061,7 +1061,6 @@ def getTaskFile(request):
             )
             root = fromstring(taskCode)
             parsed = parseXmlToJson(root)
-            print(parsed)
             data_result = {"file": parsed, "mode": "xml"}
             json_result = dumps(data_result)
             return HttpResponse(json_result)
@@ -1076,7 +1075,6 @@ def getTaskFile(request):
 def parseXmlToJson(xml):
     response = {}
     for child in list(xml):
-        print(child.tag)
         if len(list(child)) > 0:
             if child.tag == "repeat":
                 response[child.tag] = {
@@ -1141,7 +1139,6 @@ def ajaxCreateDialogue(request):
 
 # action da eseguire
 def ajaxCallParserAction(request):
-    print("call parser action")
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text")
@@ -1163,7 +1160,6 @@ def ajaxCallParserAction(request):
 
 # numero di volte da eseguire il task
 def ajaxCallParserTimes(request):
-    print("call parser condition")
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1181,7 +1177,6 @@ def ajaxCallParserTimes(request):
 
 # End condition
 def ajaxCallParserEnd(request):
-    print("call parser END")
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1199,7 +1194,6 @@ def ajaxCallParserEnd(request):
 
 # Risposta affermativa?
 def ajaxCallParserAssert(request):
-    print("call parser ASSERT")
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1226,7 +1220,6 @@ def ajaxCallParser(request):
         response, end, card = main_dialog(text_to_parse.lower(), username, taskname)
         data_result["response"] = response
         data_result["end"] = end
-        print("CARD " + card)
         if (
             (not card.isnumeric() and all_sinonimi.__contains__(card))
             or card == "0"
