@@ -573,11 +573,15 @@ def takeShot(request):
                 + ".png",
                 image,
                 [
-                    int(cv2.IMWRITE_PNG_COMPRESSION),
-                    3,
-                ][  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
-                    cv2.IMWRITE_JPEG_QUALITY, 95
-                ],  # Value between 0 tp 100, default 95
+                    (
+                        int(cv2.IMWRITE_PNG_COMPRESSION),
+                        3,
+                    ),  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
+                    (
+                        cv2.IMWRITE_JPEG_QUALITY,
+                        95,
+                    ),  # Value between 0 tp 100, default 95
+                ],
             )
 
             shifted = cv2.pyrMeanShiftFiltering(image, 51, 71)
@@ -608,11 +612,15 @@ def takeShot(request):
                 + "_contour.png",
                 copy,
                 [
-                    int(cv2.IMWRITE_PNG_COMPRESSION),
-                    3,
-                ][  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
-                    cv2.IMWRITE_JPEG_QUALITY, 95
-                ],  # Value between 0 tp 100, default 95
+                    (
+                        int(cv2.IMWRITE_PNG_COMPRESSION),
+                        3,
+                    ),  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
+                    (
+                        cv2.IMWRITE_JPEG_QUALITY,
+                        95,
+                    ),  # Value between 0 tp 100, default 95
+                ],
             )
 
             outline = zeros(image.shape, dtype="uint8")
@@ -628,11 +636,15 @@ def takeShot(request):
                 + "_shape.png",
                 roi,
                 [
-                    int(cv2.IMWRITE_PNG_COMPRESSION),
-                    3,
-                ][  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
-                    cv2.IMWRITE_JPEG_QUALITY, 95
-                ],  # Value between 0 tp 100, default 95
+                    (
+                        int(cv2.IMWRITE_PNG_COMPRESSION),
+                        3,
+                    ),  # Value between 0 to 9: 9 highest compression with more time to save images into the file. Default 3
+                    (
+                        cv2.IMWRITE_JPEG_QUALITY,
+                        95,
+                    ),  # Value between 0 tp 100, default 95
+                ],
             )
 
             return HttpResponse("Ok")
