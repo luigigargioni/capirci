@@ -1,8 +1,6 @@
 from xml.etree.ElementTree import Element, tostring, SubElement, dump, fromstring
-from pickle import load
 from app.models import Task
-from .dictionary import all_sinonimi
-from os import path
+from .dictionary import all_synonyms
 
 
 def iterator(parents, nested=False):
@@ -52,39 +50,59 @@ def add_external_tag_XML(taskname, username, newExtTag, newExtTagText):
     Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
 
 
-# this method read info about pickPlace task from .pkl file and write corresponding tags in .xml file
-def create_XML_program(taskname, username):
-    task_name_pkl = str(username) + "_" + taskname + ".pkl"
+def create_XML_program(taskname, username, pickPlace):
+    root = None
 
-    data = Element("program")
-    pick = SubElement(data, "pick")
-    place = SubElement(data, "place")
+    if Task.objects.filter(name=taskname).filter(owner=username).exists():
+        taskCode = (
+            Task.objects.filter(name=taskname)
+            .filter(owner=username)
+            .values_list("code", flat=True)
+            .first()
+        )
+        if taskCode is not None and taskCode != "":
+            root = fromstring(taskCode)
 
-    if path.isfile(task_name_pkl):
-        with open(task_name_pkl, "rb") as input:
-            pick_place_data = load(input)
-            pick_data = pick_place_data.pick
-            place_data = pick_place_data.place
+    data = None
+    pickExists = False
+    placeExists = False
 
-    pick.set("adj", pick_data.object.adjective)
-    card = pick_data.object.cardinality
-    if (
-        card == "1"
-        or (not card.isnumeric() and all_sinonimi.__contains__(card))
-        or card == "0"
-    ):
-        card = ""
+    if root is not None:
+        data = root
+        for child in root:
+            # solo figli diretti
+            tag = child.tag
+            if tag == "pick":
+                pickExists = True
+            if tag == "place":
+                placeExists = True
+    else:
+        data = Element("program")
 
-    pick.set("card", card)
-    place.set("adj", place_data.location.adjective)
-    place.set("card", place_data.location.cardinality)
+    pick_data = pickPlace.pick
+    place_data = pickPlace.place
 
-    pick.text = pick_data.object.name
-    place.text = place_data.location.name
+    if pick_data is not None and pickExists is False:
+        pick = SubElement(data, "pick")
+        pick.set("adj", pick_data.object.adjective)
+        card = pick_data.object.cardinality
+        if (
+            # card == "1" or
+            (not card.isnumeric() and all_synonyms.__contains__(card))
+            or card == "0"
+            or card == ""
+        ):
+            card = "1"
+        pick.set("card", card)
+        pick.text = pick_data.object.name
+
+    if place_data is not None and placeExists is False:
+        place = SubElement(data, "place")
+        place.set("adj", place_data.location.adjective)
+        place.text = place_data.location.name
+
     mydata = tostring(data, encoding="unicode")
     Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
-    # myfile = open(program_name_xml, "w")
-    # myfile.write(mydata)
 
 
 # This method add an end tag to existing XML file

@@ -3,23 +3,10 @@ from math import inf
 from pytz import timezone as pytzTimezone
 from os import remove, path, listdir
 import cv2
-from pickle import load
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Task, Object, Robot, UserRobot, Location, Action
-from .main_dialog import (
-    main_dialog_condition,
-    main_dialog_action,
-    main_dialog_end,
-    main_dialog_assert,
-    main_dialog,
-)
 from django.core import serializers
-from .XML_utilities import (
-    add_external_tag_XML,
-    create_XML_program,
-)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from pythonping import ping
@@ -28,8 +15,9 @@ from xml.etree.ElementTree import fromstring
 from json import dumps, loads
 from win32com.client import Dispatch
 from numpy import zeros
-from .dictionary import all_sinonimi
 from django.views.decorators.cache import never_cache
+from .dictionary import all_synonyms
+from .XML_utilities import add_external_tag_XML
 from .robot_functions import (
     polar_to_robot_coordinates,
     find_polar_coordinates,
@@ -42,6 +30,14 @@ from .robot_functions import (
     switch_orin_to_bcap,
     list_to_string_position,
     list_to_string_joints,
+)
+from .models import Task, Object, Robot, UserRobot, Location, Action
+from .main_dialog import (
+    main_dialog_condition,
+    main_dialog_action,
+    main_dialog_end,
+    main_dialog_assert,
+    main_dialog,
 )
 
 # Create your views here.
@@ -342,9 +338,6 @@ def deleteTask(request):
         username = request.POST.get("username")
         instance = Task.objects.filter(name=taskname).filter(owner=username)
         instance.delete()
-        taskname = str(username) + "_" + taskname
-        if path.exists(taskname + ".pkl"):
-            remove(taskname + ".pkl")
         return HttpResponse("oki")
     else:
         return HttpResponse("ERROR")
@@ -1174,11 +1167,6 @@ def ajaxCallParserAction(request):
         text_to_parse = request.POST.get("text")
         taskname = request.POST.get("taskname", "")
         username = request.POST.get("username", "")
-        filepkl = username + "_" + taskname + ".pkl"
-        files = listdir(".")
-        for file in files:
-            if file.startswith(filepkl):
-                remove(path.join(".", file))
         response, end = main_dialog_action(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
@@ -1247,11 +1235,11 @@ def ajaxCallParser(request):
         username = request.POST.get("username")
         taskname = request.POST.get("taskname")
         # pick place recognition
-        response, end, card = main_dialog(text_to_parse.lower(), username, taskname)
+        response, end, card = main_dialog(text_to_parse.lower(), taskname, username)
         data_result["response"] = response
         data_result["end"] = end
         if (
-            (not card.isnumeric() and all_sinonimi.__contains__(card))
+            (not card.isnumeric() and all_synonyms.__contains__(card))
             or card == "0"
             or card == ""
         ):
@@ -1259,30 +1247,38 @@ def ajaxCallParser(request):
         else:
             data_result["card"] = card
         if end == "1":
-            create_XML_program(taskname, username)
-            task_name_pkl = str(username) + "_" + taskname + ".pkl"
-            if path.isfile(task_name_pkl):
-                with open(task_name_pkl, "rb") as input:
-                    pick_place_data = load(input)
-                    pick_data = pick_place_data.pick
-                    # place_data = pick_place_data.place
+            root = None
+            if Task.objects.filter(name=taskname).filter(owner=username).exists():
+                taskCode = (
+                    Task.objects.filter(name=taskname)
+                    .filter(owner=username)
+                    .values_list("code", flat=True)
+                    .first()
+                )
+                if taskCode is not None and taskCode != "":
+                    root = fromstring(taskCode)
 
-            if (
-                pick_data.object.cardinality != ""
-                and pick_data.object.cardinality != "0"
-            ):
-                if (
-                    not pick_data.object.cardinality.isnumeric()
-                    and all_sinonimi.__contains__(pick_data.object.cardinality)
+            pick_data_card = None
+
+            if root is not None:
+                for child in root:
+                    # solo figli diretti
+                    tag = child.tag
+                    if tag == "pick":
+                        pick_data_card = child.attrib.get("card")
+
+            if pick_data_card != "" and pick_data_card != "0":
+                if not pick_data_card.isnumeric() and all_synonyms.__contains__(
+                    pick_data_card
                 ):
                     add_external_tag_XML(taskname, username, "repeat", "while")
                     data_result["card"] = "while"
-                elif pick_data.object.cardinality.isnumeric():
+                elif pick_data_card.isnumeric():
                     add_external_tag_XML(
                         taskname,
                         username,
                         "repeat",
-                        pick_data.object.cardinality,
+                        pick_data_card,
                     )
         json_result = dumps(data_result)
         return HttpResponse(json_result)
@@ -1318,14 +1314,12 @@ def checkLibrariesXML(request):
             .values_list("code", flat=True)
             .first()
         )
-        file = fromstring(taskCode)
-        if file.find("event") is None:
-            search = "repeat/"
-        else:
-            search = "event/repeat/"
-        pick = file.find(search + "/pick").text
-        place = file.find(search + "/place").text
-        action = file.find(search + "/action")
+        root = fromstring(taskCode)
+
+        pick = root.findall(".//pick")[0].text
+        place = root.findall(".//place")[0].text
+        action = root.findall(".//action")[0]
+
         if action is not None:
             action = action.text
         else:

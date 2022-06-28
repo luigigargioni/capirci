@@ -1,7 +1,8 @@
-from .dictionary import place_sinonimi, pick_sinonimi
-from pickle import load, dump, HIGHEST_PROTOCOL
-from os import path
 from word2number import w2n
+from xml.etree.ElementTree import fromstring
+from .dictionary import place_synonyms, pick_synonyms
+from .XML_utilities import create_XML_program
+from .models import Task
 
 
 class Object:
@@ -12,9 +13,8 @@ class Object:
 
 
 class Location:
-    def __init__(self, name, cardinality, adjective):
+    def __init__(self, name, adjective):
         self.name = name
-        self.cardinality = cardinality
         self.adjective = adjective
 
 
@@ -71,8 +71,7 @@ class PickAndPlace:
         return cardinality
 
     # define all the elements of a pick and place task
-    def process_dependencies(self, lista, tokens, tagged, username, taskname):
-        task_name_pkl = str(username) + "_" + taskname + ".pkl"
+    def process_dependencies(self, lista, tokens, tagged, taskname, username):
         # definizione pick
         # CASO 1: take the obj and put it on place
         for i in range(0, len(lista)):
@@ -82,135 +81,95 @@ class PickAndPlace:
                 or lista[i][0] == "compound"
             ):
                 if lista[i][0] == "compound":
-                    if pick_sinonimi.__contains__(tokens[lista[i][2] - 1]):
-                        self.define_direct_object2(lista, tokens, i, username, taskname)
+                    if pick_synonyms.__contains__(tokens[lista[i][2] - 1]):
+                        self.define_direct_object(
+                            lista, tokens[lista[i][1] - 1], tokens, i
+                        )
                 else:
-                    if pick_sinonimi.__contains__(tokens[lista[i][1] - 1]):
+                    if pick_synonyms.__contains__(tokens[lista[i][1] - 1]):
                         if self.pick is None:
                             self.define_direct_object(
-                                lista, tokens, i, username, taskname
+                                lista, tokens[lista[i][2] - 1], tokens, i
                             )
 
             elif (lista[i][0] == "obj") and (
-                place_sinonimi.__contains__(tokens[lista[i][1] - 1])
+                place_synonyms.__contains__(tokens[lista[i][1] - 1])
             ):
                 object = tokens[lista[i][2] - 1]
                 word = self.search_in_tagged(tagged, object)
                 if word != "PRP":
-                    self.define_direct_object(lista, tokens, i, username, taskname)
+                    self.define_direct_object(lista, tokens[lista[i][2] - 1], tokens, i)
 
             elif lista[i][0] == "case":
-                self.define_location(lista, tokens, i, username, taskname)
+                self.define_location(lista, tokens, i)
 
-        """Leggo pick and place"""
-        # pick_data = None
-        # place_data = None
+        # Controllo se esiste già in db
+        root = None
 
-        if path.isfile(task_name_pkl):
-            with open(task_name_pkl, "rb") as input:
-                pick_place_data = load(input)
-                pick_data = pick_place_data.pick
-                place_data = pick_place_data.place
+        if Task.objects.filter(name=taskname).filter(owner=username).exists():
+            taskCode = (
+                Task.objects.filter(name=taskname)
+                .filter(owner=username)
+                .values_list("code", flat=True)
+                .first()
+            )
+            if taskCode is not None and taskCode != "":
+                root = fromstring(taskCode)
 
-            if pick_data is None and place_data is not None:
-                msg = "which is the object to be taken?"
-                end = "0"
-                card = ""
-                return msg, end, card
+        pick = None
+        place = None
+        pick_card = ""
 
-            elif place_data is None and pick_data is not None:
-                msg = "Where should I put the " + pick_data.object.name + "?"
-                end = "0"
-                card = pick_data.object.cardinality
-                return msg, end, card
-            elif pick_data is not None and place_data is not None:
-                msg = (
-                    "I have to put the "
-                    + pick_data.object.adjective
-                    + " "
-                    + pick_data.object.name
-                    + " in the "
-                    + place_data.location.name
-                    + "."
-                )
-                end = "1"
-                card = pick_data.object.cardinality
-                return msg, end, card
-            elif place_data is None and pick_data is None:
-                msg = "I did not understand what you said. Tell me again what to do."
-                end = "0"
-                card = ""
-                return msg, end, card
-        else:
-            if self.pick is None and self.place is not None:
-                msg = "which is the object to be taken?"
-                end = "0"
-                card = ""
-                return msg, end, card
+        if root is not None:
+            for child in root:
+                # solo figli diretti
+                tag = child.tag
+                if tag == "pick":
+                    pick = child.text
+                    pick_card = child.attrib.get("card")
+                if tag == "place":
+                    place = child.text
 
-            elif (self.place is None) and (self.pick is not None):
-                msg = "Where should I put the " + self.pick.object.name + "?"
-                end = "0"
-                card = self.pick.object.cardinality
-                return msg, end, card
-            elif (self.pick is not None) and (self.place is not None):
-                msg = (
-                    "I have to put the "
-                    + self.pick.object.name
-                    + " in the "
-                    + self.place.location.name
-                    + "."
-                )
-                end = "1"
-                card = self.pick.object.cardinality
-                return msg, end, card
-            elif (self.pick is None) and (self.place is None):
-                msg = "I did not understand what you said. Tell me again what to do."
-                end = "0"
-                card = ""
-                return msg, end, card
+        if (self.pick is None and pick is None) and self.place is not None:
+            create_XML_program(taskname, username, self)
+            msg = "Which is the object to be taken?"
+            end = "0"
+            card = ""
+            return msg, end, card
+        elif (self.place is None and place is None) and (self.pick is not None):
+            create_XML_program(taskname, username, self)
+            msg = "Where should I put the " + self.pick.object.name + "?"
+            end = "0"
+            card = self.pick.object.cardinality
+            return msg, end, card
+        elif (self.pick is not None or pick is not None) and (
+            self.place is not None or place is not None
+        ):
+            pickData = self.pick.object.name if pick is None else pick
+            placeData = self.place.location.name if place is None else place
+            msg = "I have to put the " + pickData + " in the " + placeData + "."
+            end = "1"
+            card = self.pick.object.cardinality if pick is None else pick_card
+            create_XML_program(taskname, username, self)
+            return msg, end, card
+        elif (self.pick is None) and (self.place is None):
+            msg = "I did not understand what you said. Tell me again what to do."
+            end = "0"
+            card = ""
+            return msg, end, card
 
     # search and define the class object -> manipulable
-    def define_direct_object(self, lista, tokens, i, username, taskname):
-
-        task_name_pkl = str(username) + "_" + taskname + ".pkl"
-
-        object_name = tokens[lista[i][2] - 1]
+    def define_direct_object(self, lista, object_name, tokens, i):
         object_adjective = self.find_object_adj(object_name, lista, tokens)
         object_cardinality = self.find_object_cardinality(object_name, lista, tokens)
         object = Object(object_name, object_cardinality, object_adjective)
         self.pick = Pick(object)
 
-        with open(task_name_pkl, "wb") as output:
-            dump(self, output, HIGHEST_PROTOCOL)
-
-    def define_direct_object2(self, lista, tokens, i, username, taskname):
-
-        task_name_pkl = str(username) + "_" + taskname + ".pkl"
-
-        object_name = tokens[lista[i][1] - 1]
-        object_adjective = self.find_object_adj(object_name, lista, tokens)
-        object_cardinality = self.find_object_cardinality(object_name, lista, tokens)
-        object = Object(object_name, object_cardinality, object_adjective)
-        self.pick = Pick(object)
-
-        with open(task_name_pkl, "wb") as output:
-            dump(self, output, HIGHEST_PROTOCOL)
-
-    def define_location(self, lista, tokens, i, username, taskname):
-
-        task_name_pkl = str(username) + "_" + taskname + ".pkl"
-
+    def define_location(self, lista, tokens, i):
         location_name = tokens[lista[i][1] - 1]
         location_adjective = self.find_object_adj(location_name, lista, tokens)
-        location_cardinality = self.find_object_cardinality(
-            location_name, lista, tokens
-        )
-        location = Location(location_name, location_cardinality, location_adjective)
+        location = Location(location_name, location_adjective)
         self.place = Place(self.pick, location)
-
-        with open(task_name_pkl, "wb") as output:
-            dump(self, output, HIGHEST_PROTOCOL)
 
     # search and return the tag of a word
     def search_in_tagged(self, tagged, word):

@@ -1,22 +1,20 @@
 from nltk import word_tokenize, pos_tag
-from .relation_states import PickAndPlace
 from django.contrib.auth.models import User
-from .dictionary import (
-    find_sinonimi,
-    all_sinonimi,
-    negative_response,
-    assert_response,
-    sensor,
-)
 from word2number import w2n
-from xml.etree.ElementTree import Element, dump as xmlDump, tostring, fromstring
+from xml.etree.ElementTree import Element, dump, tostring, fromstring
 from django.db.models import Q
 from stanza import Pipeline
 from stanza.pipeline.core import DownloadMethod
-from os import path
+from .relation_states import PickAndPlace
 from .XML_utilities import add_external_tag_XML, add_end_tag_XML
 from .models import Action, Task
-from pickle import load, dump as pickleDump, HIGHEST_PROTOCOL
+from .dictionary import (
+    find_synonyms,
+    all_synonyms,
+    negative_response,
+    positive_response,
+    sensor_synonyms,
+)
 
 
 def get_tagged_sentence(sentence):
@@ -53,7 +51,7 @@ def main_dialog_condition(text_to_parse, taskname, username):
     tagged = get_tagged_sentence(text_to_parse)
 
     for i in range(0, len(tokens)):
-        if all_sinonimi.__contains__(tokens[i].lower()):
+        if all_synonyms.__contains__(tokens[i].lower()):
             times = "while"
             add_external_tag_XML(
                 taskname, username, newExtTag="repeat", newExtTagText=str(times)
@@ -164,7 +162,7 @@ def main_dialog_action(text_to_parse, taskname, username):
                     element.insert(1, c)
                 break
 
-        xmlDump(root)
+        dump(root)
         mydata = tostring(root, encoding="unicode")
         Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
         result = "ok"
@@ -188,14 +186,14 @@ def main_dialog_end(text_to_parse, taskname, username):
     tagged = get_tagged_sentence(text_to_parse)
 
     for i in range(0, len(tagged)):
-        if sensor.__contains__(tagged[i][0].lower()):
+        if sensor_synonyms.__contains__(tagged[i][0].lower()):
             word = tagged[i][0].lower()
             find = 1
             break
     if find == 0:
         for i in range(0, len(dependencies)):
             if dependencies[i][0] == "obj" and findInlList(
-                find_sinonimi, tokens[dependencies[i][1] - 1]
+                find_synonyms, tokens[dependencies[i][1] - 1]
             ):
                 obj = tokens[dependencies[i][2] - 1]
                 find = 1
@@ -258,7 +256,7 @@ def main_dialog_assert(text_to_parse, taskname, username):
     tokens, dependencies = calcDependencies(text_to_parse)
 
     for i in range(0, len(tokens)):
-        if assert_response.__contains__(tokens[i].lower()):
+        if positive_response.__contains__(tokens[i].lower()):
             yes = 1
             break
 
@@ -283,19 +281,8 @@ def main_dialog_assert(text_to_parse, taskname, username):
 
 
 # pick place
-def main_dialog(text_to_parse, username, taskname):
-    task_name_pkl = str(username) + "_" + taskname + ".pkl"
-    """Se non c'è ancora il file lo creo -> non ho ancora un pick place, quindi lo creo"""
-    """Se ho il file ho il pickPlace() , ma è completo?"""
-
-    if path.isfile(task_name_pkl):
-        with open(task_name_pkl, "rb") as input:
-            pickPlace = load(input)  # carico il contenuto
-        # leggo il file, se è un pick place completo dovrei poter aggiungere un altro pick place al file
-    else:
-        pickPlace = (
-            PickAndPlace()
-        )  # creo il nuovo oggetto PickPlace perchè non ho file .pkl
+def main_dialog(text_to_parse, taskname, username):
+    pickPlace = PickAndPlace()
 
     program_list = text_to_parse.split(".")
     for sentence in program_list:
@@ -305,10 +292,7 @@ def main_dialog(text_to_parse, username, taskname):
             lista=dependencies,
             tokens=tokens,
             tagged=tagged,
-            username=username,
             taskname=taskname,
+            username=username,
         )
-        with open(task_name_pkl, "wb") as output:
-            pickleDump(pickPlace, output, HIGHEST_PROTOCOL)
-
         return result, end, card
