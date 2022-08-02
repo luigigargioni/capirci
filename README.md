@@ -1,20 +1,22 @@
 # CAPIRCI
 
-## Avvia server:
+## Avvia server
+
 `poetry run python manage.py runserver`  
 OPPURE  
 `poetry shell && python manage.py runserver`
 
 ---
 
-## Installazione:
+## Installazione
+
 `poetry install`  
 OPPURE  
 `poetry update`
 
 ---
 
-## Credenziali:
+## Credenziali
 
 Username: operator1  
 Password: Passwordoperator2  
@@ -28,5 +30,4 @@ Tipo utente: gestore
 Username: admin  
 Password: adminpassword  
 Tipo utente: gestore  
-(utente per poter entrare nel pannello di amministrazione Django ed accedere al database all'indirizzo: http://localhost:8000/admin/  )
-
+(utente per poter entrare nel pannello di amministrazione Django ed accedere al database all'indirizzo: <http://localhost:8000/admin/>  )
