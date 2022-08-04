@@ -31,3 +31,10 @@ Username: admin
 Password: adminpassword  
 Tipo utente: gestore  
 (utente per poter entrare nel pannello di amministrazione Django ed accedere al database all'indirizzo: <http://localhost:8000/admin/>  )
+
+---
+
+## React refactor
+
+<https://dev.to/kozlovzxc/django-templates-with-react-4hko>
+<https://github.com/kozlovzxc/djangoReactTemplates/blob/master/utils/render_react_page.py>

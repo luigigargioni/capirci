@@ -1,0 +1,85 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb",
+    "prettier",
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:import/typescript"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "prettier",
+    "react",
+    "@typescript-eslint",
+    "react-hooks",
+    "jsx-a11y"
+  ],
+  "rules": {
+    "prettier/prettier": "warn",
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["off"],
+    "no-console":"off",
+    "no-nested-ternary":"off",
+    "import/prefer-default-export": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "react/function-component-definition": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
+    "react-hooks/exhaustive-deps": "off",
+    "no-undef": "off",
+    "react/destructuring-assignment": "off",
+    "react/jsx-props-no-spreading": "off",
+    "object-shorthand": "off",
+    "import/no-cycle": "off",
+    "no-case-declarations": "off",
+    "react/jsx-no-useless-fragment":  "off",
+    "no-restricted-syntax": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "spaced-comment": "off",
+    "array-callback-return": "off",
+    "default-param-last": "off",
+    "import/no-useless-path-segments": "off",
+    "react/prop-types": "off",
+    "react/no-unstable-nested-components": "off",
+    "no-restricted-globals": "off",
+    "react/jsx-key": "off",
+    "import/order": "off",
+    "import/no-extraneous-dependencies": "off",
+    "jsx-a11y/anchor-is-valid" :"off",
+    "global-require": "off",
+    "import/extensions": [
+      "off",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+   ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/parsers": {
+      "typescript": [],
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    }
+  }
+}

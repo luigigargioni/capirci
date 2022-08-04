@@ -1,2 +1,8 @@
+# App
 .venv
 __pycache__/
+
+# Frontend
+node_modules
+dist
+.parcel-cache

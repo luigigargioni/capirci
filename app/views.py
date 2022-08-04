@@ -39,6 +39,7 @@ from .main_dialog import (
     main_dialog_assert,
     main_dialog,
 )
+from .utils.render_react_page import render_react_page
 
 # Create your views here.
 
@@ -48,7 +49,8 @@ from .main_dialog import (
 @login_required(login_url="/accounts/login/")
 def home(request):
     template_name = "home.html"
-    return render(request, template_name)
+    return render_react_page(request, "app")
+    # return render(request, template_name)
 
 
 @never_cache

@@ -20,12 +20,20 @@
     <script src="../../static/js/home.js"></script>
     <script src="../../static/js/bootstrap-slider.min.js"></script>
 
-
     <title>CAPIRCI</title>
 
 </head>
 
 <body>
+
+{% load static %}
+
+{% block content %}
+    <div id="{{ element_id }}" style="z-index: 9999; position: fixed"></div>
+    {{ page_context | json_script:'page-context' }}
+
+    <script src="{% static 'index.js' %}"></script>
+{% endblock %}
 
 <!-- NAVBAR SUPERIORE -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
