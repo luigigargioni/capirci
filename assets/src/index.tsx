@@ -1,8 +1,15 @@
+import { ConfigProvider } from 'antd'
+import enGB from 'antd/lib/locale/en_GB'
 import React, { LazyExoticComponent, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ThemeProvider } from 'styled-components'
 import { GlobalStyle } from './style/global'
 import { theme } from './style/theme'
+import { SWRConfig } from 'swr'
+import { swrParams } from './services/api'
+import { validateMessages } from './utils/formUtils'
+import { Provider } from 'react-redux'
+import { store } from './store'
 
 const LoginPage = lazy(() => import('./pages/authentication/index'))
 const ChatPage = lazy(() => import('./pages/chat/index'))
@@ -20,10 +27,18 @@ const declarePage = (
 
     root.render(
       <Suspense fallback={<></>}>
-        <ThemeProvider theme={theme}>
-          <GlobalStyle />
-          <Content />
-        </ThemeProvider>
+        <React.StrictMode>
+          <ConfigProvider locale={enGB} form={{ validateMessages }}>
+            <ThemeProvider theme={theme}>
+              <Provider store={store}>
+                <SWRConfig value={swrParams}>
+                  <GlobalStyle />
+                  <Content />
+                </SWRConfig>
+              </Provider>
+            </ThemeProvider>
+          </ConfigProvider>
+        </React.StrictMode>
       </Suspense>
     )
   } catch (e) {

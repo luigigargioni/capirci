@@ -1,0 +1,11 @@
+{
+    "plugins": [
+        "@babel/plugin-transform-runtime",
+        [
+            "styled-components",
+            {
+                "displayName": true
+            }
+        ]
+    ]
+}

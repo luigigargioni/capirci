@@ -1,6 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
 import { ThemeType } from './theme'
-// import 'antd/dist/antd.css'
 
 export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
 
