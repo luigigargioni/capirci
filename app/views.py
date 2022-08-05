@@ -49,8 +49,12 @@ from .utils.render_react_page import render_react_page
 @login_required(login_url="/accounts/login/")
 def home(request):
     template_name = "home.html"
-    return render_react_page(request, "app")
-    # return render(request, template_name)
+    return render(request, template_name)
+
+
+@login_required()
+def home_new(request):
+    return render_react_page(request, "HomePage")
 
 
 @never_cache
@@ -60,11 +64,25 @@ def chat(request, taskName):
     return render(request, template_name, {"taskName": taskName})
 
 
+@login_required()
+def chat_new(request, taskName):
+    return render_react_page(request, "ChatPage", {"taskName": taskName})
+
+
 @never_cache
 @login_required(login_url="/accounts/login/")
 def task(request, taskName):
     template_name = "task.html"
     return render(request, template_name, {"taskName": taskName})
+
+
+@login_required()
+def task_new(request, taskName):
+    return render_react_page(request, "GraphicPage", {"taskName": taskName})
+
+
+def login(request):
+    return render_react_page(request, "LoginPage")
 
 
 # VIEWS -- VIEWS -- VIEWS -- VIEWS -- VIEWS

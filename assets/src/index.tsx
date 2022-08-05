@@ -1,8 +1,13 @@
 import React, { LazyExoticComponent, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ThemeProvider } from 'styled-components'
+import { GlobalStyle } from './style/global'
+import { theme } from './style/theme'
 
-// eslint-disable-next-line import/no-unresolved
-const App = lazy(() => import('./App'))
+const LoginPage = lazy(() => import('./pages/authentication/index'))
+const ChatPage = lazy(() => import('./pages/chat/index'))
+const GraphicPage = lazy(() => import('./pages/graphic/index'))
+const HomePage = lazy(() => import('./pages/home/index'))
 
 const declarePage = (
   id: string,
@@ -10,11 +15,15 @@ const declarePage = (
 ) => {
   try {
     const element = document.getElementById(id) as HTMLElement
+    if (!element) return
     const root = createRoot(element)
 
     root.render(
       <Suspense fallback={<></>}>
-        <Content />
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <Content />
+        </ThemeProvider>
       </Suspense>
     )
   } catch (e) {
@@ -22,4 +31,7 @@ const declarePage = (
   }
 }
 
-declarePage('app', App)
+declarePage('LoginPage', LoginPage)
+declarePage('ChatPage', ChatPage)
+declarePage('GraphicPage', GraphicPage)
+declarePage('HomePage', HomePage)

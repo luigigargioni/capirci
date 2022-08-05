@@ -8,14 +8,15 @@ authors = ["Luigi Gargioni <luigi.gargioni@gmail.com>"]
 start = "python manage.py runserver"
 
 [tool.poetry.dependencies]
-django = "^4.0.6"
+django = "^4.1"
 django-mysql = "^4.7.0"
+docutils = "^0.19"
 nltk = "^3.7"
 numpy = "^1.23.1"
 opencv-python = "^4.6.0.66"
-pillow = "^9.1.1"
+pillow = "^9.2.0"
 python = "^3.10"
-pythonping = "^1.1.1"
+pythonping = "^1.1.2"
 pytz = "^2022.1"
 pywin32 = "^304"
 stanza = "^1.4.0"
@@ -24,7 +25,7 @@ word2number = "^1.1"
 [tool.poetry.dev-dependencies]
 black = "22.3.0"
 flake8 = "^4.0.1"
-poetryup = "^0.8.1"
+poetryup = "^0.8.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

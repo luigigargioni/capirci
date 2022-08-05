@@ -105,6 +105,9 @@ STATICFILES_DIRS = [
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = "/"
 
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "login"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

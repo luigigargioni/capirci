@@ -14,6 +14,9 @@ OPPURE
 OPPURE  
 `poetry update`
 
+Per aggiornare:
+`poetry run poetryup`
+
 ---
 
 ## Credenziali

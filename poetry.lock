@@ -70,14 +70,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "django"
-version = "4.0.6"
+version = "4.1"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.dependencies]
-asgiref = ">=3.4.1,<4"
+asgiref = ">=3.5.2,<4"
 sqlparse = ">=0.2.2"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
@@ -95,6 +95,14 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 Django = ">=3.2"
+
+[[package]]
+name = "docutils"
+version = "0.19"
+description = "Docutils -- Python Documentation Utilities"
+category = "main"
+optional = false
+python-versions = ">=3.7"
 
 [[package]]
 name = "emoji"
@@ -596,7 +604,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "7f37b811aa769cfee3129fcfc08c80a5e1ffddd0215d2460769f94c25e9f88e2"
+content-hash = "10f7cf441f99b28f4ff9b7c36cfdfc460a9535ae8987a5fad6a31e6984b4de54"
 
 [metadata.files]
 asgiref = [
@@ -646,6 +654,7 @@ django-mysql = [
     {file = "django-mysql-4.7.0.tar.gz", hash = "sha256:13d640413680b57c0ea3a49c4a0a9d1ac2b4a6e679baa5ac299dd45f3880a583"},
     {file = "django_mysql-4.7.0-py3-none-any.whl", hash = "sha256:26ba087d9163b411d404d44bc53dfbb4b321b4692eee3061a373040e9482000e"},
 ]
+docutils = []
 emoji = []
 filelock = [
     {file = "filelock-3.7.1-py3-none-any.whl", hash = "sha256:37def7b658813cda163b56fc564cdc75e86d338246458c4c28ae84cabefa2404"},
