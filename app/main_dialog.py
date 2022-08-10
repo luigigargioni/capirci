@@ -6,7 +6,7 @@ from django.db.models import Q
 from stanza import Pipeline
 from stanza.pipeline.core import DownloadMethod
 from .relation_states import PickAndPlace
-from .XML_utilities import add_external_tag_XML, add_end_tag_XML
+from .utils.xml import add_external_tag_XML, add_end_tag_XML
 from .models import Action, Task
 from .dictionary import (
     find_synonyms,

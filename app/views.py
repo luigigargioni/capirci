@@ -1,81 +1,84 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse, HttpRequest, HttpResponse
 from json import loads
+
+from app.utils.response import HttpMethod, invalid_request_method
+from app.utils.string import get_or_default
 from .utils.render_react_page import render_react_page
-from django.views.decorators.cache import never_cache
-
-# Create your views here.
 
 
-# VIEWS -- VIEWS -- VIEWS -- VIEWS -- VIEWS
-@never_cache
-@login_required(login_url="/login/")
-def home(request):
-    template_name = "home.html"
-    return render(request, template_name)
+@login_required()
+def home(request: HttpRequest) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render(request, "home.html")
+    else:
+        return invalid_request_method()
 
 
-@never_cache
-@login_required(login_url="/login/")
-def home_new(request):
-    return render_react_page(request, "HomePage")
+@login_required()
+def home_view(request: HttpRequest) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render_react_page(request, "HomePage")
+    else:
+        return invalid_request_method()
 
 
-@never_cache
-@login_required(login_url="/login/")
-def chat(request, taskName):
-    template_name = "chat.html"
-    return render(request, template_name, {"taskName": taskName})
+@login_required()
+def chat(request: HttpRequest, task_name: str) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render(request, "chat.html", {"taskName": task_name})
+    else:
+        return invalid_request_method()
 
 
-@never_cache
-@login_required(login_url="/login/")
-def chat_new(request, taskName):
-    return render_react_page(request, "ChatPage", {"taskName": taskName})
+@login_required()
+def chat_view(request: HttpRequest, task_name: str) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render_react_page(request, "ChatPage", {"taskName": task_name})
+    else:
+        return invalid_request_method()
 
 
-@never_cache
-@login_required(login_url="/login/")
-def task(request, taskName):
-    template_name = "task.html"
-    return render(request, template_name, {"taskName": taskName})
+@login_required()
+def task(request: HttpRequest, task_name: str) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render(request, "task.html", {"taskName": task_name})
+    else:
+        return invalid_request_method()
 
 
-@never_cache
-@login_required(login_url="/login/")
-def task_new(request, taskName):
-    return render_react_page(request, "GraphicPage", {"taskName": taskName})
+@login_required()
+def task_view(request: HttpRequest, task_name: str) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        return render_react_page(request, "TaskPage", {"taskName": task_name})
+    else:
+        return invalid_request_method()
 
 
-@never_cache
 @csrf_exempt
-def login(request):
-    if request.method == "GET":
-        logout = request.GET.get("logout", 0)
-        if logout == "1":
-            auth_logout(request)
-            return render_react_page(request, "LoginPage", {"logout": logout})
+def login_view(request: HttpRequest) -> HttpResponse:
+    if request.method == HttpMethod.GET.value:
+        logout_param = int(request.GET.get("logout", 0))
+        if logout_param == 1:
+            logout(request)
+            return render_react_page(request, "LoginPage", {"logout": logout_param})
         return render_react_page(request, "LoginPage")
-    elif request.method == "POST":
+    elif request.method == HttpMethod.POST.value:
         data = loads(request.body)
-        username = data["username"]
-        password = data["password"]
+        username: str = get_or_default(data["username"], "")
+        password: str = get_or_default(data["password"], "")
 
-        authError = True
+        authError: bool = True
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            auth_login(request, user)
+            login(request, user)
             authError = False
 
         response = {"authError": authError}
         return JsonResponse(response)
     else:
-        return HttpResponse("ERROR: login")
-
-
-# VIEWS -- VIEWS -- VIEWS -- VIEWS -- VIEWS
+        return invalid_request_method()

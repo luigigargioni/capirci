@@ -2,9 +2,6 @@ from django.contrib import admin
 from .models import Action, Task, Object, Robot, UserRobot, Location
 
 
-# Define which attributes are displayed in admin section
-
-
 class ActionOption(admin.ModelAdmin):
     list_display = ("name", "owner", "point", "shared")
 

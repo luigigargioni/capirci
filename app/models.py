@@ -3,9 +3,8 @@ from django.conf import settings
 from django.db.models import CharField
 from django_mysql.models import ListCharField
 from django.utils.timezone import now
+from enum import Enum
 
-
-# Create your models here.
 
 # For update the database and create table
 # python manage.py makemigrations app && python manage.py migrate --run-syncdb
@@ -50,13 +49,18 @@ class Object(models.Model):
         return self.name
 
 
+class robot_type(Enum):
+    C = "Cobotta"
+    V = "VS-060"
+
+
 class Robot(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     ip = models.GenericIPAddressField()
     MODEL_CHOICES = (
-        ("C", "Cobotta"),
-        ("V", "VS-060"),
+        (robot_type.C.name, robot_type.C.value),
+        (robot_type.V.name, robot_type.V.value),
     )
     model = models.CharField(max_length=1, choices=MODEL_CHOICES)
     port = models.IntegerField(default=0)

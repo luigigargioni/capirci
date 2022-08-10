@@ -10,7 +10,7 @@ from os import remove, path, listdir
 import cv2
 from django.db.models import Q
 from .dictionary import all_synonyms
-from .XML_utilities import add_external_tag_XML
+from .utils.xml import add_external_tag_XML
 from .robot_functions import (
     polar_to_robot_coordinates,
     find_polar_coordinates,
@@ -38,7 +38,6 @@ from xml.etree.ElementTree import fromstring
 from django.http import HttpResponse
 
 
-# FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION
 def getTaskList(request):
     if request.method == "POST":
         username = request.POST.get("username")

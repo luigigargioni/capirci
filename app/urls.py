@@ -3,10 +3,10 @@ from . import views
 from . import function
 
 urlpatterns = [
-    path("home_new/", views.home_new, name="home_new"),
-    path("chat_new/<str:taskName>/", views.chat_new, name="chat_new"),
-    path("task_new/<str:taskName>/", views.task_new, name="task_new"),
-    path("login/", views.login, name="login"),
+    path("home_new/", views.home_view, name="home_new"),
+    path("chat_new/<str:taskName>/", views.chat_view, name="chat_new"),
+    path("task_new/<str:taskName>/", views.task_view, name="task_new"),
+    path("login/", views.login_view, name="login"),
     path("", views.home, name="home"),
     path("chat/<str:taskName>/", views.chat, name="chat"),
     path("task/<str:taskName>/", views.task, name="task"),

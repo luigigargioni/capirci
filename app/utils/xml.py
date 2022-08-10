@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import Element, tostring, SubElement, dump, fromstring
 from app.models import Task
-from .dictionary import all_synonyms
+from ..dictionary import all_synonyms
 
 
 def iterator(parents, nested=False):

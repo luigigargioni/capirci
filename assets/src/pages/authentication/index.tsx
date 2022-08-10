@@ -27,7 +27,7 @@ const LoginPage = () => {
   const logout = context?.logout || 0
 
   useEffect(() => {
-    if (logout === '1') {
+    if (logout === 1) {
       notification.success({ message: MessageText.logoutSuccess })
       window.history.replaceState({}, document.title, '/login/')
       clearPageContext()

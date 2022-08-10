@@ -1,7 +1,7 @@
 from word2number import w2n
 from xml.etree.ElementTree import fromstring
 from .dictionary import place_synonyms, pick_synonyms
-from .XML_utilities import create_XML_program
+from .utils.xml import create_XML_program
 from .models import Task
 
 
