@@ -4,12 +4,12 @@ from . import function
 
 urlpatterns = [
     path("home_new/", views.home_view, name="home_new"),
-    path("chat_new/<str:taskName>/", views.chat_view, name="chat_new"),
-    path("task_new/<str:taskName>/", views.task_view, name="task_new"),
+    path("chat_new/<str:task_name>/", views.chat_view, name="chat_new"),
+    path("task_new/<str:task_name>/", views.task_view, name="task_new"),
     path("login/", views.login_view, name="login"),
     path("", views.home, name="home"),
-    path("chat/<str:taskName>/", views.chat, name="chat"),
-    path("task/<str:taskName>/", views.task, name="task"),
+    path("chat/<str:task_name>/", views.chat, name="chat"),
+    path("task/<str:task_name>/", views.task, name="task"),
     # FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION
     path("ajaxCallParser/", function.ajaxCallParser, name="ajaxCallParser"),
     path("ajaxCreateDialogue/", function.ajaxCreateDialogue, name="ajaxCreateDialogue"),
