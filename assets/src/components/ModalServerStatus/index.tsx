@@ -4,10 +4,11 @@ import { Button, Modal, Tooltip } from 'antd'
 import styled from 'styled-components'
 import { useAppSelector } from '../../redux'
 import { hideServerModal } from '../../redux/serverStatus'
-import ServerConnectionImg from '../../img/serverConnection.gif'
 import ServerErrorImg from '../../img/serverError.gif'
 import { iconMap } from '../../utils/iconMap'
 import { notificationSuccess } from '../Notification'
+import { RingLoader } from 'react-spinners'
+import { primary } from '../../style/colors'
 
 export const ModalServerStatus = () => {
   const dispatch = useDispatch()
@@ -17,7 +18,6 @@ export const ModalServerStatus = () => {
   const title = noConnection
     ? 'Ooops! Problems connecting to server'
     : 'Ooops! There was a server error'
-  const img = noConnection ? ServerConnectionImg : ServerErrorImg
 
   const modalReload = () => {
     location.reload()
@@ -50,8 +50,19 @@ export const ModalServerStatus = () => {
       ]}
     >
       <Tooltip title={msgError} placement="right">
-        <StyledImg src={img} alt="server status" onClick={handleImgClick} />
+        {!noConnection && (
+          <StyledImg
+            src={ServerErrorImg}
+            alt="server status"
+            onClick={handleImgClick}
+          />
+        )}
       </Tooltip>
+      {noConnection && (
+        <WrapperLoader>
+          <RingLoader color={primary.main} size={250} />
+        </WrapperLoader>
+      )}
     </Modal>
   )
 }
@@ -62,4 +73,13 @@ const StyledImg = styled.img`
   margin-right: auto;
   height: 100%;
   width: auto;
+`
+
+const WrapperLoader = styled.div`
+  height: 100%;
+  top: 50vh;
+  left: 50vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
