@@ -9,4 +9,5 @@ export enum MessageText {
   newPasswordEqualOld = 'The new password matches the current password',
   incorrectPassword = 'Incorrect password',
   errorCredentials = 'Incorrect credentials',
+  logoutSuccess = 'Logout successful',
 }

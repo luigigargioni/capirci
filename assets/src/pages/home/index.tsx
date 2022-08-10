@@ -1,5 +1,5 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 const HomePage = () => <div>Home</div>
 
-export default HomePage
+export default memo(HomePage)

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 const ChatPage = () => (
   <div>
@@ -6,4 +6,4 @@ const ChatPage = () => (
   </div>
 )
 
-export default ChatPage
+export default memo(ChatPage)

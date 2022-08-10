@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
     <div id="{{ element_id }}"></div>
-    {{ page_context | json_script:'page-context' }}
+    {% if page_context %}{{ page_context | json_script:'page-context' }}{% endif %}
 
+    <script src="{% static 'index.js' %}"></script>
 {% endblock %}

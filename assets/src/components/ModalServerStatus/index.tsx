@@ -15,8 +15,8 @@ export const ModalServerStatus = () => {
     ({ serverStatus }) => serverStatus
   )
   const title = noConnection
-    ? 'Ooops! Problemi di connessione al server'
-    : "Ooops! C'è stato un error sul server"
+    ? 'Ooops! Problems connecting to server'
+    : 'Ooops! There was a server error'
   const img = noConnection ? ServerConnectionImg : ServerErrorImg
 
   const modalReload = () => {
@@ -30,7 +30,7 @@ export const ModalServerStatus = () => {
   const handleImgClick = () => {
     if (error) {
       navigator.clipboard.writeText(msgError)
-      notificationSuccess("Messaggio d'errore copiato")
+      notificationSuccess('Error message copied')
     }
   }
 
@@ -42,10 +42,10 @@ export const ModalServerStatus = () => {
       bodyStyle={{ height: '376px' }}
       footer={[
         <Button key="hide" onClick={() => handleHideClick()}>
-          Nascondi
+          Hide
         </Button>,
         <Button key="reload" type="primary" onClick={modalReload}>
-          Ricarica la pagina
+          Reload
         </Button>,
       ]}
     >

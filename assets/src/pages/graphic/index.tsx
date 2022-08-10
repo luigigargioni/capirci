@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 const GraphicPage = () => (
   <div>
@@ -6,4 +6,4 @@ const GraphicPage = () => (
   </div>
 )
 
-export default GraphicPage
+export default memo(GraphicPage)

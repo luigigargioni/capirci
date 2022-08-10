@@ -1,6 +1,11 @@
 import { ConfigProvider } from 'antd'
 import enGB from 'antd/lib/locale/en_GB'
-import React, { LazyExoticComponent, Suspense, lazy } from 'react'
+import React, {
+  LazyExoticComponent,
+  Suspense,
+  lazy,
+  MemoExoticComponent,
+} from 'react'
 import { createRoot } from 'react-dom/client'
 import { ThemeProvider } from 'styled-components'
 import { GlobalStyle } from './style/global'
@@ -18,7 +23,7 @@ const HomePage = lazy(() => import('./pages/home/index'))
 
 const declarePage = (
   id: string,
-  Content: LazyExoticComponent<() => JSX.Element>
+  Content: LazyExoticComponent<MemoExoticComponent<() => JSX.Element>>
 ) => {
   try {
     const element = document.getElementById(id) as HTMLElement
@@ -27,18 +32,18 @@ const declarePage = (
 
     root.render(
       <Suspense fallback={<></>}>
-        <React.StrictMode>
-          <ConfigProvider locale={enGB} form={{ validateMessages }}>
-            <ThemeProvider theme={theme}>
-              <Provider store={store}>
-                <SWRConfig value={swrParams}>
-                  <GlobalStyle />
-                  <Content />
-                </SWRConfig>
-              </Provider>
-            </ThemeProvider>
-          </ConfigProvider>
-        </React.StrictMode>
+        {/* <React.StrictMode> */}
+        <ConfigProvider locale={enGB} form={{ validateMessages }}>
+          <ThemeProvider theme={theme}>
+            <Provider store={store}>
+              <SWRConfig value={swrParams}>
+                <GlobalStyle />
+                <Content />
+              </SWRConfig>
+            </Provider>
+          </ThemeProvider>
+        </ConfigProvider>
+        {/* </React.StrictMode> */}
       </Suspense>
     )
   } catch (e) {

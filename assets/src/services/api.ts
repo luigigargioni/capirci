@@ -10,48 +10,15 @@ import {
   LocalStorageKey,
 } from '../utils/localStorageUtils'
 
-const PROTOCOL = 'https://'
+const PROTOCOL = 'http://'
 const HOST = 'localhost'
-const PORT = ':443'
+const PORT = ':8000'
 
 export const SERVER_API = PROTOCOL + HOST + PORT
 
-const API = `${SERVER_API}/api/`
-const API_APP = `${API}app/`
-
-const AUTHENTICATION = `${API}auth/`
-
-const CLIENTI = `${API_APP}clienti/`
-const SEARCH = `${API_APP}search/`
-const USER = `${API_APP}user/`
-
 export const endpoints = {
   authentication: {
-    register: `${AUTHENTICATION}register`,
-    login: `${AUTHENTICATION}login`,
-  },
-  user: {
-    verifyToken: `${USER}verifyToken`,
-    changePassword: `${USER}changePassword`,
-    settings: `${USER}settings`,
-  },
-  clienti: {
-    elenco: `${CLIENTI}elenco`,
-    cliente: `${CLIENTI}cliente`,
-    rubricaCliente: `${SEARCH}rubricaCliente`,
-    esenzioneIVACliente: `${SEARCH}esenzioneIVACliente`,
-  },
-  search: {
-    listaCitta: `${SEARCH}listaCitta`,
-    listaModPagamento: `${SEARCH}listaModPagamento`,
-    listaCondPagamento: `${SEARCH}listaCondPagamento`,
-    listaNostraBanca: `${SEARCH}listaNostraBanca`,
-    listaResa: `${SEARCH}listaResa`,
-    listaTrasporto: `${SEARCH}listaTrasporto`,
-    listaCatMerc: `${SEARCH}listaCatMerc`,
-    listaNatura: `${SEARCH}listaNatura`,
-    listaNaturaEsenzione: `${SEARCH}listaNaturaEsenzione`,
-    listaNormativeNatura: `${SEARCH}listaNormative`,
+    login: `${SERVER_API}/login/`,
   },
 }
 
