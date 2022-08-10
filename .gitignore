@@ -1,6 +1,7 @@
 # App
 .venv
 __pycache__/
+.sqlite.db
 
 # Frontend
 node_modules
