@@ -16,7 +16,6 @@ import { endpoints, MethodHTTP } from '../../services/api'
 import Logo from '../../img/logo.png'
 import 'antd/dist/antd.css'
 import { setServerError, setServerNoConnection } from '../../redux/serverStatus'
-import { ModalServerStatus } from '../../components/ModalServerStatus'
 import { clearPageContext, getPageContext } from '../../utils/pageContext'
 
 const LoginPage = () => {
@@ -33,12 +32,6 @@ const LoginPage = () => {
       clearPageContext()
     }
   })
-
-  const copyrightStartYear = 2022
-  const copyrightEndYear =
-    new Date().getFullYear() === copyrightStartYear
-      ? ''
-      : `-${new Date().getFullYear()}`
 
   const runLogin = () => {
     const username = form.getFieldValue('username')
@@ -74,7 +67,6 @@ const LoginPage = () => {
           ])
         })
         .catch((error: AxiosError<any>) => {
-          console.log(error)
           if (error.response) {
             switch (error.response.status) {
               case 0:
@@ -95,64 +87,56 @@ const LoginPage = () => {
   }
 
   return (
-    <>
-      <BodyWrapper>
-        <FormWrapper>
-          <LogoWrapper>
-            <LogoStyled src={Logo} alt="Logo" />
-            <span>CAPIRCI</span>
-          </LogoWrapper>
-          <Form
-            form={form}
-            onFinish={runLogin}
-            size="large"
-            initialValues={{
-              username: 'operator1',
-              password: 'Passwordoperator2',
-            }} // TODO Remove default value
+    <BodyWrapper>
+      <FormWrapper>
+        <LogoWrapper>
+          <LogoStyled src={Logo} alt="Logo" />
+          <span>CAPIRCI</span>
+        </LogoWrapper>
+        <Form
+          form={form}
+          onFinish={runLogin}
+          size="large"
+          initialValues={{
+            username: 'operator1',
+            password: 'Passwordoperator2',
+          }} // TODO Remove default value
+        >
+          <Form.Item
+            name="username"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: MessageText.requiredField,
+              },
+            ]}
           >
-            <Form.Item
-              name="username"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: MessageText.requiredField,
-                },
-              ]}
-            >
-              <Input placeholder="Utente" prefix={<UserOutlined />} />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: MessageText.requiredField,
-                },
-              ]}
-            >
-              <Input.Password
-                placeholder="Password"
-                prefix={<LockOutlined />}
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading} block>
-                Accedi
-              </Button>
-            </Form.Item>
-          </Form>
-        </FormWrapper>
-        <FooterWrapper>
-          <Footer
-            copyright={`CAPIRCI ©${copyrightStartYear}${copyrightEndYear} Luigi Gargioni`}
-          />
-        </FooterWrapper>
-      </BodyWrapper>
-      <ModalServerStatus />
-    </>
+            <Input placeholder="User" prefix={<UserOutlined />} />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: MessageText.requiredField,
+              },
+            ]}
+          >
+            <Input.Password placeholder="Password" prefix={<LockOutlined />} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading} block>
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </FormWrapper>
+      <FooterWrapper>
+        <Footer />
+      </FooterWrapper>
+    </BodyWrapper>
   )
 }
 

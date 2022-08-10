@@ -344,7 +344,10 @@ def checkConnectionRobot(request):
             return HttpResponse("NoRobot")
         ip_robot = Robot.objects.filter(pk=pk_robot).values_list("ip", flat=True)
         ResponseList = ping(ip_robot[0], count=1)
-        if ResponseList.responses[0].success is True:
+        if (
+            hasattr(ResponseList, "responses")
+            and ResponseList.responses[0].success is True
+        ):
             return HttpResponse(True)
         else:
             return HttpResponse(False)

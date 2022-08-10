@@ -15,6 +15,7 @@ import { swrParams } from './services/api'
 import { validateMessages } from './utils/formUtils'
 import { Provider } from 'react-redux'
 import { store } from './store'
+import { ModalServerStatus } from './components/ModalServerStatus'
 
 const LoginPage = lazy(() => import('./pages/authentication/index'))
 const ChatPage = lazy(() => import('./pages/chat/index'))
@@ -39,6 +40,7 @@ const declarePage = (
               <SWRConfig value={swrParams}>
                 <GlobalStyle />
                 <Content />
+                <ModalServerStatus />
               </SWRConfig>
             </Provider>
           </ThemeProvider>
