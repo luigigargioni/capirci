@@ -3,14 +3,11 @@ import { ThemeType } from './theme'
 
 export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
 
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-
   body {
     overflow: hidden;
     background-color: ${(p) => p.theme.colors.neutral.gray4};
+    margin: 0;
+    padding: 0;
   }
 
   .ant-layout {

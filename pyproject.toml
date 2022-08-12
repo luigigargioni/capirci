@@ -9,7 +9,8 @@ start = "python manage.py runserver"
 
 [tool.poetry.dependencies]
 django = "^4.1"
-django-mysql = "^4.7.0"
+django-cors-headers = "^3.13.0"
+django-mysql = "^4.7.1"
 docutils = "^0.19"
 nltk = "^3.7"
 numpy = "^1.23.1"

@@ -53,7 +53,7 @@ def task(request: HttpRequest, task_name: str) -> HttpResponse:
 @login_required()
 def task_view(request: HttpRequest, task_name: str) -> HttpResponse:
     if request.method == HttpMethod.GET.value:
-        return render_react_page(request, "TaskPage", {"taskName": task_name})
+        return render_react_page(request, "GraphicPage", {"taskName": task_name})
     else:
         return invalid_request_method()
 

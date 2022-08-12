@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <div id="{{ element_id }}"></div>
+    <div id="{{ element_id }}" style="height: 100vh;"></div>
     {% if page_context %}{{ page_context | json_script:'page-context' }}{% endif %}
 
     <script src="{% static 'index.js' %}"></script>

@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import backgroundLogin from '../../img/backgroundLogin.png'
-import SVG from 'react-inlinesvg'
 
 export const FooterWrapper = styled.div`
   position: absolute;
