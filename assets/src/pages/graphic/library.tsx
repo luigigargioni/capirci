@@ -7,6 +7,9 @@ import {
   LibraryItem,
   LibraryWrapper,
 } from './library.style'
+import { useDrag } from 'react-dnd'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { endpoints, fetchApi, MethodHTTP } from '../../services/api'
 
 interface LibraryItemInterface {
   name: string
@@ -20,9 +23,18 @@ interface LibraryCategoryInterface {
   items: LibraryItemInterface[]
 }
 
+export enum CategoriesEnum {
+  TASKS = 'Tasks',
+  CONTROLS = 'Controls',
+  EVENTS = 'Events',
+  ACTIONS = 'Actions',
+  OBJECTS = 'Objects',
+  LOCATIONS = 'Locations',
+}
+
 const LibraryCategories: LibraryCategoryInterface[] = [
   {
-    name: 'Tasks',
+    name: CategoriesEnum.TASKS,
     color: '#FFC107',
     info: 'These blocks represent existing tasks that you can reuse in the new program.',
     items: [
@@ -35,38 +47,64 @@ const LibraryCategories: LibraryCategoryInterface[] = [
     ],
   },
   {
-    name: 'Controls',
+    name: CategoriesEnum.CONTROLS,
     color: '#FF5722',
     info: 'Some of these blocks allow you to write tasks that perform actions repeatedly, others to perform different actions depending on the occurrence of an event. Remember, drag only other Controls or Actions into Control blocks.',
     items: [{ name: 'Controls', keyword: 'test' }],
   },
   {
-    name: 'Events',
+    name: CategoriesEnum.EVENTS,
     color: '#4CAF50',
     info: 'These blocks represent the conditions that can be used to define controls. Click them to see more!',
     items: [{ name: 'Events', keyword: 'test' }],
   },
   {
-    name: 'Actions',
+    name: CategoriesEnum.ACTIONS,
     color: '#2196F3',
     info: 'These blocks represent the actions that the robot can execute on objects. Remember, drag only one object at a time into Actions! The robot has only one arm!',
     items: [{ name: 'Actions', keyword: 'test' }],
   },
   {
-    name: 'Object',
+    name: CategoriesEnum.OBJECTS,
     color: '#9C27B0',
     info: 'These blocks represent the objects that the robot can manipulate. Remember that you can drop objects only on Action and Event blocks.',
     items: [{ name: 'Object', keyword: 'test' }],
   },
   {
-    name: 'Locations',
+    name: CategoriesEnum.LOCATIONS,
     color: '#795548',
     info: 'These blocks represent the locations where the robot can release objects. Remember that you can drop locations only on Action.',
     items: [{ name: 'Locations', keyword: 'test' }],
   },
 ]
 
+interface LibraryItemProps {
+  name: string
+  type: string
+  color: string
+}
+
+const DraggableLibraryItem = (p: LibraryItemProps) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: p.type,
+    item: p.name,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }))
+
+  return (
+    <LibraryItem ref={drag} color={p.color} isDragging={isDragging}>
+      {p.name}
+    </LibraryItem>
+  )
+}
+
 export const Library = () => {
+  const result = fetchApi(endpoints.library.actions, MethodHTTP.POST, {
+    username: 'operator1',
+  })
+  console.log(result)
   const [selectedCategory, setSelectedCategory] = React.useState(0)
   return (
     <LibraryWrapper>
@@ -100,9 +138,12 @@ export const Library = () => {
               placement="right"
               mouseEnterDelay={1}
             >
-              <LibraryItem key={item.name} color={category.color}>
-                {item.name}
-              </LibraryItem>
+              <DraggableLibraryItem
+                key={item.name}
+                color={category.color}
+                name={item.name}
+                type={category.name}
+              />
             </Tooltip>
           ))
         )}

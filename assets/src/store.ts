@@ -9,7 +9,6 @@ const loggerMiddleware = createLogger({
 })
 
 export const isDevelopment = process.env.NODE_ENV === ENV_TYPE.DEVELOPMENT
-console.log(process.env.NODE_ENV)
 
 export const store = configureStore({
   reducer: rootReducer,

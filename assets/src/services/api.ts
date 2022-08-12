@@ -5,10 +5,6 @@ import { store } from '../store'
 import { logout } from './authentication'
 import { notificationError } from '../components/Notification'
 import { MessageText } from '../utils/messages'
-import {
-  getFromLocalStorage,
-  LocalStorageKey,
-} from '../utils/localStorageUtils'
 
 const PROTOCOL = 'http://'
 const HOST = 'localhost'
@@ -19,6 +15,9 @@ export const SERVER_API = PROTOCOL + HOST + PORT
 export const endpoints = {
   authentication: {
     login: `${SERVER_API}/login/`,
+  },
+  library: {
+    actions: `${SERVER_API}/getActionList/`,
   },
 }
 
@@ -36,6 +35,9 @@ export interface ResponseInterface {
   payload: any
 }
 
+const getToken = () =>
+  document.getElementsByName('csrfmiddlewaretoken')[0]?.getAttribute('value')
+
 axios.defaults.timeout = 10000
 
 export const fetchApi = async (
@@ -43,14 +45,15 @@ export const fetchApi = async (
   methodApi?: MethodHTTP,
   body?: any
 ) => {
-  const token = getFromLocalStorage(LocalStorageKey.TOKEN)
+  const token = getToken()
   const options: AxiosRequestConfig = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'multipart/form-data' },
     url: url,
     method: methodApi, // Axios default is GET
-    data: body,
+    data: {
+      ...body,
+      ...(token && { csrfmiddlewaretoken: token }),
+    },
   }
 
   return axios(options)
@@ -67,10 +70,6 @@ export const fetchApi = async (
         switch (error.response.status) {
           case 0:
             store.dispatch(setServerNoConnection())
-            break
-          case 401:
-            logout(false)
-            notificationError(MessageText.sessioneExpired)
             break
           case 400:
             throw err

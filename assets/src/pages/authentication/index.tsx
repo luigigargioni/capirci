@@ -12,7 +12,7 @@ import {
   LogoWrapper,
   LogoStyled,
 } from './index.style'
-import { endpoints, MethodHTTP } from '../../services/api'
+import { endpoints, fetchApi, MethodHTTP } from '../../services/api'
 import Logo from '../../img/logo.png'
 import 'antd/dist/antd.css'
 import { setServerError, setServerNoConnection } from '../../redux/serverStatus'
@@ -39,6 +39,34 @@ const LoginPage = () => {
 
     form.validateFields().then(() => {
       setLoading(true)
+      fetchApi(endpoints.authentication.login, MethodHTTP.POST, {
+        username,
+        password,
+      })
+        .then((response: any) => {
+          const { authError }: { authError: boolean } = response
+          if (!authError) {
+            const next =
+              new URLSearchParams(window.location.search).get('next') || ''
+            window.history.replaceState({}, document.title, next)
+            window.location.pathname = next
+            return
+          }
+          form.setFields([
+            {
+              name: 'username',
+              errors: [MessageText.errorCredentials],
+            },
+            {
+              name: 'password',
+              errors: [MessageText.errorCredentials],
+            },
+          ])
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+      /*
       const options: AxiosRequestConfig = {
         url: endpoints.authentication.login,
         method: MethodHTTP.POST,
@@ -48,11 +76,13 @@ const LoginPage = () => {
         },
       }
       axios(options)
-        .then((response: AxiosResponse) => response.data)
         .then((response: any) => {
           const { authError }: { authError: boolean } = response
           if (!authError) {
-            window.location.pathname = ''
+            const next =
+              new URLSearchParams(window.location.search).get('next') || ''
+            window.history.replaceState({}, document.title, next)
+            window.location.pathname = next
             return
           }
           form.setFields([
@@ -83,6 +113,7 @@ const LoginPage = () => {
         .finally(() => {
           setLoading(false)
         })
+        */
     })
   }
 

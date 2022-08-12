@@ -6,7 +6,7 @@ urlpatterns = [
     # NEW URLS
     path("home_new/", views.home_view, name="home_new"),
     path("chat_new/<str:task_name>/", views.chat_view, name="chat_new"),
-    path("graphic/<str:task_name>/", views.task_view, name="graphic"),
+    path("graphic/<str:task_name>/", views.graphic_view, name="graphic"),
     path("login/", views.login_view, name="login"),
     # OLD URLS
     path("", views.home, name="home"),

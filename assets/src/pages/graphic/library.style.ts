@@ -45,10 +45,12 @@ export const Category = styled.div<CategoryProps>`
 
 type ItemsProps = {
   readonly color: string
+  readonly isDragging: boolean
 }
 
 export const LibraryItem = styled.div<ItemsProps>`
   background: ${(p) => p.color};
+  opacity: ${(p) => (p.isDragging ? 0.7 : 1)};
   margin-top: 1rem;
   width: 15rem;
   color: white;

@@ -3,12 +3,12 @@ from numpy import zeros
 from json import dumps, loads
 from django.contrib.auth.models import User, Group
 from django.core import serializers
-from datetime import datetime
 from math import inf
-from pytz import timezone as pytzTimezone
 from os import remove, path, listdir
 import cv2
 from django.db.models import Q
+
+from .utils.date import getDateTimeNow
 from .dictionary import all_synonyms
 from .utils.xml import add_external_tag_XML
 from .robot_functions import (
@@ -35,10 +35,10 @@ from .main_dialog import (
 from pythonping import ping
 from pythoncom import CoInitialize
 from xml.etree.ElementTree import fromstring
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 
 
-def getTaskList(request):
+def getTaskList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         tasks = Task.objects.filter(Q(owner=username) | Q(shared=True))
@@ -48,7 +48,7 @@ def getTaskList(request):
         return HttpResponse("ERROR")
 
 
-def checkTaskName(request):
+def checkTaskName(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
         username = request.POST.get("username")
@@ -69,7 +69,7 @@ def checkTaskName(request):
         return HttpResponse("ERROR: checkTaskName")
 
 
-def checkTaskNameModify(request):
+def checkTaskNameModify(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
         username = request.POST.get("username")
@@ -93,7 +93,7 @@ def checkTaskNameModify(request):
         return HttpResponse("ERROR: checkTaskName")
 
 
-def getUserIdFromUsername(request):
+def getUserIdFromUsername(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.filter(username=username)
@@ -103,7 +103,7 @@ def getUserIdFromUsername(request):
         return HttpResponse("ERROR")
 
 
-def getUsernameFromUserId(request):
+def getUsernameFromUserId(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         userpk = request.POST.get("userpk")
         user = User.objects.filter(pk=userpk)
@@ -113,7 +113,7 @@ def getUsernameFromUserId(request):
         return HttpResponse("ERROR")
 
 
-def getUserList(request):
+def getUserList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         users = User.objects.all()
         qs_json = serializers.serialize("json", users)
@@ -122,7 +122,7 @@ def getUserList(request):
         return HttpResponse("ERROR")
 
 
-def getRobotList(request):
+def getRobotList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robots = Robot.objects.all()
         qs_json = serializers.serialize("json", robots)
@@ -131,7 +131,7 @@ def getRobotList(request):
         return HttpResponse("ERROR")
 
 
-def getObjectList(request):
+def getObjectList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.get(username=username)
@@ -142,7 +142,7 @@ def getObjectList(request):
         return HttpResponse("ERROR")
 
 
-def getLocationList(request):
+def getLocationList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.get(username=username)
@@ -153,10 +153,9 @@ def getLocationList(request):
         return HttpResponse("ERROR")
 
 
-def getActionList(request):
+def getActionList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
-        username = request.POST.get("username")
-        user = User.objects.get(username=username)
+        user = User.objects.get(username=request.user)
         actions = Action.objects.filter(Q(owner=user) | Q(shared=True))
         qs_json = serializers.serialize("json", actions)
         return HttpResponse(qs_json, content_type="application/json")
@@ -164,7 +163,7 @@ def getActionList(request):
         return HttpResponse("ERROR")
 
 
-def deleteUser(request):
+def deleteUser(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         instance = User.objects.get(username=username)
@@ -174,7 +173,7 @@ def deleteUser(request):
         return HttpResponse("ERROR")
 
 
-def deleteLocation(request):
+def deleteLocation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         name = request.POST.get("name")
@@ -186,7 +185,7 @@ def deleteLocation(request):
         return HttpResponse("ERROR")
 
 
-def deleteAction(request):
+def deleteAction(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         name = request.POST.get("name")
@@ -198,7 +197,7 @@ def deleteAction(request):
         return HttpResponse("ERROR")
 
 
-def deleteRobot(request):
+def deleteRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robotname = request.POST.get("robotname")
         instance = Robot.objects.get(name=robotname)
@@ -208,7 +207,7 @@ def deleteRobot(request):
         return HttpResponse("ERROR")
 
 
-def deleteMyRobot(request):
+def deleteMyRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robotname = request.POST.get("robotname")
         instance = UserRobot.objects.get(name=robotname)
@@ -218,7 +217,7 @@ def deleteMyRobot(request):
         return HttpResponse("ERROR")
 
 
-def checkEditMyRobot(request):
+def checkEditMyRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         response = {}
         robotnameOld = request.POST.get("robotnameOld")
@@ -243,7 +242,7 @@ def checkEditMyRobot(request):
         return HttpResponse("ERROR")
 
 
-def editRobot(request):
+def editRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         id = request.POST.get("id")
         robotname = request.POST.get("name")
@@ -263,7 +262,7 @@ def editRobot(request):
         return HttpResponse("ERROR")
 
 
-def editMyRobot(request):
+def editMyRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robotnameOld = request.POST.get("robotnameOld")
         robotnameNew = request.POST.get("robotnameNew")
@@ -274,7 +273,7 @@ def editMyRobot(request):
         return HttpResponse("ERROR")
 
 
-def deleteObject(request):
+def deleteObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         objectname = request.POST.get("name")
         username = request.POST.get("username")
@@ -301,7 +300,7 @@ def deleteObject(request):
         return HttpResponse("ERROR")
 
 
-def deleteTask(request):
+def deleteTask(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         taskname = request.POST.get("name")
         username = request.POST.get("username")
@@ -312,7 +311,7 @@ def deleteTask(request):
         return HttpResponse("ERROR")
 
 
-def checkPassword(request):
+def checkPassword(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("oldPassword")
@@ -323,7 +322,7 @@ def checkPassword(request):
         return HttpResponse("ERROR")
 
 
-def getMyRobotList(request):
+def getMyRobotList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.get(username=username)
@@ -334,7 +333,7 @@ def getMyRobotList(request):
         return HttpResponse("ERROR")
 
 
-def checkConnectionRobot(request):
+def checkConnectionRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         pk_robot = request.POST.get("code")
         ip_robot_count = (
@@ -355,7 +354,7 @@ def checkConnectionRobot(request):
         return HttpResponse("ERROR")
 
 
-def pkRobotToModel(request):
+def pkRobotToModel(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robot_pk = request.POST.get("pk")
         model = Robot.objects.filter(pk=robot_pk)
@@ -365,7 +364,7 @@ def pkRobotToModel(request):
         return HttpResponse("ERROR")
 
 
-def MyNewRobot(request):
+def MyNewRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("oldPassword")
@@ -376,7 +375,7 @@ def MyNewRobot(request):
         return HttpResponse("ERROR")
 
 
-def checkUser(request):
+def checkUser(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         response = {}
         username = request.POST.get("username")
@@ -389,7 +388,7 @@ def checkUser(request):
         return HttpResponse("ERROR")
 
 
-def checkRobot(request):
+def checkRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         response = {}
         name = request.POST.get("name")
@@ -408,7 +407,7 @@ def checkRobot(request):
         return HttpResponse("ERROR")
 
 
-def checkMyRobot(request):
+def checkMyRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         response = {}
         name = request.POST.get("name")
@@ -436,7 +435,7 @@ def checkMyRobot(request):
         return HttpResponse("ERROR")
 
 
-def createMyNewRobot(request):
+def createMyNewRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         name = request.POST.get("name")
         robotpk = request.POST.get("robotpk")
@@ -449,7 +448,7 @@ def createMyNewRobot(request):
         return HttpResponse("ERROR")
 
 
-def checkEditRobot(request):
+def checkEditRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         response = {}
         id = request.POST.get("id")
@@ -469,7 +468,7 @@ def checkEditRobot(request):
         return HttpResponse("ERROR")
 
 
-def changePassword(request):
+def changePassword(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("newPassword")
@@ -481,7 +480,7 @@ def changePassword(request):
         return HttpResponse("ERROR")
 
 
-def createNewUser(request):
+def createNewUser(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("newPassword")
@@ -494,7 +493,7 @@ def createNewUser(request):
         return HttpResponse("ERROR")
 
 
-def createNewRobot(request):
+def createNewRobot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         name = request.POST.get("name")
         IP = request.POST.get("IP")
@@ -507,7 +506,7 @@ def createNewRobot(request):
         return HttpResponse("ERROR")
 
 
-def takeShot(request):
+def takeShot(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
             username = request.POST.get("username")
@@ -620,7 +619,7 @@ def takeShot(request):
         return HttpResponse("ERROR")
 
 
-def robotOfUser(request):
+def robotOfUser(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.get(username=username)
@@ -631,7 +630,7 @@ def robotOfUser(request):
         return HttpResponse("ERROR")
 
 
-def objectExist(request):
+def objectExist(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"keywordExist": False, "nameExist": False}
         object_name = request.POST.get("object")
@@ -669,7 +668,7 @@ def objectExist(request):
         return HttpResponse("ERROR")
 
 
-def keywordExist(request):
+def keywordExist(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         keywordsFound = []
@@ -706,7 +705,7 @@ def keywordExist(request):
         return HttpResponse("ERROR")
 
 
-def keywordExistSaveChanges(request):
+def keywordExistSaveChanges(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         keywordsFound = []
@@ -746,7 +745,7 @@ def keywordExistSaveChanges(request):
         return HttpResponse("ERROR")
 
 
-def objectSaveChanges(request):
+def objectSaveChanges(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         keywords = request.POST.get("keywords")
         username = request.POST.get("username")
@@ -765,7 +764,7 @@ def objectSaveChanges(request):
         return HttpResponse("ERROR")
 
 
-def saveObject(request):
+def saveObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         keywords = request.POST.get("keywords")
         username = request.POST.get("username")
@@ -787,20 +786,18 @@ def saveObject(request):
         return HttpResponse("ERROR")
 
 
-def modifyTask(request):
+def modifyTask(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         taskname = request.POST.get("taskname")
         shared = request.POST.get("shared")
-        timezone = pytzTimezone("Europe/Rome")
-        date = timezone.localize(datetime.now())
-        date.strftime("%H:%M %d-%m-%Y")
+        date = getDateTimeNow()
         Task.objects.filter(name=taskname).update(shared=shared, last_modified=date)
         return HttpResponse("OK")
     else:
         return HttpResponse("ERROR")
 
 
-def takePositionLocation(request):
+def takePositionLocation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
             user = request.POST.get("user")
@@ -831,7 +828,7 @@ def takePositionLocation(request):
         return HttpResponse("ERROR")
 
 
-def takePositionObject(request):
+def takePositionObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
             user = request.POST.get("user")
@@ -852,7 +849,7 @@ def takePositionObject(request):
         return HttpResponse("ERROR")
 
 
-def takePosition(request):
+def takePosition(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
             user = request.POST.get("user")
@@ -890,7 +887,7 @@ def takePosition(request):
         return HttpResponse("ERROR")
 
 
-def locationExist(request):
+def locationExist(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
         location_name = request.POST.get("location")
@@ -913,7 +910,7 @@ def locationExist(request):
         return HttpResponse("ERROR")
 
 
-def actionExist(request):
+def actionExist(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
         action_name = request.POST.get("action")
@@ -936,7 +933,7 @@ def actionExist(request):
         return HttpResponse("ERROR")
 
 
-def locationExistModify(request):
+def locationExistModify(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
         location_name = request.POST.get("name")
@@ -963,7 +960,7 @@ def locationExistModify(request):
         return HttpResponse("ERROR")
 
 
-def createLocation(request):
+def createLocation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         location_name = request.POST.get("location")
         username = request.POST.get("username")
@@ -984,7 +981,7 @@ def createLocation(request):
         return HttpResponse("ERROR")
 
 
-def createAction(request):
+def createAction(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         action_name = request.POST.get("action")
         username = request.POST.get("username")
@@ -1001,7 +998,7 @@ def createAction(request):
         return HttpResponse("ERROR")
 
 
-def myRobotNameFromId(request):
+def myRobotNameFromId(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robot = request.POST.get("robot")
         robot_name = UserRobot.objects.get(pk=robot)
@@ -1012,7 +1009,7 @@ def myRobotNameFromId(request):
         return HttpResponse("ERROR")
 
 
-def modifyLocation(request):
+def modifyLocation(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         position = request.POST.get("position")
         user = request.POST.get("owner")
@@ -1026,7 +1023,7 @@ def modifyLocation(request):
         return HttpResponse("ERROR")
 
 
-def deleteImageObject(request):
+def deleteImageObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         object_owner = request.POST.get("object_owner")
         object_name = request.POST.get("object_name")
@@ -1043,7 +1040,7 @@ def deleteImageObject(request):
 # -------- CHAT -----
 
 
-def getTaskFile(request):
+def getTaskFile(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         taskname = request.POST.get("fileName", "")
         username = request.POST.get("username", "")
@@ -1113,7 +1110,7 @@ def parseXmlToJson(xml):
 """se end=1 ho un pick place completo lo metto nel file"""
 
 
-def ajaxCreateDialogue(request):
+def ajaxCreateDialogue(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         dialogue_name = request.POST.get("dialogue_name", "")
         dialogue_owner = request.POST.get("dialogue_owner", "")
@@ -1133,7 +1130,7 @@ def ajaxCreateDialogue(request):
 
 
 # action da eseguire
-def ajaxCallParserAction(request):
+def ajaxCallParserAction(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text")
@@ -1149,7 +1146,7 @@ def ajaxCallParserAction(request):
 
 
 # numero di volte da eseguire il task
-def ajaxCallParserTimes(request):
+def ajaxCallParserTimes(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1166,7 +1163,7 @@ def ajaxCallParserTimes(request):
 
 
 # End condition
-def ajaxCallParserEnd(request):
+def ajaxCallParserEnd(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1183,7 +1180,7 @@ def ajaxCallParserEnd(request):
 
 
 # Risposta affermativa?
-def ajaxCallParserAssert(request):
+def ajaxCallParserAssert(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text", "")
@@ -1200,7 +1197,7 @@ def ajaxCallParserAssert(request):
 
 
 # riceve l'input dell'utente verifica pickplace
-def ajaxCallParser(request):
+def ajaxCallParser(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {}
         text_to_parse = request.POST.get("text")
@@ -1258,14 +1255,12 @@ def ajaxCallParser(request):
         return HttpResponse("ERROR")
 
 
-def getHtmlText(request):
+def getHtmlText(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         taskname = request.POST.get("taskname", "")
         taskText = request.POST.get("text", "")
         taskOwner = request.POST.get("username", "")
-        timezone = pytzTimezone("Europe/Rome")
-        date = timezone.localize(datetime.now())
-        date.strftime("%H:%M %d-%m-%Y")
+        date = getDateTimeNow()
         Task.objects.filter(name=taskname).filter(owner=taskOwner).update(
             last_modified=date, code=taskText
         )
@@ -1274,7 +1269,7 @@ def getHtmlText(request):
         return HttpResponse("ERROR")
 
 
-def checkLibrariesXML(request):
+def checkLibrariesXML(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"pickExist": False, "placeExist": False, "actionExist": False}
         taskname = request.POST.get("taskname")
@@ -1340,7 +1335,7 @@ def checkLibrariesXML(request):
         return HttpResponse("ERROR")
 
 
-def runTask(request):
+def runTask(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
 
