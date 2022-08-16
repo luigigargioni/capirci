@@ -12,20 +12,20 @@ class HttpMethod(Enum):
 
 
 def invalid_request_method():
-    return JsonResponse({"error": "Invalid request method"})
+    return error_response("", "Invalid request method", 405)
 
 
 def success_response(data):
     return JsonResponse(
-        {"message": "OK", "statis": 200, "timestamp": getDateTimeNow(), "payload": data}
+        {"message": "OK", "status": 200, "timestamp": getDateTimeNow(), "payload": data}
     )
 
 
-def error_response(error):
+def error_response(error, message="Error", status=500):
     return JsonResponse(
         {
-            "message": "Error",
-            "statis": 500,
+            "message": message,
+            "status": status,
             "timestamp": getDateTimeNow(),
             "payload": error,
         }

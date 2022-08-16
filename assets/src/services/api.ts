@@ -2,9 +2,7 @@ import { SWRConfiguration } from 'swr'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { setServerError, setServerNoConnection } from '../redux/serverStatus'
 import { store } from '../store'
-import { logout } from './authentication'
 import { notificationError } from '../components/Notification'
-import { MessageText } from '../utils/messages'
 
 const PROTOCOL = 'http://'
 const HOST = 'localhost'
@@ -65,13 +63,15 @@ export const fetchApi = async (
     )
     .catch((error: AxiosError<any>) => {
       if (error.response) {
-        const err = new Error(error.response.data.message)
+        console.log(error.response)
+        const err = new Error(error.response.data?.message || 'No connection')
         err.name = error.response.status.toString()
         switch (error.response.status) {
           case 0:
             store.dispatch(setServerNoConnection())
             break
           case 400:
+            notificationError(err.message)
             throw err
           case 500:
             store.dispatch(setServerError(err.message))

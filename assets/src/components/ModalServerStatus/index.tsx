@@ -1,14 +1,17 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Button, Modal, Tooltip } from 'antd'
-import styled from 'styled-components'
 import { useAppSelector } from '../../redux'
 import { hideServerModal } from '../../redux/serverStatus'
 import ServerErrorImg from '../../img/serverError.gif'
 import { iconMap } from '../../utils/iconMap'
 import { notificationSuccess } from '../Notification'
-import { RingLoader } from 'react-spinners'
-import { primary } from '../../style/colors'
+import {
+  NoConnectionAnimation,
+  NoConnectionAnimation2,
+  StyledImg,
+  WrapperLoader,
+} from './index.style'
 
 export const ModalServerStatus = () => {
   const dispatch = useDispatch()
@@ -60,26 +63,10 @@ export const ModalServerStatus = () => {
       </Tooltip>
       {noConnection && (
         <WrapperLoader>
-          <RingLoader color={primary.main} size={250} />
+          <NoConnectionAnimation />
+          <NoConnectionAnimation2 />
         </WrapperLoader>
       )}
     </Modal>
   )
 }
-
-const StyledImg = styled.img`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  height: 100%;
-  width: auto;
-`
-
-const WrapperLoader = styled.div`
-  height: 100%;
-  top: 50vh;
-  left: 50vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
