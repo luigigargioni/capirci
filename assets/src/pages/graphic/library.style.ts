@@ -17,6 +17,7 @@ export const ItemsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadein 0.5s;
 `
 
 type CategoryProps = {
@@ -45,12 +46,10 @@ export const Category = styled.div<CategoryProps>`
 
 type ItemsProps = {
   readonly color: string
-  readonly isDragging: boolean
 }
 
 export const LibraryItem = styled.div<ItemsProps>`
   background: ${(p) => p.color};
-  opacity: ${(p) => (p.isDragging ? 0.7 : 1)};
   margin-top: 1rem;
   width: 15rem;
   color: white;
@@ -61,9 +60,15 @@ export const LibraryItem = styled.div<ItemsProps>`
   justify-content: center;
   align-items: center;
   border-radius: 10px;
+  user-select: none;
 
   &:hover {
     cursor: grab;
     background: ${(p) => `${p.color}80`};
   }
+`
+
+export const CloneLibraryItem = styled(LibraryItem)`
+  transform: none;
+  background: ${(p) => `${p.color}80`};
 `

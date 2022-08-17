@@ -1,15 +1,21 @@
-import { Tooltip } from 'antd'
 import React from 'react'
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  Droppable,
+  DroppableProvided,
+} from '@hello-pangea/dnd'
+import { Tooltip } from 'antd'
 import {
   CategoriesWrapper,
   ItemsWrapper,
   Category,
   LibraryItem,
   LibraryWrapper,
+  CloneLibraryItem,
 } from './library.style'
-import { useDrag } from 'react-dnd'
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { endpoints, fetchApi, MethodHTTP } from '../../services/api'
+import { nanoid } from 'nanoid'
 
 interface LibraryItemInterface {
   name: string
@@ -78,33 +84,7 @@ const LibraryCategories: LibraryCategoryInterface[] = [
   },
 ]
 
-interface LibraryItemProps {
-  name: string
-  type: string
-  color: string
-}
-
-const DraggableLibraryItem = (p: LibraryItemProps) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: p.type,
-    item: p.name,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }))
-
-  return (
-    <LibraryItem ref={drag} color={p.color} isDragging={isDragging}>
-      {p.name}
-    </LibraryItem>
-  )
-}
-
 export const Library = () => {
-  const result = fetchApi(endpoints.library.actions, MethodHTTP.POST, {
-    username: 'operator1',
-  })
-  console.log(result)
   const [selectedCategory, setSelectedCategory] = React.useState(0)
   return (
     <LibraryWrapper>
@@ -127,27 +107,55 @@ export const Library = () => {
           </Tooltip>
         ))}
       </CategoriesWrapper>
-      <ItemsWrapper>
-        {LibraryCategories.filter(
-          (_category, index) => index === selectedCategory
-        ).map((category) =>
-          category.items.map((item) => (
-            <Tooltip
-              key={item.name}
-              title={item.keyword}
-              placement="right"
-              mouseEnterDelay={1}
-            >
-              <DraggableLibraryItem
-                key={item.name}
-                color={category.color}
-                name={item.name}
-                type={category.name}
-              />
-            </Tooltip>
-          ))
+      <Droppable droppableId={`library_${nanoid()}`} isDropDisabled>
+        {(providedDroppable: DroppableProvided) => (
+          <ItemsWrapper
+            ref={providedDroppable.innerRef}
+            {...providedDroppable.droppableProps}
+          >
+            {LibraryCategories.filter(
+              (_category, index) => index === selectedCategory
+            ).map((category) =>
+              category.items.map((item, index) => (
+                <Draggable
+                  key={item.name}
+                  index={index}
+                  draggableId={`${category.name}_${item.name}`}
+                >
+                  {(
+                    providedDraggable: DraggableProvided,
+                    snapshotDraggable: DraggableStateSnapshot
+                  ) => (
+                    <>
+                      <LibraryItem
+                        key={item.name}
+                        color={category.color}
+                        ref={providedDraggable.innerRef}
+                        {...providedDraggable.draggableProps}
+                        {...providedDraggable.dragHandleProps}
+                        style={{
+                          ...providedDraggable.draggableProps.style,
+                          transform: snapshotDraggable.isDragging
+                            ? providedDraggable.draggableProps.style?.transform
+                            : 'translate(0px, 0px)',
+                        }}
+                      >
+                        {item.name}
+                      </LibraryItem>
+                      {snapshotDraggable.isDragging && (
+                        <CloneLibraryItem color={category.color}>
+                          {item.name}
+                        </CloneLibraryItem>
+                      )}
+                    </>
+                  )}
+                </Draggable>
+              ))
+            )}
+            {providedDroppable.placeholder}
+          </ItemsWrapper>
         )}
-      </ItemsWrapper>
+      </Droppable>
     </LibraryWrapper>
   )
 }
