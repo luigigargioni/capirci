@@ -6,6 +6,13 @@ The research reported in this paper proposes a new approach to collaborative rob
 
 ---
 
+## :dart: Requirements
+
+* [Python 3.x.x](https://www.python.org/downloads/)
+* [Poetry](https://python-poetry.org/docs/#installation)
+
+---
+
 ## :star2: Installing from scratch
 
 ```
