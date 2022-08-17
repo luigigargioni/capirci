@@ -42,7 +42,7 @@ Update with versions from `pyproject.toml`:
 ```bash
 poetry update
 ```
-
+\
 Update `pyproject.toml` with latest versions retrieved from internet:
 
 ```bash
