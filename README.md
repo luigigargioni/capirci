@@ -1,33 +1,54 @@
-# CAPIRCI
+# :robot: CAPIRCI
 
-## Avvia server
+### Chat And Program Industrial Robots through Convenient Interaction
+
+`https://www.sciencedirect.com/science/article/abs/pii/S073658452100106X`
+
+The research reported in this paper proposes a new approach to collaborative robots that aims at improving the simplicity and efficiency of the programming task for non-technical users. It is grounded on three standpoints: (i) an elementary and disciplined paradigm for robot programming, called the simple programming journey, (ii) a hybrid interaction mode where robot tasks can be programmed using a natural language chat and, if necessary, can be completed and finalized through a block-based interface, and (iii) a robust cognitive match between the mental models of the user and the programming interface. The proposed approach has been implemented and tested through the development of a prototype programming environment called CAPIRCI, which can be tailored to different application domains through the definition of objects, locations, and actions. CAPIRCI has been tested by real users with a COBOTTA robot by DENSO WAVE Ltd. Two experimental tests have been carried out in order to validate the novel approach proposed and to assess its impact on end-user programming. The results obtained show that a hybrid approach exploiting both natural language dialogue and block-based interaction can help make the programming task easy and efficient for non-technical users.
+
+---
+
+## :star2: Installing from scratch
+
+`poetry install`  
+
+---
+
+## :wrench: Start server
 
 `poetry run python manage.py runserver`  
-OPPURE  
+
+or  
+
 `poetry shell && python manage.py runserver`
 
 ---
 
-## Installazione
 
-`poetry install`  
-OPPURE  
+## :arrows_counterclockwise: Update dependencies
+
+Update with versions from `pyproject.toml`: 
+
 `poetry update`
+
+
+
+Update `pyproject.toml` with latest versions retrieved from internet:
+
+`poetry run poetryup`
 
 ---
 
-## Credenziali
+## :key: Credentials
 
 Username: operator1  
 Password: Passwordoperator2  
-Tipo utente: operatore  
-(la maggior parte delle librerie sono definite con questo utente)
+Type: Operator  
 
 Username: manager1  
 Password: passwordmanager1  
-Tipo utente: gestore  
+Type: Manager  
 
 Username: admin  
 Password: adminpassword  
-Tipo utente: gestore  
-(utente per poter entrare nel pannello di amministrazione Django ed accedere al database all'indirizzo: <http://localhost:8000/admin/>  )
+Type: Administrator/Manager  
