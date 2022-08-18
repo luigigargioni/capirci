@@ -7,26 +7,35 @@ import {
 } from '@hello-pangea/dnd'
 import { nanoid } from 'nanoid'
 import { PlusCircleOutlined } from '@ant-design/icons'
+import { useAppSelector } from '../../redux'
+import { CategoriesEnum } from './library'
+import { useIdRef } from '../../utils/useIdRef'
 
-interface WorkspaceProps {
-  taskStructure: any
-}
+export const Workspace = () => {
+  const { taskStructure, draggingType } = useAppSelector(
+    ({ graphic }) => graphic
+  )
+  const droppableId = useIdRef('workspace')
 
-export const Workspace = (p: WorkspaceProps) => {
-  const a = 0
+  const isDropDisabled = ![
+    CategoriesEnum.TASKS,
+    CategoriesEnum.EVENTS,
+    CategoriesEnum.ACTIONS,
+  ].includes(draggingType)
+
   return (
-    <Droppable droppableId={`workspace_${nanoid()}`}>
+    <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
         <WorkspaceWrapper>
           <DroppableWorkspaceArea
             ref={provided.innerRef}
             {...provided.droppableProps}
-            isEmpty={p.taskStructure.length === 0}
+            isEmpty={taskStructure.length === 0}
             isDraggingOver={snapshot.isDraggingOver}
           >
-            {p.taskStructure.length === 0 && <PlusCircleOutlined />}
+            {taskStructure.length === 0 && <PlusCircleOutlined />}
             {/* TASK STRUCTURE */}
-            {p.taskStructure.map((task: any, index: number) => (
+            {taskStructure.map((task: any, index: number) => (
               <div key={nanoid()}>
                 {task.type} - {task.name}
               </div>

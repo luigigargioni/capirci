@@ -16,6 +16,7 @@ import {
   CloneLibraryItem,
 } from './library.style'
 import { nanoid } from 'nanoid'
+import { useIdRef } from '../../utils/useIdRef'
 
 interface LibraryItemInterface {
   name: string
@@ -86,6 +87,7 @@ const LibraryCategories: LibraryCategoryInterface[] = [
 
 export const Library = () => {
   const [selectedCategory, setSelectedCategory] = React.useState(0)
+  const droppableId = useIdRef('library')
   return (
     <LibraryWrapper>
       <CategoriesWrapper>
@@ -107,7 +109,7 @@ export const Library = () => {
           </Tooltip>
         ))}
       </CategoriesWrapper>
-      <Droppable droppableId={`library_${nanoid()}`} isDropDisabled>
+      <Droppable droppableId={droppableId} isDropDisabled>
         {(providedDroppable: DroppableProvided) => (
           <ItemsWrapper
             ref={providedDroppable.innerRef}
@@ -133,6 +135,7 @@ export const Library = () => {
                         ref={providedDraggable.innerRef}
                         {...providedDraggable.draggableProps}
                         {...providedDraggable.dragHandleProps}
+                        isDragging={snapshotDraggable.isDragging}
                         style={{
                           ...providedDraggable.draggableProps.style,
                           transform: snapshotDraggable.isDragging
@@ -143,7 +146,10 @@ export const Library = () => {
                         {item.name}
                       </LibraryItem>
                       {snapshotDraggable.isDragging && (
-                        <CloneLibraryItem color={category.color}>
+                        <CloneLibraryItem
+                          color={category.color}
+                          isDragging={false}
+                        >
                           {item.name}
                         </CloneLibraryItem>
                       )}

@@ -26,7 +26,7 @@ type CategoryProps = {
 }
 
 export const Category = styled.div<CategoryProps>`
-  background: ${(p) => (p.selected ? 'white' : p.color)};
+  background: ${(p) => (p.selected ? `${p.color}20` : p.color)};
   border: 2px solid ${(p) => p.color};
   margin-top: 1rem;
   height: 4rem;
@@ -39,17 +39,20 @@ export const Category = styled.div<CategoryProps>`
   align-items: center;
 
   &:hover {
-    background: ${(p) => (p.selected ? 'white' : `${p.color}80`)};
+    background: ${(p) => (p.selected ? `${p.color}20` : `${p.color}80`)};
     cursor: ${(p) => (p.selected ? 'default' : 'pointer')};
   }
 `
 
 type ItemsProps = {
   readonly color: string
+  readonly isDragging: boolean
 }
 
 export const LibraryItem = styled.div<ItemsProps>`
   background: ${(p) => p.color};
+  border: ${({ isDragging }) => (isDragging ? '2px' : '0px')} dashed
+    ${({ theme }) => theme.colors.neutral.gray7};
   margin-top: 1rem;
   width: 15rem;
   color: white;

@@ -1,18 +1,44 @@
 import {
   DragDropContext,
+  DragStart,
+  DragUpdate,
   DropResult,
-  OnDragEndResponder,
 } from '@hello-pangea/dnd'
 import React from 'react'
+import { useAppSelector } from '../../redux'
+import {
+  resetDraggingType,
+  setDraggingType,
+  setTaskStructure,
+} from '../../redux/graphic'
+import { store } from '../../store'
 import { CategoriesEnum, Library } from './library'
+import {
+  getDraggingName,
+  getDraggingType,
+  isDestinationLibrary,
+  isDestinationWorkspace,
+  isSourceLibrary,
+} from './util'
 import { Workspace } from './workspace'
 
-const onDragEnd = (
-  result: DropResult,
-  taskStructure: any,
-  setTaskStructure: (newTaskStructure: any) => void
-) => {
+const onDragStart = (result: DragStart) => {
+  console.log('onDragStart', result)
+
+  const { draggableId } = result
+  const type = getDraggingType(draggableId)
+  store.dispatch(setDraggingType(type))
+}
+
+const onDragUpdate = (result: DragUpdate) => {
+  console.log('onDragUpdate', result)
+}
+
+const onDragEnd = (result: DropResult, taskStructure: any) => {
   const { source, destination, draggableId } = result
+
+  store.dispatch(resetDraggingType())
+
   if (!destination) return
   if (
     destination.droppableId === source.droppableId &&
@@ -20,41 +46,27 @@ const onDragEnd = (
   )
     return
 
-  const type = draggableId.split('_')[0] as CategoriesEnum
-  const name = draggableId.split('_')[1]
+  const type = getDraggingType(draggableId)
+  const name = getDraggingName(draggableId)
 
-  const sourceWorkspace = source.droppableId.includes('workspace_')
-  const sourceLibrary = source.droppableId.includes('library_')
+  if (isDestinationLibrary(destination)) return
 
-  const destinationWorkspace = destination.droppableId.includes('workspace_')
-  const destinationLibrary = destination.droppableId.includes('library_')
-
-  if (destinationLibrary) return
-
-  // Dropping from library to workspace in empty area
-  if (
-    destinationWorkspace &&
-    sourceLibrary &&
-    [
-      CategoriesEnum.TASKS,
-      CategoriesEnum.EVENTS,
-      CategoriesEnum.ACTIONS,
-    ].includes(type)
-  ) {
-    setTaskStructure([...taskStructure, { type: type, name: name }])
-  }
+  const newTaskStructure = [...taskStructure, { type: type, name: name }]
+  store.dispatch(setTaskStructure(newTaskStructure))
 
   console.log('onDragEnd', result)
 }
 
 export const DndArea = () => {
-  const [taskStructure, setTaskStructure] = React.useState<any>([])
+  const taskStructure = useAppSelector(({ graphic }) => graphic.taskStructure)
   return (
     <DragDropContext
-      onDragEnd={(r) => onDragEnd(r, taskStructure, setTaskStructure)}
+      onDragEnd={(r) => onDragEnd(r, taskStructure)}
+      onDragStart={onDragStart}
+      onDragUpdate={onDragUpdate}
     >
       <Library />
-      <Workspace taskStructure={taskStructure} />
+      <Workspace />
     </DragDropContext>
   )
 }
