@@ -5,28 +5,32 @@ export const LibraryWrapper = styled.div`
   width: 100%;
   flex: 1;
   display: flex;
+  padding-bottom: 4rem;
 `
 
 export const CategoriesWrapper = styled.div`
-  margin-left: 1rem;
-  margin-right: 3rem;
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+  align-items: center;
 `
 
 export const ItemsWrapper = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
+  overflow: auto;
   flex-direction: column;
   align-items: center;
-  animation: fadein 0.5s;
 `
 
-type CategoryProps = {
+type CategoryItemProps = {
   readonly color: string
   readonly selected: boolean
 }
 
-export const Category = styled.div<CategoryProps>`
-  background: ${(p) => (p.selected ? `${p.color}20` : p.color)};
+export const CategoryItem = styled.div<CategoryItemProps>`
+  background-color: ${(p) => (p.selected ? `${p.color}20` : p.color)};
   border: 2px solid ${(p) => p.color};
   margin-top: 1rem;
   height: 4rem;
@@ -37,9 +41,10 @@ export const Category = styled.div<CategoryProps>`
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.2s linear;
 
   &:hover {
-    background: ${(p) => (p.selected ? `${p.color}20` : `${p.color}80`)};
+    background-color: ${(p) => (p.selected ? `${p.color}20` : `${p.color}80`)};
     cursor: ${(p) => (p.selected ? 'default' : 'pointer')};
   }
 `
@@ -50,7 +55,7 @@ type ItemsProps = {
 }
 
 export const LibraryItem = styled.div<ItemsProps>`
-  background: ${(p) => p.color};
+  background-color: ${(p) => p.color};
   border: ${({ isDragging }) => (isDragging ? '2px' : '0px')} dashed
     ${({ theme }) => theme.colors.neutral.gray7};
   margin-top: 1rem;
@@ -64,10 +69,11 @@ export const LibraryItem = styled.div<ItemsProps>`
   align-items: center;
   border-radius: 10px;
   user-select: none;
+  transition: background-color 0.2s linear;
 
   &:hover {
     cursor: grab;
-    background: ${(p) => `${p.color}80`};
+    background-color: ${(p) => `${p.color}80`};
   }
 
   & span {
@@ -79,4 +85,11 @@ export const LibraryItem = styled.div<ItemsProps>`
 export const CloneLibraryItem = styled(LibraryItem)`
   transform: none;
   background: ${(p) => `${p.color}80`};
+`
+
+export const ScrollableWrapper = styled.div`
+  display: flex;
+  min-height: min-content;
+  flex-direction: column;
+  align-items: center;
 `

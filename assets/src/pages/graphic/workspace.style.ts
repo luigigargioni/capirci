@@ -39,5 +39,5 @@ export const DroppableWorkspaceArea = styled.div<DroppableWorkspaceAreaProps>`
       : 'inherit'};
   background-color: ${({ isDraggingOver, theme }) =>
     isDraggingOver && theme.colors.primary.light4};
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s linear;
 `

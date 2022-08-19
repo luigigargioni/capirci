@@ -10,10 +10,11 @@ import { Tooltip } from 'antd'
 import {
   CategoriesWrapper,
   ItemsWrapper,
-  Category,
+  CategoryItem,
   LibraryItem,
   LibraryWrapper,
   CloneLibraryItem,
+  ScrollableWrapper,
 } from './library.style'
 import { useIdRef } from '../../utils/useIdRef'
 import useSWR from 'swr'
@@ -133,23 +134,25 @@ export const Library = () => {
   return (
     <LibraryWrapper>
       <CategoriesWrapper>
-        {LibraryCategories.map((category, index) => (
-          <Tooltip
-            title={category.info}
-            mouseEnterDelay={1}
-            key={category.name}
-            placement="right"
-          >
-            <Category
+        <ScrollableWrapper>
+          {LibraryCategories.map((category, index) => (
+            <Tooltip
+              title={category.info}
+              mouseEnterDelay={1}
               key={category.name}
-              color={category.color}
-              selected={selectedCategory === index}
-              onClick={() => setSelectedCategory(index)}
+              placement="right"
             >
-              {category.name}
-            </Category>
-          </Tooltip>
-        ))}
+              <CategoryItem
+                key={category.name}
+                color={category.color}
+                selected={selectedCategory === index}
+                onClick={() => setSelectedCategory(index)}
+              >
+                {category.name}
+              </CategoryItem>
+            </Tooltip>
+          ))}
+        </ScrollableWrapper>
       </CategoriesWrapper>
       <Droppable droppableId={droppableId} isDropDisabled>
         {(providedDroppable: DroppableProvided) => (
@@ -157,82 +160,87 @@ export const Library = () => {
             ref={providedDroppable.innerRef}
             {...providedDroppable.droppableProps}
           >
-            {LibraryCategories.filter(
-              (_category, index) => index === selectedCategory
-            ).map((category) => {
-              const items =
-                category.name === CategoriesEnum.ACTIONS
-                  ? actions
-                  : category.name === CategoriesEnum.OBJECTS
-                  ? objects
-                  : category.name === CategoriesEnum.LOCATIONS
-                  ? locations
-                  : category.name === CategoriesEnum.TASKS
-                  ? tasks
-                  : category.items
-              return items.map((item: LibraryItemInterface, index: number) => (
-                <Draggable
-                  key={item.name}
-                  index={index}
-                  draggableId={`${category.name}_${item.name}`}
-                >
-                  {(
-                    providedDraggable: DraggableProvided,
-                    snapshotDraggable: DraggableStateSnapshot
-                  ) => {
-                    const objectKeywords =
-                      category.name === CategoriesEnum.OBJECTS
-                        ? item.keywords.reduce(
-                            (acc, str) => (acc !== '' ? `${acc}, ${str}` : str),
-                            ''
-                          )
-                        : null
-                    return (
-                      <>
-                        <Tooltip
-                          title={
-                            category.name === CategoriesEnum.OBJECTS
-                              ? objectKeywords
-                              : item.info
-                          }
-                          mouseEnterDelay={1}
-                          key={category.name}
-                          placement="right"
-                        >
-                          <LibraryItem
-                            key={item.id}
-                            color={category.color}
-                            ref={providedDraggable.innerRef}
-                            {...providedDraggable.draggableProps}
-                            {...providedDraggable.dragHandleProps}
-                            isDragging={snapshotDraggable.isDragging}
-                            style={{
-                              ...providedDraggable.draggableProps.style,
-                              transform: snapshotDraggable.isDragging
-                                ? providedDraggable.draggableProps.style
-                                    ?.transform
-                                : 'translate(0px, 0px)',
-                            }}
-                          >
-                            {item.name}
-                            {item.shared && <GlobalOutlined />}
-                          </LibraryItem>
-                        </Tooltip>
-                        {snapshotDraggable.isDragging && (
-                          <CloneLibraryItem
-                            color={category.color}
-                            isDragging={false}
-                          >
-                            {item.name}
-                          </CloneLibraryItem>
-                        )}
-                      </>
-                    )
-                  }}
-                </Draggable>
-              ))
-            })}
-            {providedDroppable.placeholder}
+            <ScrollableWrapper>
+              {LibraryCategories.filter(
+                (_category, index) => index === selectedCategory
+              ).map((category) => {
+                const items =
+                  category.name === CategoriesEnum.ACTIONS
+                    ? actions
+                    : category.name === CategoriesEnum.OBJECTS
+                    ? objects
+                    : category.name === CategoriesEnum.LOCATIONS
+                    ? locations
+                    : category.name === CategoriesEnum.TASKS
+                    ? tasks
+                    : category.items
+                return items.map(
+                  (item: LibraryItemInterface, index: number) => (
+                    <Draggable
+                      key={item.name}
+                      index={index}
+                      draggableId={`${category.name}_${item.name}`}
+                    >
+                      {(
+                        providedDraggable: DraggableProvided,
+                        snapshotDraggable: DraggableStateSnapshot
+                      ) => {
+                        const objectKeywords =
+                          category.name === CategoriesEnum.OBJECTS
+                            ? item.keywords.reduce(
+                                (acc, str) =>
+                                  acc !== '' ? `${acc}, ${str}` : str,
+                                ''
+                              )
+                            : null
+                        return (
+                          <>
+                            <Tooltip
+                              title={
+                                category.name === CategoriesEnum.OBJECTS
+                                  ? objectKeywords
+                                  : item.info
+                              }
+                              mouseEnterDelay={1}
+                              key={category.name}
+                              placement="right"
+                            >
+                              <LibraryItem
+                                key={item.id}
+                                color={category.color}
+                                ref={providedDraggable.innerRef}
+                                {...providedDraggable.draggableProps}
+                                {...providedDraggable.dragHandleProps}
+                                isDragging={snapshotDraggable.isDragging}
+                                style={{
+                                  ...providedDraggable.draggableProps.style,
+                                  transform: snapshotDraggable.isDragging
+                                    ? providedDraggable.draggableProps.style
+                                        ?.transform
+                                    : 'translate(0px, 0px)',
+                                }}
+                              >
+                                {item.name}
+                                {item.shared && <GlobalOutlined />}
+                              </LibraryItem>
+                            </Tooltip>
+                            {snapshotDraggable.isDragging && (
+                              <CloneLibraryItem
+                                color={category.color}
+                                isDragging={false}
+                              >
+                                {item.name}
+                              </CloneLibraryItem>
+                            )}
+                          </>
+                        )
+                      }}
+                    </Draggable>
+                  )
+                )
+              })}
+              {providedDroppable.placeholder}
+            </ScrollableWrapper>
           </ItemsWrapper>
         )}
       </Droppable>
