@@ -1,14 +1,24 @@
+from enum import Enum
 from django.urls import path
 from . import views
 from . import function
 
+API = "api/"
+
+
+class PathEnum(Enum):
+    HOME = API + "home/"
+    GRAPHIC = API + "graphic/"
+    CHAT = API + "chat/"
+
+
 urlpatterns = [
-    # NEW URLS
+    # Views
     path("home_new/", views.home_view, name="home_new"),
     path("chat_new/<str:task_name>/", views.chat_view, name="chat_new"),
     path("graphic/<str:task_name>/", views.graphic_view, name="graphic"),
     path("login/", views.login_view, name="login"),
-    # OLD URLS
+    # OLD Views
     path("", views.home, name="home"),
     path("chat/<str:task_name>/", views.chat, name="chat"),
     path("task/<str:task_name>/", views.task, name="task"),
@@ -110,4 +120,29 @@ urlpatterns = [
     path("getActionList/", function.getActionList, name="getActionList"),
     path("checkLibrariesXML/", function.checkLibrariesXML, name="checkLibrariesXML"),
     path("runTask/", function.runTask, name="runTask"),
+    # Home
+    ############################
+    # Graphic
+    path(
+        PathEnum.GRAPHIC.value + "getActionList/",
+        function.getActionListGraphic,
+        name="getActionListGraphic",
+    ),
+    path(
+        PathEnum.GRAPHIC.value + "getObjectList/",
+        function.getObjectListGraphic,
+        name="getObjectListGraphic",
+    ),
+    path(
+        PathEnum.GRAPHIC.value + "getLocationList/",
+        function.getLocationListGraphic,
+        name="getLocationListGraphic",
+    ),
+    path(
+        PathEnum.GRAPHIC.value + "getTaskList/",
+        function.getTaskListGraphic,
+        name="getTaskListGraphic",
+    ),
+    # Chat
+    ############################
 ]

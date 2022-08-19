@@ -1,5 +1,8 @@
 from enum import Enum
 from django.http import JsonResponse
+from django.db.models.query import QuerySet
+from collections.abc import Sequence
+from json import loads, dumps
 
 from .date import getDateTimeNow
 
@@ -12,21 +15,30 @@ class HttpMethod(Enum):
 
 
 def invalid_request_method():
-    return error_response("", "Invalid request method", 405)
+    return error_response("Invalid request method", 405)
 
 
 def success_response(data):
+    payload = loads(dumps(list(data))) if isinstance(data, QuerySet) else data
+    payload = {"records": payload} if isinstance(payload, Sequence) else payload
     return JsonResponse(
-        {"message": "OK", "status": 200, "timestamp": getDateTimeNow(), "payload": data}
+        {
+            "message": "OK",
+            "status": 200,
+            "timestamp": getDateTimeNow(),
+            "payload": payload,
+        },
+        status=200,
     )
 
 
-def error_response(error, message="Error", status=500):
+def error_response(error, status=500):
     return JsonResponse(
         {
-            "message": message,
+            "message": error,
             "status": status,
             "timestamp": getDateTimeNow(),
-            "payload": error,
-        }
+            "payload": None,
+        },
+        status=status,
     )

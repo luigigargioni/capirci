@@ -6,6 +6,10 @@ export const StyledImg = styled.img`
   margin-right: auto;
   height: 100%;
   width: auto;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 export const WrapperLoader = styled.div`

@@ -1,5 +1,9 @@
 import React from 'react'
-import { DroppableWorkspaceArea, WorkspaceWrapper } from './workspace.style'
+import {
+  DroppableWorkspaceArea,
+  TaskInfo,
+  WorkspaceWrapper,
+} from './workspace.style'
 import {
   Droppable,
   DroppableProvided,
@@ -10,23 +14,27 @@ import { PlusCircleOutlined } from '@ant-design/icons'
 import { useAppSelector } from '../../redux'
 import { CategoriesEnum } from './library'
 import { useIdRef } from '../../utils/useIdRef'
+import { getPageContext } from '../../utils/pageContext'
+
+const alloweItems = [
+  CategoriesEnum.TASKS,
+  CategoriesEnum.CONTROLS,
+  CategoriesEnum.ACTIONS,
+]
 
 export const Workspace = () => {
   const { taskStructure, draggingType } = useAppSelector(
     ({ graphic }) => graphic
   )
   const droppableId = useIdRef('workspace')
-
-  const isDropDisabled = ![
-    CategoriesEnum.TASKS,
-    CategoriesEnum.EVENTS,
-    CategoriesEnum.ACTIONS,
-  ].includes(draggingType)
+  const { taskName } = getPageContext()
+  const isDropDisabled = !alloweItems.includes(draggingType)
 
   return (
     <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
         <WorkspaceWrapper>
+          <TaskInfo>Taskname: {taskName}</TaskInfo>
           <DroppableWorkspaceArea
             ref={provided.innerRef}
             {...provided.droppableProps}

@@ -7,16 +7,28 @@ import { notificationError } from '../components/Notification'
 const PROTOCOL = 'http://'
 const HOST = 'localhost'
 const PORT = ':8000'
+const API = '/api'
 
-export const SERVER_API = PROTOCOL + HOST + PORT
+const SERVER = PROTOCOL + HOST + PORT
+const SERVER_API = SERVER + API
+
+const AUTH_API = `${SERVER}`
+const HOME_API = `${SERVER_API}/home`
+const GRAPHIC_API = `${SERVER_API}/graphic`
+const CHAT_API = `${SERVER_API}/chat`
 
 export const endpoints = {
   authentication: {
-    login: `${SERVER_API}/login/`,
+    login: `${AUTH_API}/login/`,
   },
-  library: {
-    actions: `${SERVER_API}/getActionList/`,
+  home: {},
+  graphic: {
+    actions: `${GRAPHIC_API}/getActionList/`,
+    objects: `${GRAPHIC_API}/getObjectList/`,
+    locations: `${GRAPHIC_API}/getLocationList/`,
+    tasks: `${GRAPHIC_API}/getTaskList/`,
   },
+  chat: {},
 }
 
 export enum MethodHTTP {
@@ -63,7 +75,6 @@ export const fetchApi = async (
     )
     .catch((error: AxiosError<any>) => {
       if (error.response) {
-        console.log(error.response)
         const err = new Error(error.response.data?.message || 'No connection')
         err.name = error.response.status.toString()
         switch (error.response.status) {

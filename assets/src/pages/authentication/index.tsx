@@ -1,7 +1,5 @@
 import React, { memo, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Button, Form, Input, notification } from 'antd'
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { Footer } from '../../components/Footer'
 import { MessageText } from '../../utils/messages'
@@ -15,11 +13,9 @@ import {
 import { endpoints, fetchApi, MethodHTTP } from '../../services/api'
 import Logo from '../../img/logo.png'
 import 'antd/dist/antd.css'
-import { setServerError, setServerNoConnection } from '../../redux/serverStatus'
 import { clearPageContext, getPageContext } from '../../utils/pageContext'
 
 const LoginPage = () => {
-  const dispatch = useDispatch()
   const [form] = Form.useForm()
   const [loading, setLoading] = useState<boolean>(false)
   const context = getPageContext()
@@ -66,54 +62,6 @@ const LoginPage = () => {
         .finally(() => {
           setLoading(false)
         })
-      /*
-      const options: AxiosRequestConfig = {
-        url: endpoints.authentication.login,
-        method: MethodHTTP.POST,
-        data: {
-          username,
-          password,
-        },
-      }
-      axios(options)
-        .then((response: any) => {
-          const { authError }: { authError: boolean } = response
-          if (!authError) {
-            const next =
-              new URLSearchParams(window.location.search).get('next') || ''
-            window.history.replaceState({}, document.title, next)
-            window.location.pathname = next
-            return
-          }
-          form.setFields([
-            {
-              name: 'username',
-              errors: [MessageText.errorCredentials],
-            },
-            {
-              name: 'password',
-              errors: [MessageText.errorCredentials],
-            },
-          ])
-        })
-        .catch((error: AxiosError<any>) => {
-          if (error.response) {
-            switch (error.response.status) {
-              case 0:
-                dispatch(setServerNoConnection())
-                break
-              case 500:
-                dispatch(setServerError(error.response.data.message))
-                break
-              default:
-                dispatch(setServerError(error.response.data.message))
-            }
-          }
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-        */
     })
   }
 

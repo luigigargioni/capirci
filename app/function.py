@@ -2,11 +2,18 @@ from win32com.client import Dispatch
 from numpy import zeros
 from json import dumps, loads
 from django.contrib.auth.models import User, Group
-from django.core import serializers
+from django.core.serializers import serialize
 from math import inf
 from os import remove, path, listdir
 import cv2
 from django.db.models import Q
+
+from app.utils.response import (
+    HttpMethod,
+    invalid_request_method,
+    error_response,
+    success_response,
+)
 
 from .utils.date import getDateTimeNow
 from .dictionary import all_synonyms
@@ -42,7 +49,7 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         tasks = Task.objects.filter(Q(owner=username) | Q(shared=True))
-        qs_json = serializers.serialize("json", tasks)
+        qs_json = serialize("json", tasks)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -97,7 +104,7 @@ def getUserIdFromUsername(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.filter(username=username)
-        qs_json = serializers.serialize("json", user)
+        qs_json = serialize("json", user)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -107,7 +114,7 @@ def getUsernameFromUserId(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         userpk = request.POST.get("userpk")
         user = User.objects.filter(pk=userpk)
-        qs_json = serializers.serialize("json", user)
+        qs_json = serialize("json", user)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -116,7 +123,7 @@ def getUsernameFromUserId(request: HttpRequest) -> HttpResponse:
 def getUserList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         users = User.objects.all()
-        qs_json = serializers.serialize("json", users)
+        qs_json = serialize("json", users)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -125,7 +132,7 @@ def getUserList(request: HttpRequest) -> HttpResponse:
 def getRobotList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robots = Robot.objects.all()
-        qs_json = serializers.serialize("json", robots)
+        qs_json = serialize("json", robots)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -136,7 +143,7 @@ def getObjectList(request: HttpRequest) -> HttpResponse:
         username = request.POST.get("username")
         user = User.objects.get(username=username)
         objects = Object.objects.filter(Q(owner=user) | Q(shared=True))
-        qs_json = serializers.serialize("json", objects)
+        qs_json = serialize("json", objects)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -147,7 +154,7 @@ def getLocationList(request: HttpRequest) -> HttpResponse:
         username = request.POST.get("username")
         user = User.objects.get(username=username)
         locations = Location.objects.filter(Q(owner=user) | Q(shared=True))
-        qs_json = serializers.serialize("json", locations)
+        qs_json = serialize("json", locations)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -157,10 +164,66 @@ def getActionList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         user = User.objects.get(username=request.user)
         actions = Action.objects.filter(Q(owner=user) | Q(shared=True))
-        qs_json = serializers.serialize("json", actions)
+        qs_json = serialize("json", actions)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
+
+
+def getActionListGraphic(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.method == HttpMethod.GET.value:
+            user = User.objects.get(username=request.user)
+            actions = Action.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                "id", "name", "shared"
+            )
+            return success_response(actions)
+        else:
+            return invalid_request_method
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getObjectListGraphic(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.method == HttpMethod.GET.value:
+            user = User.objects.get(username=request.user)
+            objects = Object.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                "id", "name", "shared", "keywords"
+            )
+            return success_response(objects)
+        else:
+            return invalid_request_method
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getLocationListGraphic(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.method == HttpMethod.GET.value:
+            user = User.objects.get(username=request.user)
+            locations = Location.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                "id", "name", "shared"
+            )
+            return success_response(locations)
+        else:
+            return invalid_request_method
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getTaskListGraphic(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.method == HttpMethod.GET.value:
+            user = User.objects.get(username=request.user)
+            tasks = Task.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                "id", "name", "shared"
+            )
+            return success_response(tasks)
+        else:
+            return invalid_request_method
+    except Exception as e:
+        return error_response(str(e))
 
 
 def deleteUser(request: HttpRequest) -> HttpResponse:
@@ -327,7 +390,7 @@ def getMyRobotList(request: HttpRequest) -> HttpResponse:
         username = request.POST.get("username")
         user = User.objects.get(username=username)
         userrobot = UserRobot.objects.filter(user=user.pk)
-        qs_json = serializers.serialize("json", userrobot)
+        qs_json = serialize("json", userrobot)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -358,7 +421,7 @@ def pkRobotToModel(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robot_pk = request.POST.get("pk")
         model = Robot.objects.filter(pk=robot_pk)
-        qs_json = serializers.serialize("json", model)
+        qs_json = serialize("json", model)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")
@@ -624,7 +687,7 @@ def robotOfUser(request: HttpRequest) -> HttpResponse:
         username = request.POST.get("username")
         user = User.objects.get(username=username)
         robots = UserRobot.objects.filter(user=user)
-        qs_json = serializers.serialize("json", robots)
+        qs_json = serialize("json", robots)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")

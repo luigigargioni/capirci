@@ -9,6 +9,11 @@ export const WorkspaceWrapper = styled.div`
   justify-content: center;
 `
 
+export const TaskInfo = styled.div`
+  position: absolute;
+  top: 4rem;
+`
+
 type DroppableWorkspaceAreaProps = {
   readonly isEmpty: boolean
   readonly isDraggingOver: boolean

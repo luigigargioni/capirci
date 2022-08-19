@@ -69,6 +69,11 @@ export const LibraryItem = styled.div<ItemsProps>`
     cursor: grab;
     background: ${(p) => `${p.color}80`};
   }
+
+  & span {
+    position: absolute;
+    right: 1rem;
+  }
 `
 
 export const CloneLibraryItem = styled(LibraryItem)`
