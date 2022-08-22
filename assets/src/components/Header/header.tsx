@@ -9,7 +9,7 @@ import Logo from '../../img/logo.png'
 
 export const Header = () => (
   <LayoutHeader>
-    <WrapperTitle href="/">
+    <WrapperTitle href="/" title="Go to homepage">
       <LogoStyled src={Logo} alt="Logo" />
       <TitleStyled>CAPIRCI</TitleStyled>
     </WrapperTitle>

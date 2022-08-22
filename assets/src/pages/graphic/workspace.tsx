@@ -58,7 +58,7 @@ export const Workspace = () => {
     <WorkspaceWrapper>
       <TaskInfo>
         Task name: {taskName}
-        <SaveOutlined onClick={saveTask} />
+        <SaveOutlined onClick={saveTask} title="Save" />
       </TaskInfo>
       <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
