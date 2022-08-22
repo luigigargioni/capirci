@@ -8,4 +8,5 @@ export const theme = {
     contextual,
     neutral,
   },
+  headerHeight: '40px',
 }

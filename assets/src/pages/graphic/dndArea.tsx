@@ -22,6 +22,12 @@ import {
 } from './util'
 import { Workspace } from './workspace'
 
+export interface DndItem {
+  name: string
+  type: CategoriesEnum
+  children: DndItem[]
+}
+
 const onDragStart = (result: DragStart) => {
   console.log('onDragStart', result)
 

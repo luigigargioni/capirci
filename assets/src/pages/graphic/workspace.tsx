@@ -9,18 +9,40 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from '@hello-pangea/dnd'
-import { nanoid } from 'nanoid'
-import { PlusCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, SaveOutlined } from '@ant-design/icons'
 import { useAppSelector } from '../../redux'
 import { CategoriesEnum } from './library'
 import { useIdRef } from '../../utils/useIdRef'
 import { getPageContext } from '../../utils/pageContext'
+import { DndItem } from './dndArea'
 
 const alloweItems = [
   CategoriesEnum.TASKS,
   CategoriesEnum.CONTROLS,
   CategoriesEnum.ACTIONS,
 ]
+
+interface SwitcherStructureProps {
+  item: DndItem
+}
+
+const SwitcherStructure = (p: SwitcherStructureProps) => {
+  switch (p.item.type) {
+    case CategoriesEnum.ACTIONS:
+      return <></>
+    case CategoriesEnum.CONTROLS:
+      return <></>
+    case CategoriesEnum.EVENTS:
+      return <></>
+    case CategoriesEnum.LOCATIONS:
+      return <></>
+    case CategoriesEnum.OBJECTS:
+      return <></>
+    //case CategoriesEnum.TASKS:
+    default:
+      return <></>
+  }
+}
 
 export const Workspace = () => {
   const { taskStructure, draggingType } = useAppSelector(
@@ -30,11 +52,16 @@ export const Workspace = () => {
   const { taskName } = getPageContext()
   const isDropDisabled = !alloweItems.includes(draggingType)
 
+  const saveTask = () => {}
+
   return (
-    <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
-      {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
-        <WorkspaceWrapper>
-          <TaskInfo>Taskname: {taskName}</TaskInfo>
+    <WorkspaceWrapper>
+      <TaskInfo>
+        Task name: {taskName}
+        <SaveOutlined onClick={saveTask} />
+      </TaskInfo>
+      <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
+        {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <DroppableWorkspaceArea
             ref={provided.innerRef}
             {...provided.droppableProps}
@@ -42,16 +69,13 @@ export const Workspace = () => {
             isDraggingOver={snapshot.isDraggingOver}
           >
             {taskStructure.length === 0 && <PlusCircleOutlined />}
-            {/* TASK STRUCTURE */}
-            {taskStructure.map((task: any, index: number) => (
-              <div key={nanoid()}>
-                {task.type} - {task.name}
-              </div>
+            {taskStructure.map((item: DndItem) => (
+              <SwitcherStructure item={item} />
             ))}
+            <span style={{ display: 'none' }}>{provided.placeholder}</span>
           </DroppableWorkspaceArea>
-          {provided.placeholder}
-        </WorkspaceWrapper>
-      )}
-    </Droppable>
+        )}
+      </Droppable>
+    </WorkspaceWrapper>
   )
 }

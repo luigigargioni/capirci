@@ -1,9 +1,17 @@
 import React from 'react'
-import { LayoutHeader } from './header.style'
-import { HeaderMenu } from './headerMenu'
+import {
+  LayoutHeader,
+  LogoStyled,
+  TitleStyled,
+  WrapperTitle,
+} from './header.style'
+import Logo from '../../img/logo.png'
 
 export const Header = () => (
   <LayoutHeader>
-    <HeaderMenu />
+    <WrapperTitle href="/">
+      <LogoStyled src={Logo} alt="Logo" />
+      <TitleStyled>CAPIRCI</TitleStyled>
+    </WrapperTitle>
   </LayoutHeader>
 )

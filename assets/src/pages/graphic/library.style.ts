@@ -5,7 +5,6 @@ export const LibraryWrapper = styled.div`
   width: 100%;
   flex: 1;
   display: flex;
-  padding-bottom: 4rem;
 `
 
 export const CategoriesWrapper = styled.div`

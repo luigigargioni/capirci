@@ -1,17 +1,23 @@
 import styled from 'styled-components'
 
 export const WorkspaceWrapper = styled.div`
-  height: 100%;
-  width: 100%;
   flex: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  margin: 0 1rem 1rem 1rem;
 `
 
 export const TaskInfo = styled.div`
-  position: absolute;
-  top: 4rem;
+  width: 100%;
+  height: 3rem;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.neutral.gray8};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `
 
 type DroppableWorkspaceAreaProps = {
@@ -27,9 +33,8 @@ export const DroppableWorkspaceArea = styled.div<DroppableWorkspaceAreaProps>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  height: 80%;
-  width: 60%;
+  flex: 1;
+  width: 100%;
   font-size: ${({ isEmpty }) => (isEmpty ? '10rem' : '1rem')};
   color: ${({ isEmpty, isDraggingOver, theme }) =>
     isEmpty

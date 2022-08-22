@@ -37,18 +37,27 @@ interface LibraryCategoryInterface {
 }
 
 export enum CategoriesEnum {
-  TASKS = 'Tasks',
   CONTROLS = 'Controls',
   EVENTS = 'Events',
   ACTIONS = 'Actions',
   OBJECTS = 'Objects',
   LOCATIONS = 'Locations',
+  TASKS = 'Tasks',
+}
+
+export enum CategoriesColorEnum {
+  CONTROLS = '#FF5722',
+  EVENTS = '#4CAF50',
+  ACTIONS = '#2196F3',
+  OBJECTS = '#9C27B0',
+  LOCATIONS = '#795548',
+  TASKS = '#FFC107',
 }
 
 const LibraryCategories: LibraryCategoryInterface[] = [
   {
     name: CategoriesEnum.CONTROLS,
-    color: '#FF5722',
+    color: CategoriesColorEnum.CONTROLS,
     info: 'Some of these blocks allow you to write tasks that perform actions repeatedly, others to perform different actions depending on the occurrence of an event. Remember, drag only other Controls or Actions into Control blocks.',
     items: [
       {
@@ -80,7 +89,7 @@ const LibraryCategories: LibraryCategoryInterface[] = [
   },
   {
     name: CategoriesEnum.EVENTS,
-    color: '#4CAF50',
+    color: CategoriesColorEnum.EVENTS,
     info: 'These blocks represent the conditions that can be used to define controls',
     items: [
       {
@@ -102,22 +111,32 @@ const LibraryCategories: LibraryCategoryInterface[] = [
   },
   {
     name: CategoriesEnum.ACTIONS,
-    color: '#2196F3',
+    color: CategoriesColorEnum.ACTIONS,
     info: 'These blocks represent the actions that the robot can execute on objects. Remember, drag only one object at a time into Actions! The robot has only one arm!',
+    items: [
+      {
+        id: -1,
+        name: 'Pick',
+      },
+      {
+        id: -2,
+        name: 'Place',
+      },
+    ],
   },
   {
     name: CategoriesEnum.OBJECTS,
-    color: '#9C27B0',
+    color: CategoriesColorEnum.OBJECTS,
     info: 'These blocks represent the objects that the robot can manipulate. Remember that you can drop objects only on Action and Event blocks.',
   },
   {
     name: CategoriesEnum.LOCATIONS,
-    color: '#795548',
+    color: CategoriesColorEnum.LOCATIONS,
     info: 'These blocks represent the locations where the robot can release objects. Remember that you can drop locations only on Action.',
   },
   {
     name: CategoriesEnum.TASKS,
-    color: '#FFC107',
+    color: CategoriesColorEnum.TASKS,
     info: 'These blocks represent existing tasks that you can reuse in the new program.',
   },
 ]
@@ -166,7 +185,7 @@ export const Library = () => {
               ).map((category) => {
                 const items =
                   category.name === CategoriesEnum.ACTIONS
-                    ? actions
+                    ? [...category.items, ...actions]
                     : category.name === CategoriesEnum.OBJECTS
                     ? objects
                     : category.name === CategoriesEnum.LOCATIONS
