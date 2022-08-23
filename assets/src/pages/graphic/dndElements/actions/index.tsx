@@ -1,6 +1,17 @@
 import React from 'react'
+import { StyledDndItem } from '..'
+import { useIdRef } from '../../../../utils/useIdRef'
+import { CategoriesColorEnum } from '../../library'
 
-export const ActionItem = () => {
-  const a = 0
-  return <div>action</div>
+interface ActionItemProps {
+  name: string
+}
+
+export const ActionItem = (p: ActionItemProps) => {
+  const id = useIdRef(p.name)
+  return (
+    <StyledDndItem color={CategoriesColorEnum.OBJECTS} key={id}>
+      {p.name}
+    </StyledDndItem>
+  )
 }

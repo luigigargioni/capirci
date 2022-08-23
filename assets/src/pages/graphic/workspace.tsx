@@ -9,12 +9,17 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from '@hello-pangea/dnd'
-import { PlusCircleOutlined, SaveOutlined } from '@ant-design/icons'
+import { SaveOutlined, SnippetsOutlined } from '@ant-design/icons'
 import { useAppSelector } from '../../redux'
 import { CategoriesEnum } from './library'
 import { useIdRef } from '../../utils/useIdRef'
 import { getPageContext } from '../../utils/pageContext'
 import { DndItem } from './dndArea'
+import { ObjectItem } from './dndElements/objects'
+import { LocationItem } from './dndElements/locations'
+import { SwitcherEvents } from './dndElements/events'
+import { SwitcherControls } from './dndElements/controls'
+import { ActionItem } from './dndElements/actions'
 
 const alloweItems = [
   CategoriesEnum.TASKS,
@@ -29,15 +34,15 @@ interface SwitcherStructureProps {
 const SwitcherStructure = (p: SwitcherStructureProps) => {
   switch (p.item.type) {
     case CategoriesEnum.ACTIONS:
-      return <></>
+      return <ActionItem name={p.item.name} />
     case CategoriesEnum.CONTROLS:
-      return <></>
+      return SwitcherControls(p.item.name, p.item.children)
     case CategoriesEnum.EVENTS:
-      return <></>
+      return SwitcherEvents(p.item.name)
     case CategoriesEnum.LOCATIONS:
-      return <></>
+      return <LocationItem name={p.item.name} />
     case CategoriesEnum.OBJECTS:
-      return <></>
+      return <ObjectItem name={p.item.name} />
     //case CategoriesEnum.TASKS:
     default:
       return <></>
@@ -68,7 +73,12 @@ export const Workspace = () => {
             isEmpty={taskStructure.length === 0}
             isDraggingOver={snapshot.isDraggingOver}
           >
-            {taskStructure.length === 0 && <PlusCircleOutlined />}
+            {taskStructure.length === 0 && (
+              <>
+                <SnippetsOutlined />
+                Project area
+              </>
+            )}
             {taskStructure.map((item: DndItem) => (
               <SwitcherStructure item={item} />
             ))}

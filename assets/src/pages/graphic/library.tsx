@@ -54,6 +54,25 @@ export enum CategoriesColorEnum {
   TASKS = '#FFC107',
 }
 
+export enum ControlsValuesEnum {
+  REPEAT = 'Repeat',
+  LOOP = 'Loop',
+  WHEN = 'When',
+  STOP_WHEN = 'Stop when',
+  DO_WHEN = 'Do when',
+}
+
+export enum EventsValuesEnum {
+  FIND = 'Find',
+  SENSOR_SIGNAL = 'Sensor signal',
+  DETECT_OBJECT = 'Detect object',
+}
+
+export enum ActionsValuesEnum {
+  PICK = 'Pick',
+  PLACE = 'Place',
+}
+
 const LibraryCategories: LibraryCategoryInterface[] = [
   {
     name: CategoriesEnum.CONTROLS,
@@ -62,27 +81,27 @@ const LibraryCategories: LibraryCategoryInterface[] = [
     items: [
       {
         id: 0,
-        name: 'Repeat for # times',
+        name: ControlsValuesEnum.REPEAT,
         info: 'This instruction performs an actions sequence exactly the specified number of times',
       },
       {
         id: 1,
-        name: 'Loop',
+        name: ControlsValuesEnum.LOOP,
         info: 'This instruction performs an actions sequence exactly the specified number of times',
       },
       {
         id: 2,
-        name: 'When',
+        name: ControlsValuesEnum.WHEN,
         info: 'This instruction performs an action sequence if a certain event occurs',
       },
       {
         id: 3,
-        name: 'Stop when',
+        name: ControlsValuesEnum.STOP_WHEN,
         info: 'This instruction stops the actions sequence when a specific event occurs',
       },
       {
         id: 4,
-        name: 'Do when',
+        name: ControlsValuesEnum.DO_WHEN,
         info: 'This instruction repeatedly performs an action sequence until a certain event occurs',
       },
     ],
@@ -94,17 +113,17 @@ const LibraryCategories: LibraryCategoryInterface[] = [
     items: [
       {
         id: 0,
-        name: 'Find',
+        name: EventsValuesEnum.FIND,
         info: 'This event represents the recognition of a specific object',
       },
       {
         id: 1,
-        name: 'Sensor signal',
+        name: EventsValuesEnum.SENSOR_SIGNAL,
         info: 'This event represents the detection of a signal coming from a generic sensor',
       },
       {
         id: 2,
-        name: 'Detect an object',
+        name: EventsValuesEnum.DETECT_OBJECT,
         info: 'This event represents the detection of the presence of a generic object',
       },
     ],
@@ -116,11 +135,11 @@ const LibraryCategories: LibraryCategoryInterface[] = [
     items: [
       {
         id: -1,
-        name: 'Pick',
+        name: ActionsValuesEnum.PICK,
       },
       {
         id: -2,
-        name: 'Place',
+        name: ActionsValuesEnum.PLACE,
       },
     ],
   },

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Layout } from 'antd'
-import SVG from 'react-inlinesvg'
+// import SVG from 'react-inlinesvg'
 
 export const LayoutSider = styled(Layout.Sider)`
   height: 100%;
@@ -18,12 +18,13 @@ export const Brand = styled.div`
   justify-content: center;
   box-shadow: 0 1px 9px -3px rgba(0, 0, 0, 0.2);
 `
-
+/*
 export const LogoSvgStyled = styled(SVG)`
   width: 2.25rem;
   margin-left: 10px;
   margin-right: 8px;
 `
+*/
 
 export const Logo = styled.div`
   display: flex;

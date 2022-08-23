@@ -1,3 +1,7 @@
 import React from 'react'
 
-export const EventFind = () => <div>Find</div>
+interface EventFindProps {
+  name: string
+}
+
+export const EventFind = (p: EventFindProps) => <div>{p.name}</div>

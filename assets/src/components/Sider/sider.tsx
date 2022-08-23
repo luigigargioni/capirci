@@ -5,7 +5,7 @@ import {
   Brand,
   Logo,
   LayoutSider,
-  LogoSvgStyled,
+  // LogoSvgStyled,
 } from './sider.style'
 // import LogoSvg from '../../../../assets/img/logo.svg'
 

@@ -35,7 +35,7 @@ export const DroppableWorkspaceArea = styled.div<DroppableWorkspaceAreaProps>`
   justify-content: center;
   flex: 1;
   width: 100%;
-  font-size: ${({ isEmpty }) => (isEmpty ? '10rem' : '1rem')};
+  font-size: ${({ isEmpty }) => (isEmpty ? '5rem' : '1rem')};
   color: ${({ isEmpty, isDraggingOver, theme }) =>
     isEmpty
       ? isDraggingOver
