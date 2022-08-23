@@ -1,20 +1,27 @@
 import { DraggableLocation } from '@hello-pangea/dnd'
 import { CategoriesEnum } from './library'
 
-export const getDraggingType = (draggableId: string) =>
-  draggableId.split('_')[0] as CategoriesEnum
+export const LIBRARY_ID = 'library'
+export const WORKSPACE_ID = 'workspace'
 
-export const getDraggingName = (draggableId: string) =>
-  draggableId.split('_')[1]
+export const getItemCategory = (itemId: string): CategoriesEnum =>
+  itemId.split('_')[0] as CategoriesEnum
 
-export const isSourceWorkspace = (source: DraggableLocation) =>
-  source.droppableId.includes('workspace_')
+export const getItemName = (itemId: string): string => itemId.split('_')[1]
 
-export const isSourceLibrary = (source: DraggableLocation) =>
-  source.droppableId.includes('library_')
+export const getItemId = (itemId: string): string => itemId.split('_')[2]
 
-export const isDestinationWorkspace = (destination: DraggableLocation) =>
-  destination.droppableId.includes('workspace_')
+export const getItemType = (itemId: string): string => itemId.split('_')[3]
 
-export const isDestinationLibrary = (destination: DraggableLocation) =>
-  destination.droppableId.includes('library_')
+export const isSourceWorkspace = (source: DraggableLocation): boolean =>
+  source.droppableId.includes(`${WORKSPACE_ID}_`)
+
+export const isSourceLibrary = (source: DraggableLocation): boolean =>
+  source.droppableId.includes(`${LIBRARY_ID}_`)
+
+export const isDestinationWorkspace = (
+  destination: DraggableLocation
+): boolean => destination.droppableId.includes(`${WORKSPACE_ID}_`)
+
+export const isDestinationLibrary = (destination: DraggableLocation): boolean =>
+  destination.droppableId.includes(`${LIBRARY_ID}_`)

@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { RootDndInterface } from '../pages/graphic/dndElements'
 import { CategoriesEnum } from '../pages/graphic/library'
 
 export interface GraphicState {
-  taskStructure: any
+  taskStructure: RootDndInterface
   draggingType: CategoriesEnum
 }
 
@@ -15,7 +16,7 @@ const graphicSlice = createSlice({
   name: 'graphic',
   initialState,
   reducers: {
-    setTaskStructure(state, action: PayloadAction<any>) {
+    setTaskStructure(state, action: PayloadAction<RootDndInterface>) {
       return {
         ...state,
         taskStructure: action.payload,

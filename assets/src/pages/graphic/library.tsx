@@ -20,6 +20,7 @@ import { useIdRef } from '../../utils/useIdRef'
 import useSWR from 'swr'
 import { endpoints } from '../../services/api'
 import { GlobalOutlined } from '@ant-design/icons'
+import { LIBRARY_ID } from './util'
 
 interface LibraryItemInterface {
   id: number
@@ -162,7 +163,7 @@ const LibraryCategories: LibraryCategoryInterface[] = [
 
 export const Library = () => {
   const [selectedCategory, setSelectedCategory] = React.useState(0)
-  const droppableId = useIdRef('library')
+  const droppableId = useIdRef(LIBRARY_ID)
 
   const { data: actions } = useSWR(endpoints.graphic.actions)
   const { data: objects } = useSWR(endpoints.graphic.objects)
@@ -277,7 +278,9 @@ export const Library = () => {
                   )
                 )
               })}
-              {providedDroppable.placeholder}
+              <span style={{ display: 'none' }}>
+                {providedDroppable.placeholder}
+              </span>
             </ScrollableWrapper>
           </ItemsWrapper>
         )}

@@ -1,16 +1,16 @@
 import React from 'react'
 import { StyledDndItem } from '..'
-import { useIdRef } from '../../../../utils/useIdRef'
 import { CategoriesColorEnum } from '../../library'
 
 interface LocationItemProps {
+  id: string
   name: string
 }
 
 export const LocationItem = (p: LocationItemProps) => {
-  const id = useIdRef(p.name)
+  const a = 0
   return (
-    <StyledDndItem color={CategoriesColorEnum.LOCATIONS} key={id}>
+    <StyledDndItem color={CategoriesColorEnum.LOCATIONS} key={p.id}>
       {p.name}
     </StyledDndItem>
   )

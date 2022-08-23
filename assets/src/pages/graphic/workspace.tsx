@@ -14,12 +14,20 @@ import { useAppSelector } from '../../redux'
 import { CategoriesEnum } from './library'
 import { useIdRef } from '../../utils/useIdRef'
 import { getPageContext } from '../../utils/pageContext'
-import { DndItem } from './dndArea'
 import { ObjectItem } from './dndElements/objects'
 import { LocationItem } from './dndElements/locations'
 import { SwitcherEvents } from './dndElements/events'
 import { SwitcherControls } from './dndElements/controls'
 import { ActionItem } from './dndElements/actions'
+import { notificationSuccess } from '../../components/Notification'
+import { WORKSPACE_ID } from './util'
+import {
+  ActionInterface,
+  ControlInterface,
+  EventInterface,
+  LocationInterface,
+  ObjectInterface,
+} from './dndElements'
 
 const alloweItems = [
   CategoriesEnum.TASKS,
@@ -28,21 +36,28 @@ const alloweItems = [
 ]
 
 interface SwitcherStructureProps {
-  item: DndItem
+  item:
+    | ControlInterface
+    | EventInterface
+    | ActionInterface
+    | ObjectInterface
+    | LocationInterface
 }
 
 const SwitcherStructure = (p: SwitcherStructureProps) => {
-  switch (p.item.type) {
+  switch (p.item.category) {
     case CategoriesEnum.ACTIONS:
-      return <ActionItem name={p.item.name} />
+      return (
+        <ActionItem id={p.item.id} name={p.item.name} object={p.item.object} />
+      )
     case CategoriesEnum.CONTROLS:
-      return SwitcherControls(p.item.name, p.item.children)
+      return SwitcherControls(p.item)
     case CategoriesEnum.EVENTS:
-      return SwitcherEvents(p.item.name)
-    case CategoriesEnum.LOCATIONS:
-      return <LocationItem name={p.item.name} />
+      return SwitcherEvents(p.item)
     case CategoriesEnum.OBJECTS:
-      return <ObjectItem name={p.item.name} />
+      return <ObjectItem id={p.item.id} name={p.item.name} />
+    case CategoriesEnum.LOCATIONS:
+      return <LocationItem id={p.item.id} name={p.item.name} />
     //case CategoriesEnum.TASKS:
     default:
       return <></>
@@ -53,11 +68,13 @@ export const Workspace = () => {
   const { taskStructure, draggingType } = useAppSelector(
     ({ graphic }) => graphic
   )
-  const droppableId = useIdRef('workspace')
+  const droppableId = useIdRef(WORKSPACE_ID)
   const { taskName } = getPageContext()
   const isDropDisabled = !alloweItems.includes(draggingType)
 
-  const saveTask = () => {}
+  const saveTask = () => {
+    notificationSuccess('Task saved')
+  }
 
   return (
     <WorkspaceWrapper>
@@ -79,7 +96,7 @@ export const Workspace = () => {
                 Project area
               </>
             )}
-            {taskStructure.map((item: DndItem) => (
+            {taskStructure.map((item: ControlInterface | ActionInterface) => (
               <SwitcherStructure item={item} />
             ))}
             <span style={{ display: 'none' }}>{provided.placeholder}</span>
