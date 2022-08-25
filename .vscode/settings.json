@@ -10,4 +10,8 @@
       },
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[dockerfile]": {
+      "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
+    "commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,.idea,target,out,build,dist,vendor,.venv,.parcel-cache,static}/**/*"
 }

@@ -3,6 +3,8 @@ from django.urls import path
 from . import views
 from . import function
 
+# TODO Try https://django-ninja.rest-framework.com/
+
 API = "api/"
 
 
