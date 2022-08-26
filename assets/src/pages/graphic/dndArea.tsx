@@ -37,6 +37,7 @@ import {
   isSourceWorkspace,
   getItemType,
   isDestinationWorkspace,
+  isDestinationTrash,
 } from './util'
 import { Workspace } from './workspace'
 
@@ -190,16 +191,9 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
       }
     }
 
-    // Destination is not Workspace
-
-    // TODO Moved in the same item
-    if (destination.droppableId === source.droppableId) {
-      return
-    }
-
+    // Insert new item in the destination item
     const destinationId = getItemId(destination.droppableId)
     const destionationType = getItemType(destination.droppableId)
-    // Insert new item in the destination
     const newTaskStructure = taskStructure.map(
       (taskStructureItem) =>
         insertNewElement(
@@ -210,14 +204,37 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
           destination.index
         ) as ControlInterface | ActionInterface
     )
-    // TODO Delete the old item from the source
+
     store.dispatch(setTaskStructure(newTaskStructure))
     return
   }
 
-  // Moved inside the Workspace
-  if (isSourceWorkspace(source)) {
+  // Moved from Workspace
+  // TODO Moved in the same item
+  if (
+    isSourceWorkspace(source) &&
+    destination.droppableId === source.droppableId &&
+    destination.index !== source.index
+  ) {
     const id = getItemId(draggableId)
+    //return
+  }
+
+  // TODO Moved in another item
+  if (
+    isSourceWorkspace(source) &&
+    destination.droppableId !== source.droppableId
+  ) {
+    const id = getItemId(draggableId)
+    // Insert new item in the destination item
+    // Delete the old item from the source
+    //return
+  }
+
+  // TODO Dropped in the Trash
+  if (isDestinationTrash(destination)) {
+    const id = getItemId(draggableId)
+    //return
   }
 }
 

@@ -3,6 +3,7 @@ import { CategoriesEnum } from './library'
 
 export const LIBRARY_ID = 'library'
 export const WORKSPACE_ID = 'workspace'
+export const TRASH_ID = 'trash'
 
 export const getItemCategory = (itemId: string): CategoriesEnum =>
   itemId.split('_')[0] as CategoriesEnum
@@ -25,3 +26,6 @@ export const isDestinationWorkspace = (
 
 export const isDestinationLibrary = (destination: DraggableLocation): boolean =>
   destination.droppableId.includes(`${LIBRARY_ID}_`)
+
+export const isDestinationTrash = (destination: DraggableLocation): boolean =>
+  destination.droppableId.includes(`${TRASH_ID}_`)
