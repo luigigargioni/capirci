@@ -1,0 +1,7 @@
+.venv
+.vscode
+
+assets/node_modules
+assets/.parcel-cache
+assets/src
+assets/**

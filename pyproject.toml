@@ -27,7 +27,7 @@ stanza = "^1.4.0"
 word2number = "^1.1"
 
 [tool.poetry.dev-dependencies]
-black = "22.3.0"
+black = "^22.3.0"
 flake8 = "^4.0.1"
 poetryup = "^0.8.2"
 
