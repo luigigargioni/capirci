@@ -36,48 +36,53 @@ import {
   isSourceLibrary,
   isSourceWorkspace,
   getItemType,
+  isDestinationWorkspace,
 } from './util'
 import { Workspace } from './workspace'
 
-const insertNewElementRec = (
-  id: string,
+const insertNewElement = (
   currentNode: DndItemInterface,
   newItem: any,
-  destionationType: string | undefined
-): void => {
-  if (id === currentNode.id) {
-    if ('items' in currentNode && destionationType === 'items') {
-      currentNode.items.push(newItem)
-      return
+  destinationId: string,
+  destionationType: string | undefined,
+  destinationIndex: number
+): DndItemInterface => {
+  if (destinationId === currentNode.id) {
+    if (
+      currentNode.category === CategoriesEnum.CONTROLS &&
+      destionationType === 'items'
+    ) {
+      if (currentNode.items.length === 0)
+        return { ...currentNode, items: [newItem] }
+
+      const newItems = [...currentNode.items]
+      newItems.splice(destinationIndex, 0, newItem)
+      return { ...currentNode, items: newItems }
     }
-    // eslint-disable-next-line no-param-reassign
-    currentNode[destionationType] = newItem
+    // Event in Control or Object in Action
+    const newNode = { ...currentNode, [destionationType]: newItem }
+    return newNode
   }
 
-  // Use a for loop instead of forEach to avoid nested functions
-  // Otherwise "return" will not work properly
-  if ('items' in currentNode) {
-    for (let i = 0; i < currentNode.items.length; i += 1) {
-      // Search in the current child
-      insertNewElementRec(id, currentNode.items[i], newItem, destionationType)
-    }
-  }
-}
-
-const insertNewElement = (
-  newItem: DndItemInterface,
-  taskStructure: RootDndInterface,
-  destionationId: string,
-  destionationType: string | undefined
-): void => {
-  taskStructure.forEach((taskStructureItem) => {
-    insertNewElementRec(
-      destionationId,
-      taskStructureItem,
-      newItem,
-      destionationType
+  if (
+    currentNode.category === CategoriesEnum.CONTROLS &&
+    currentNode.items.length > 0
+  ) {
+    const newItems = currentNode.items.map(
+      (item: ControlInterface | ActionInterface) =>
+        insertNewElement(
+          item,
+          newItem,
+          destinationId,
+          destionationType,
+          destinationIndex
+        )
     )
-  })
+    const newNode = { ...currentNode, items: newItems } as DndItemInterface
+    return newNode
+  }
+
+  return currentNode
 }
 
 const onDragStart = (result: DragStart) => {
@@ -168,20 +173,44 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
         break
     }
 
-    // Workspace is empty
-    if (taskStructure.length === 0) {
+    // Destination is Workspace
+    if (isDestinationWorkspace(destination)) {
       if (
         newItem.category === CategoriesEnum.CONTROLS ||
         newItem.category === CategoriesEnum.ACTIONS
-      )
-        store.dispatch(setTaskStructure([newItem]))
+      ) {
+        if (taskStructure.length === 0)
+          store.dispatch(setTaskStructure([newItem]))
+        else {
+          const newTaskStructure = [...taskStructure]
+          newTaskStructure.splice(destination.index, 0, newItem)
+          store.dispatch(setTaskStructure(newTaskStructure))
+        }
+        return
+      }
+    }
+
+    // Destination is not Workspace
+
+    // TODO Moved in the same item
+    if (destination.droppableId === source.droppableId) {
       return
     }
 
     const destinationId = getItemId(destination.droppableId)
     const destionationType = getItemType(destination.droppableId)
-    const newTaskStructure = [...taskStructure]
-    insertNewElement(newItem, newTaskStructure, destinationId, destionationType)
+    // Insert new item in the destination
+    const newTaskStructure = taskStructure.map(
+      (taskStructureItem) =>
+        insertNewElement(
+          taskStructureItem,
+          newItem,
+          destinationId,
+          destionationType,
+          destination.index
+        ) as ControlInterface | ActionInterface
+    )
+    // TODO Delete the old item from the source
     store.dispatch(setTaskStructure(newTaskStructure))
     return
   }

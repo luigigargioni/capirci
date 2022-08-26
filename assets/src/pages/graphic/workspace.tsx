@@ -28,6 +28,7 @@ import {
   LocationInterface,
   ObjectInterface,
 } from './dndElements'
+import { Button, Tooltip } from 'antd'
 
 const alloweItems = [
   CategoriesEnum.TASKS,
@@ -42,16 +43,17 @@ interface SwitcherStructureProps {
     | ActionInterface
     | ObjectInterface
     | LocationInterface
+  index: number
 }
 
-const SwitcherStructure = (p: SwitcherStructureProps) => {
+export const SwitcherStructure = (p: SwitcherStructureProps) => {
   switch (p.item.category) {
     case CategoriesEnum.ACTIONS:
       return (
         <ActionItem id={p.item.id} name={p.item.name} object={p.item.object} />
       )
     case CategoriesEnum.CONTROLS:
-      return SwitcherControls(p.item)
+      return SwitcherControls(p.item, p.index)
     case CategoriesEnum.EVENTS:
       return SwitcherEvents(p.item)
     case CategoriesEnum.OBJECTS:
@@ -80,7 +82,14 @@ export const Workspace = () => {
     <WorkspaceWrapper>
       <TaskInfo>
         Task name: {taskName}
-        <SaveOutlined onClick={saveTask} title="Save" />
+        <Tooltip title="Save task">
+          <Button
+            type="primary"
+            shape="circle"
+            size="large"
+            icon={<SaveOutlined onClick={saveTask} />}
+          />
+        </Tooltip>
       </TaskInfo>
       <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
@@ -96,10 +105,16 @@ export const Workspace = () => {
                 Project area
               </>
             )}
-            {taskStructure.map((item: ControlInterface | ActionInterface) => (
-              <SwitcherStructure item={item} />
-            ))}
-            <span style={{ display: 'none' }}>{provided.placeholder}</span>
+            {taskStructure.map(
+              (item: ControlInterface | ActionInterface, index: number) => (
+                <SwitcherStructure key={item.id} item={item} index={index} />
+              )
+            )}
+            {taskStructure.length === 0 ? (
+              <span style={{ display: 'none' }}>{provided.placeholder}</span>
+            ) : (
+              provided.placeholder
+            )}
           </DroppableWorkspaceArea>
         )}
       </Droppable>

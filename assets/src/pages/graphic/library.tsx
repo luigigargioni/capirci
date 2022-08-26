@@ -278,9 +278,7 @@ export const Library = () => {
                   )
                 )
               })}
-              <span style={{ display: 'none' }}>
-                {providedDroppable.placeholder}
-              </span>
+              {providedDroppable.placeholder}
             </ScrollableWrapper>
           </ItemsWrapper>
         )}

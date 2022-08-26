@@ -5,7 +5,7 @@ import { ControlLoop } from './loop'
 import { ControlRepeat } from './repeat'
 import { ControlWhen } from './when'
 
-export const SwitcherControls = (item: ControlInterface) => {
+export const SwitcherControls = (item: ControlInterface, index: number) => {
   switch (item.name) {
     case ControlsValuesEnum.REPEAT:
       return (
@@ -14,6 +14,7 @@ export const SwitcherControls = (item: ControlInterface) => {
           name={item.name}
           items={item.items}
           iteration={item.iteration}
+          index={index}
         />
       )
     case ControlsValuesEnum.LOOP:
