@@ -5,11 +5,13 @@ import {
   DropResult,
 } from '@hello-pangea/dnd'
 import { nanoid } from 'nanoid'
+import { Item } from 'rc-menu'
 import React from 'react'
 import { useAppSelector } from '../../redux'
 import {
   resetDraggingType,
   setDraggingType,
+  setSourceLibrary,
   setTaskStructure,
 } from '../../redux/graphic'
 import { store } from '../../store'
@@ -86,11 +88,61 @@ const insertNewElement = (
   return currentNode
 }
 
+const deleteElement = (
+  currentNode: (ControlInterface | ActionInterface)[] | DndItemInterface[],
+  elementId: string
+): DndItemInterface[] => {
+  const newStructure = currentNode
+    .filter((item: DndItemInterface) => item.id !== elementId)
+    .map((item: DndItemInterface) => {
+      // Items in Control
+      if (item.category === CategoriesEnum.CONTROLS && item.items.length > 0) {
+        const newItem = {
+          ...item,
+          items: deleteElement(item.items, elementId),
+        } as ControlInterface
+        return newItem
+      }
+
+      // Event in Control
+      if (item.category === CategoriesEnum.CONTROLS && item.event) {
+        if (item.event.id === elementId) {
+          const newItem = { ...item, event: null } as ControlInterface
+          return newItem
+        }
+      }
+
+      // Object in Find Event
+      if (
+        item.category === CategoriesEnum.EVENTS &&
+        item.name === EventsValuesEnum.FIND
+      ) {
+        if (item.object.id === elementId) {
+          const newItem = { ...item, object: null } as EventInterface
+          return newItem
+        }
+      }
+
+      // Object/Location in Action
+      if (item.category === CategoriesEnum.ACTIONS) {
+        if (item.object.id === elementId) {
+          const newItem = { ...item, object: null } as ActionInterface
+          return newItem
+        }
+      }
+
+      return item
+    })
+
+  return newStructure
+}
+
 const onDragStart = (result: DragStart) => {
   console.log('onDragStart', result)
-  const { draggableId } = result
+  const { draggableId, source } = result
   const type = getItemCategory(draggableId)
   store.dispatch(setDraggingType(type))
+  store.dispatch(setSourceLibrary(isSourceLibrary(source)))
 }
 
 const onDragUpdate = (result: DragUpdate) => {
@@ -233,8 +285,12 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
 
   // TODO Dropped in the Trash
   if (isDestinationTrash(destination)) {
-    const id = getItemId(draggableId)
-    //return
+    const newTaskStructure = deleteElement(
+      taskStructure as DndItemInterface[],
+      draggableId
+    ) as RootDndInterface
+
+    store.dispatch(setTaskStructure(newTaskStructure))
   }
 }
 

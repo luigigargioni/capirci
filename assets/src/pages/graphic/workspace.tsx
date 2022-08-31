@@ -3,13 +3,18 @@ import {
   DroppableWorkspaceArea,
   TaskInfo,
   WorkspaceWrapper,
+  WrapperTrash,
 } from './workspace.style'
 import {
   Droppable,
   DroppableProvided,
   DroppableStateSnapshot,
 } from '@hello-pangea/dnd'
-import { SaveOutlined, SnippetsOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  SaveOutlined,
+  SnippetsOutlined,
+} from '@ant-design/icons'
 import { useAppSelector } from '../../redux'
 import { CategoriesEnum } from './library'
 import { useIdRef } from '../../utils/useIdRef'
@@ -20,7 +25,7 @@ import { SwitcherEvents } from './dndElements/events'
 import { SwitcherControls } from './dndElements/controls'
 import { ActionItem } from './dndElements/actions'
 import { notificationSuccess } from '../../components/Notification'
-import { WORKSPACE_ID } from './util'
+import { TRASH_ID, WORKSPACE_ID } from './util'
 import {
   ActionInterface,
   ControlInterface,
@@ -67,10 +72,11 @@ export const SwitcherStructure = (p: SwitcherStructureProps) => {
 }
 
 export const Workspace = () => {
-  const { taskStructure, draggingType } = useAppSelector(
+  const { taskStructure, draggingType, isSourceLibrary } = useAppSelector(
     ({ graphic }) => graphic
   )
-  const droppableId = useIdRef(WORKSPACE_ID)
+  const droppableIdWorkspace = useIdRef(WORKSPACE_ID)
+  const droppableIdTrash = useIdRef(TRASH_ID)
   const { taskName } = getPageContext()
   const isDropDisabled = !alloweItems.includes(draggingType)
 
@@ -82,6 +88,19 @@ export const Workspace = () => {
     <WorkspaceWrapper>
       <TaskInfo>
         Task name: {taskName}
+        <Droppable droppableId={droppableIdTrash}>
+          {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+            <WrapperTrash
+              isVisible={draggingType !== null && !isSourceLibrary}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              isDraggingOver={snapshot.isDraggingOver}
+            >
+              <DeleteOutlined />
+              <span style={{ display: 'none' }}>{provided.placeholder}</span>
+            </WrapperTrash>
+          )}
+        </Droppable>
         <Tooltip title="Save task">
           <Button
             type="primary"
@@ -91,7 +110,10 @@ export const Workspace = () => {
           />
         </Tooltip>
       </TaskInfo>
-      <Droppable droppableId={droppableId} isDropDisabled={isDropDisabled}>
+      <Droppable
+        droppableId={droppableIdWorkspace}
+        isDropDisabled={isDropDisabled}
+      >
         {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
           <DroppableWorkspaceArea
             ref={provided.innerRef}

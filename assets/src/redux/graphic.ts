@@ -5,11 +5,13 @@ import { CategoriesEnum } from '../pages/graphic/library'
 export interface GraphicState {
   taskStructure: RootDndInterface
   draggingType: CategoriesEnum
+  isSourceLibrary: boolean
 }
 
 const initialState: GraphicState = {
   taskStructure: [],
   draggingType: null,
+  isSourceLibrary: false,
 }
 
 const graphicSlice = createSlice({
@@ -34,9 +36,19 @@ const graphicSlice = createSlice({
         draggingType: null,
       }
     },
+    setSourceLibrary(state, action: PayloadAction<boolean>) {
+      return {
+        ...state,
+        isSourceLibrary: action.payload,
+      }
+    },
   },
 })
 
-export const { setTaskStructure, setDraggingType, resetDraggingType } =
-  graphicSlice.actions
+export const {
+  setTaskStructure,
+  setDraggingType,
+  resetDraggingType,
+  setSourceLibrary,
+} = graphicSlice.actions
 export const graphicReducers = graphicSlice.reducer

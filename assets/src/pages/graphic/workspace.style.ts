@@ -46,3 +46,26 @@ export const DroppableWorkspaceArea = styled.div<DroppableWorkspaceAreaProps>`
     isDraggingOver && theme.colors.primary.light4};
   transition: background-color 0.2s linear;
 `
+
+type WrapperTrashProps = {
+  readonly isVisible: boolean
+  readonly isDraggingOver: boolean
+}
+
+export const WrapperTrash = styled.div<WrapperTrashProps>`
+  visibility: ${({ isVisible }) => (isVisible ? 'visible' : 'hidden')};
+  display: flex;
+  border: 2px dashed ${({ theme }) => theme.colors.contextual.error.main};
+  flex: 1;
+  margin: 0 5rem;
+  color: ${({ theme }) => theme.colors.contextual.error.main};
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 80%;
+  background-color: ${({ theme, isDraggingOver }) =>
+    isDraggingOver
+      ? theme.colors.contextual.error.light3
+      : theme.colors.contextual.error.light4};
+  transition: background-color 0.2s linear;
+`
