@@ -18,7 +18,14 @@ export const SwitcherControls = (item: ControlInterface, index: number) => {
         />
       )
     case ControlsValuesEnum.LOOP:
-      return <ControlLoop id={item.id} name={item.name} items={item.items} />
+      return (
+        <ControlLoop
+          id={item.id}
+          name={item.name}
+          items={item.items}
+          index={index}
+        />
+      )
     case ControlsValuesEnum.WHEN:
     case ControlsValuesEnum.STOP_WHEN:
     case ControlsValuesEnum.DO_WHEN:

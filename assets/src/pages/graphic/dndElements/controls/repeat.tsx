@@ -88,7 +88,10 @@ export const ControlRepeat = (p: ControlRepeatProps) => {
               size="small"
             />
           </WrapperIteration>
-          <Droppable droppableId={`${p.id}_items`}>
+          <Droppable
+            droppableId={`${p.id}_items`}
+            isDropDisabled={isDropDisabled}
+          >
             {(
               providedDroppable: DroppableProvided,
               snapshotDroppable: DroppableStateSnapshot
@@ -97,13 +100,13 @@ export const ControlRepeat = (p: ControlRepeatProps) => {
                 ref={providedDroppable.innerRef}
                 {...providedDroppable.droppableProps}
                 isEmpty={p.items.length === 0}
-                isDraggingOver={false}
+                isDraggingOver={snapshotDroppable.isDraggingOver}
               >
                 {p.items.length === 0 && (
-                  <>
+                  <WrapperNoItems>
                     <SnippetsOutlined />
                     Drop here Controls or Actions
-                  </>
+                  </WrapperNoItems>
                 )}
                 {p.items.map(
                   (item: ControlInterface | ActionInterface, index: number) => (
@@ -175,4 +178,8 @@ const ItemsControlRepeat = styled.div<ItemsControlRepeatProps>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`
+
+const WrapperNoItems = styled.div`
+  position: absolute;
 `

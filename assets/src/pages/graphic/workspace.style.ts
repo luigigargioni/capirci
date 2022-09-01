@@ -26,8 +26,9 @@ type DroppableWorkspaceAreaProps = {
 }
 
 export const DroppableWorkspaceArea = styled.div<DroppableWorkspaceAreaProps>`
-  border: ${({ isDraggingOver }) => (isDraggingOver ? '4px' : '2px')} dashed
-    ${({ theme }) => theme.colors.neutral.gray7};
+  border: 2px dashed
+    ${({ theme, isDraggingOver }) =>
+      isDraggingOver ? theme.colors.neutral.gray8 : theme.colors.neutral.gray6};
   border-radius: 10px;
   display: flex;
   flex-direction: column;

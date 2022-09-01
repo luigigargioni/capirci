@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Draggable,
   DraggableProvided,
   DraggableStateSnapshot,
   Droppable,
   DroppableProvided,
+  DroppableStateSnapshot,
 } from '@hello-pangea/dnd'
 import { Tooltip } from 'antd'
 import {
@@ -19,8 +20,10 @@ import {
 import { useIdRef } from '../../utils/useIdRef'
 import useSWR from 'swr'
 import { endpoints } from '../../services/api'
-import { GlobalOutlined } from '@ant-design/icons'
-import { LIBRARY_ID } from './util'
+import { DeleteOutlined, GlobalOutlined } from '@ant-design/icons'
+import { LIBRARY_ID, TRASH_ID } from './util'
+import { WrapperTrash } from './workspace.style'
+import { useAppSelector } from '../../redux'
 
 interface LibraryItemInterface {
   id: number
@@ -162,7 +165,7 @@ const LibraryCategories: LibraryCategoryInterface[] = [
 ]
 
 export const Library = () => {
-  const [selectedCategory, setSelectedCategory] = React.useState(0)
+  const [selectedCategory, setSelectedCategory] = useState(0)
   const droppableId = useIdRef(LIBRARY_ID)
 
   const { data: actions } = useSWR(endpoints.graphic.actions)

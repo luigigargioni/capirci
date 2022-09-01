@@ -137,6 +137,37 @@ const deleteElement = (
   return newStructure
 }
 
+const moveElement = (
+  currentNode: DndItemInterface,
+  destinationId: string,
+  destinationIndex: number,
+  sourceIndex: number
+): DndItemInterface => {
+  if (
+    destinationId === currentNode.id &&
+    currentNode.category === CategoriesEnum.CONTROLS &&
+    currentNode.items.length > 0
+  ) {
+    const newItems = [...currentNode.items]
+    const temp = currentNode.items[sourceIndex]
+    newItems[sourceIndex] = currentNode.items[destinationIndex]
+    newItems[destinationIndex] = temp
+    return { ...currentNode, items: newItems }
+  }
+
+  if (
+    currentNode.category === CategoriesEnum.CONTROLS &&
+    currentNode.items.length > 0
+  ) {
+    const newItems = currentNode.items.map((item: ControlInterface) =>
+      moveElement(item, destinationId, destinationIndex, sourceIndex)
+    ) as (ControlInterface | ActionInterface)[]
+    return { ...currentNode, items: newItems }
+  }
+
+  return currentNode
+}
+
 const onDragStart = (result: DragStart) => {
   console.log('onDragStart', result)
   const { draggableId, source } = result
@@ -173,7 +204,7 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
 
   // Added from the Library
   if (isSourceLibrary(source)) {
-    const newId = nanoid()
+    const newId = `${category}_${name}_${nanoid()}`
 
     let newItem: DndItemInterface = null
 
@@ -243,7 +274,7 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
       }
     }
 
-    // Insert new item in the destination item
+    // Insert new item in the destination (NOT Workspace)
     const destinationId = getItemId(destination.droppableId)
     const destionationType = getItemType(destination.droppableId)
     const newTaskStructure = taskStructure.map(
@@ -261,29 +292,45 @@ const onDragEnd = (result: DropResult, taskStructure: RootDndInterface) => {
     return
   }
 
-  // Moved from Workspace
-  // TODO Moved in the same item
+  // Moved in the same item
   if (
-    isSourceWorkspace(source) &&
     destination.droppableId === source.droppableId &&
     destination.index !== source.index
   ) {
-    const id = getItemId(draggableId)
-    //return
+    if (isSourceWorkspace(source)) {
+      const newTaskStructure = [...taskStructure]
+      const temp = taskStructure[source.index]
+      newTaskStructure[source.index] = taskStructure[destination.index]
+      newTaskStructure[destination.index] = temp
+      store.dispatch(setTaskStructure(newTaskStructure))
+    } else {
+      const newTaskStructure = taskStructure.map(
+        (taskStructureItem: DndItemInterface) =>
+          moveElement(
+            taskStructureItem,
+            destination.droppableId,
+            destination.index,
+            source.index
+          )
+      ) as RootDndInterface
+      store.dispatch(setTaskStructure(newTaskStructure))
+    }
+    return
   }
 
   // TODO Moved in another item
   if (
-    isSourceWorkspace(source) &&
-    destination.droppableId !== source.droppableId
+    destination.droppableId !== source.droppableId &&
+    !isDestinationTrash(destination)
   ) {
     const id = getItemId(draggableId)
+    console.log('moved into')
     // Insert new item in the destination item
     // Delete the old item from the source
-    //return
+    return
   }
 
-  // TODO Dropped in the Trash
+  // Dropped in the Trash
   if (isDestinationTrash(destination)) {
     const newTaskStructure = deleteElement(
       taskStructure as DndItemInterface[],
