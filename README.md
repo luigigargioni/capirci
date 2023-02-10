@@ -54,14 +54,14 @@ poetry run poetryup
 
 ## :key: Credentials
 
-* Username: operator1  
-Password: Passwordoperator2  
-Type: Operator  
+* Username: `operator1`  
+Password: `Passwordoperator2`  
+Type: `Operator`  
 
-* Username: manager1  
-Password: passwordmanager1  
-Type: Manager  
+* Username: `manager1`  
+Password: `passwordmanager1`  
+Type: `Manager`  
 
-* Username: admin  
-Password: adminpassword  
-Type: Administrator/Manager
+* Username: `admin`  
+Password: `adminpassword`  
+Type: `Administrator`/`Manager`
