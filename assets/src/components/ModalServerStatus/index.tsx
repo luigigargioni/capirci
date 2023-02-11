@@ -40,7 +40,7 @@ export const ModalServerStatus = () => {
   return (
     <Modal
       title={[iconMap.warning, title]}
-      visible={noConnection || error}
+      open={noConnection || error}
       closable={false}
       bodyStyle={{ height: '376px' }}
       footer={[

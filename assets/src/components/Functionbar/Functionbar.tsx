@@ -70,7 +70,7 @@ export const Functionbar = (p: FunctionbarProps) => {
         <ModalDelete
           onOk={p.CRUD.modalDelete.onOk}
           onCancel={() => p.CRUD?.modalDelete?.setModalDeleteVisible(false)}
-          visible={p.CRUD.modalDelete.modalDeleteVisible}
+          open={p.CRUD.modalDelete.modalDeleteVisible}
           description={p.CRUD.modalDelete.description || ''}
         />
       )}

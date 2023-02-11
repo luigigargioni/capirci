@@ -1,4 +1,6 @@
+import { Typography } from 'antd'
 import React from 'react'
+import { inherits } from 'util'
 import { WrapperFooter, Copyright } from './footer.style'
 
 export const Footer = () => {
@@ -16,13 +18,23 @@ export const Footer = () => {
   return (
     <WrapperFooter>
       <Copyright>
-        <a href={linkProject} target="_blank" rel="noreferrer">
+        <Typography.Link
+          href={linkProject}
+          target="_blank"
+          rel="noreferrer"
+          style={{ fontSize: 'inherit' }}
+        >
           CAPIRCI
-        </a>
+        </Typography.Link>
         {copyright}
-        <a href={linkProfile} target="_blank" rel="noreferrer">
+        <Typography.Link
+          href={linkProfile}
+          target="_blank"
+          rel="noreferrer"
+          style={{ fontSize: 'inherit' }}
+        >
           Luigi Gargioni
-        </a>
+        </Typography.Link>
       </Copyright>
     </WrapperFooter>
   )

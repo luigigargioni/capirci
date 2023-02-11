@@ -3,7 +3,7 @@ import { Modal } from 'antd'
 import { iconMap } from '../../utils/iconMap'
 
 interface ModalDeleteProps {
-  visible: boolean
+  open: boolean
   onCancel: () => void
   onOk: () => void
   description: string
@@ -12,7 +12,7 @@ interface ModalDeleteProps {
 export const ModalDelete = (p: ModalDeleteProps) => (
   <Modal
     title={[iconMap.warning, 'Sei sicuro di eliminare questo elemento?']}
-    visible={p.visible}
+    open={p.open}
     okText="Elimina"
     okType="danger"
     okButtonProps={{ type: 'primary' }}

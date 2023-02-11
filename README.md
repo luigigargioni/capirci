@@ -12,7 +12,7 @@ The research reported in this paper proposes a new approach to collaborative rob
 
 ### :dart: Requirements
 
-* [Python 3.x.x](https://www.python.org/downloads/)
+* [Python 3.10.x](https://www.python.org/downloads/)
 * [Poetry](https://python-poetry.org/docs/#installation) (pip installation is not the official one, but the easiest one)
 
 ---

@@ -6,7 +6,7 @@ import { ActionType } from '../Functionbar/Functionbar'
 
 interface CustomModalProps {
   title: string
-  visible: boolean
+  open: boolean
   hideModal: () => void
   handleOk: () => void
   children?: JSX.Element | JSX.Element[]
@@ -26,7 +26,7 @@ export const CustomModal = (p: CustomModalProps) => {
     <StyledModal
       title={title}
       centered
-      visible={p.visible}
+      open={p.open}
       onOk={() => p.handleOk()}
       okText={p.okText || 'Salva'}
       onCancel={() => p.hideModal()}
