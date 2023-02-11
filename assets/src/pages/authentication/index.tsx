@@ -12,7 +12,7 @@ import {
 } from './index.style'
 import { endpoints, fetchApi, MethodHTTP } from '../../services/api'
 import Logo from '../../img/logo.png'
-import 'antd/dist/antd.css'
+import 'antd/dist/reset.css'
 import { clearPageContext, getPageContext } from '../../utils/pageContext'
 
 const LoginPage = () => {

@@ -6,14 +6,18 @@ The research reported in this paper proposes a new approach to collaborative rob
 
 ---
 
-## :dart: Requirements
-
-* [Python 3.x.x](https://www.python.org/downloads/)
-* [Poetry](https://python-poetry.org/docs/#installation)
+## :gear: BackEnd
 
 ---
 
-## :star2: Installing from scratch
+### :dart: Requirements
+
+* [Python 3.x.x](https://www.python.org/downloads/)
+* [Poetry](https://python-poetry.org/docs/#installation) (pip installation is not the official one, but the easiest one)
+
+---
+
+### :star2: Installing from scratch
 
 ```bash
 poetry install
@@ -21,21 +25,15 @@ poetry install
 
 ---
 
-## :wrench: Start server
+### :wrench: Start server
 
 ```bash
 poetry run python manage.py runserver
 ```
 
-or
-
-```bash
-poetry shell && python manage.py runserver
-```
-
 ---
 
-## :arrows_counterclockwise: Update dependencies
+### :arrows_counterclockwise: Update dependencies
 
 Update with versions from `pyproject.toml`:
 
@@ -51,6 +49,40 @@ poetry run poetryup
 ```
 
 ---
+
+## :dizzy: FrontEnd
+
+* Folder: ```src```
+
+---
+
+### :books: Design libraries
+
+* [React 18.x.x](https://it.reactjs.org/)
+* [Parcel](https://parceljs.org/)
+* [Ant Design](https://ant.design/)
+
+---
+
+### :open_file_folder: Install dependencies
+
+```bash
+npm install
+```
+
+---
+
+### :twisted_rightwards_arrows: Update dependencies in package.json
+
+* Visual Studio Code Exstension: [Versions Lens](https://marketplace.visualstudio.com/items?itemName=pflannery.vscode-versionlens)
+
+---
+
+### :mag_right: Start debug server
+
+```bash
+npm start
+```
 
 ## :key: Credentials
 
