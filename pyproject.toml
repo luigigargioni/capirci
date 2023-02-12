@@ -3,6 +3,11 @@ name = "capirci"
 version = "0.1.0"
 description = "Chat And Program Industrial Robots through Convenient Interaction"
 authors = ["Luigi Gargioni <luigi.gargioni@gmail.com>"]
+maintainers = ["Luigi Gargioni <luigi.gargioni@gmail.com>"]
+readme = "README.md"
+homepage = "http://localhost:8000/"
+repository = "https://github.com/luigigargioni/capirci"
+documentation = "https://github.com/luigigargioni/capirci#readme"
 packages = [
     { include="scripts", from="." },
 ]
