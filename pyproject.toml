@@ -16,19 +16,19 @@ packages = [
 start = "scripts.server:run"
 
 [tool.poetry.dependencies]
-django = "^4.1.6"
-django-cors-headers = "^3.13.0"
-django-mysql = "^4.8.0"
+django = "^4.2"
+django-cors-headers = "^3.14.0"
+django-mysql = "^4.9.0"
 docutils = "^0.19"
 nltk = "^3.8.1"
 numpy = "^1.24.2"
-opencv-python = "^4.7.0.68"
-pillow = "^9.4.0"
-python = "^3.10.10"
+opencv-python = "^4.7.0.72"
+pillow = "^9.5.0"
+python = "^3.10.11"
 pythonping = "^1.1.4"
 pytz = "^2022.7.1"
 pywin32 = "^305"
-stanza = "^1.4.2"
+stanza = "^1.5.0"
 word2number = "^1.1"
 
 [tool.poetry.dev-dependencies]
