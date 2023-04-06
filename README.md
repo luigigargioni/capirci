@@ -14,7 +14,7 @@ The research reported in this paper proposes a new approach to collaborative rob
 
 ### :dart: Requirements
 
-* [Python 3.10.x](https://www.python.org/downloads/) (Torch version 1.13.1, an indirect dependency of Stanza, is not yet compatible with Python 3.11.x)
+* [Python 3.11.x](https://www.python.org/downloads/)
 * [Poetry](https://python-poetry.org/docs/#installation) (pip installation is not the official one, but the easiest)
 
 ---
