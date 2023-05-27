@@ -10,7 +10,6 @@ SECRET_KEY = "pe=ipw6q4g-2d+*7n76g70c#ps+!n=i3-d91i^l9adjh@o)8+!"
 DEBUG = True
 
 CORS_ORIGIN_ALLOW_ALL = True
-# ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -43,7 +42,7 @@ ROOT_URLCONF = "project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [path.join(BASE_DIR, "app/templates")],
+        "DIRS": [path.join(BASE_DIR, "frontend/build")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -84,14 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Static files (CSS, JavaScript, Images)
-
-STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    BASE_DIR + "/assets/dist",
-]
-
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = "/"
 
@@ -101,3 +92,28 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
 }
+
+# These are the settings you should have for everything to work properly.
+# Add these to your main settings.py file, or modify it accordingly.
+
+# Needed for production. Avoid using '*'.
+ALLOWED_HOSTS = ["*"]
+
+# Needed for 'debug' to be available inside templates.
+# https://docs.djangoproject.com/en/3.2/ref/templates/api/#django-template-context-processors-debug
+INTERNAL_IPS = ["127.0.0.1"]
+
+# Vite App Dir: point it to the folder your vite app is in.
+VITE_APP_DIR = path.join(BASE_DIR, "frontend")
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+# You may change these, but it's important that the dist folder is includedself.
+# If it's not, collectstatic won't copy your bundle to production.
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    path.join(VITE_APP_DIR, "public"),
+]
+STATIC_ROOT = path.join(BASE_DIR, "staticfiles")

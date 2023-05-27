@@ -13,6 +13,10 @@ from app.utils.string import get_or_default
 from .utils.render_react_page import render_react_page
 
 
+def index(request):
+    return render(request, "index.html")
+
+
 @login_required()
 def home(request: HttpRequest) -> HttpResponse:
     try:
