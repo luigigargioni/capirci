@@ -2,7 +2,7 @@ from os import environ
 from sys import argv
 
 if __name__ == "__main__":
-    environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
+    environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project_conf.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

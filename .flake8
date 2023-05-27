@@ -4,7 +4,5 @@ ignore =
     E203 # Whitespace before ':'
     W503 # line break before binary operator
 exclude =
-    **/site-packages/**/*.py
-    .vscode/*.py
     .venv/**/*.py
-    app/pybcapclient/*.py
+    backend/pybcapclient/*.py

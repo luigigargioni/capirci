@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('app', '0002_task_code_alter_action_robot_alter_location_robot_and_more'),
+        ("backend", "0002_task_code_alter_action_robot_alter_location_robot_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='code',
+            model_name="task",
+            name="code",
             field=models.BinaryField(default=None, editable=True, null=True),
         ),
     ]

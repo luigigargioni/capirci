@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.admindocs",
     "corsheaders",
     "django_mysql",
-    "app.apps.ConfigApp",
+    "backend.apps.ConfigApp",
 ]
 
 MIDDLEWARE = [
@@ -37,12 +37,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "project.urls"
+ROOT_URLCONF = "django_project_conf.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [path.join(BASE_DIR, "frontend/build")],
+        "DIRS": [path.join(BASE_DIR, "frontend/dist")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -55,14 +55,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "project.wsgi.application"
+WSGI_APPLICATION = "django_project_conf.wsgi.application"
 
 # Database
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": path.join(BASE_DIR, "sqlite.db"),
+        "NAME": path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -86,7 +86,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = "/"
 
-LOGIN_URL = "login"
+LOGIN_URL = "/"
 
 LOGGING = {
     "version": 1,
@@ -103,7 +103,7 @@ ALLOWED_HOSTS = ["*"]
 # https://docs.djangoproject.com/en/3.2/ref/templates/api/#django-template-context-processors-debug
 INTERNAL_IPS = ["127.0.0.1"]
 
-# Vite App Dir: point it to the folder your vite app is in.
+# Vite App Dir: point it to the folder your vite App is in.
 VITE_APP_DIR = path.join(BASE_DIR, "frontend")
 
 # Static files (CSS, JavaScript, Images)
@@ -114,6 +114,6 @@ VITE_APP_DIR = path.join(BASE_DIR, "frontend")
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [
-    path.join(VITE_APP_DIR, "public"),
+    path.join(VITE_APP_DIR, "dist"),
 ]
 STATIC_ROOT = path.join(BASE_DIR, "staticfiles")

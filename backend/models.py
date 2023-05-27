@@ -7,7 +7,7 @@ from enum import Enum
 
 
 # For update the database and create table
-# python manage.py makemigrations app && python manage.py migrate --run-syncdb
+# python manage.py makemigrations backend && python manage.py migrate --run-syncdb
 
 
 class Task(models.Model):

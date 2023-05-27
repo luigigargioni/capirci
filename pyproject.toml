@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "capirci"
-version = "0.1.0"
+version = "0.0.1"
 description = "Chat And Program Industrial Robots through Convenient Interaction"
 authors = ["Luigi Gargioni <luigi.gargioni@gmail.com>"]
 maintainers = ["Luigi Gargioni <luigi.gargioni@gmail.com>"]
@@ -9,11 +9,12 @@ homepage = "http://localhost:8000/"
 repository = "https://github.com/luigigargioni/capirci"
 documentation = "https://github.com/luigigargioni/capirci#readme"
 packages = [
-    { include="scripts", from="." },
+    { include="poetry_scripts", from="./backend" },
 ]
 
 [tool.poetry.scripts]
-start = "scripts.server:run"
+start = "backend.poetry_scripts.server:run"
+collectstatic = "backend.poetry_scripts.server:collectstatic"
 
 [tool.poetry.dependencies]
 django = "^4.2.1"

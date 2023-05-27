@@ -1,5 +1,5 @@
 from xml.etree.ElementTree import Element, tostring, SubElement, dump, fromstring
-from app.models import Task
+from backend.models import Task
 from ..dictionary import all_synonyms
 
 

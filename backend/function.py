@@ -8,7 +8,7 @@ from os import remove, path, listdir
 import cv2
 from django.db.models import Q
 
-from app.utils.response import (
+from backend.utils.response import (
     HttpMethod,
     invalid_request_method,
     error_response,
@@ -343,16 +343,18 @@ def deleteObject(request: HttpRequest) -> HttpResponse:
         user = User.objects.get(username=username)
         instance = Object.objects.filter(name=objectname).filter(owner=user.pk)
         instance.delete()
-        remove("app\\static\\images\\objects\\" + username + "_" + objectname + ".png")
         remove(
-            "app\\static\\images\\objects\\"
+            "backend\\static\\images\\objects\\" + username + "_" + objectname + ".png"
+        )
+        remove(
+            "backend\\static\\images\\objects\\"
             + username
             + "_"
             + objectname
             + "_contour.png"
         )
         remove(
-            "app\\static\\images\\objects\\"
+            "backend\\static\\images\\objects\\"
             + username
             + "_"
             + objectname
@@ -593,7 +595,7 @@ def takeShot(request: HttpRequest) -> HttpResponse:
             disconnect(client, hCtrl, hRobot)
             image = take_img(wb=True, cameraip=robot[0].cameraip)
             cv2.imwrite(
-                "app\\static\\images\\objects\\"
+                "backend\\static\\images\\objects\\"
                 + str(username)
                 + "_"
                 + str(object)
@@ -632,7 +634,7 @@ def takeShot(request: HttpRequest) -> HttpResponse:
             copy = image.copy()
             cv2.drawContours(copy, cnts, areaMaxi, (0, 0, 255), 3)
             cv2.imwrite(
-                "app\\static\\images\\objects\\"
+                "backend\\static\\images\\objects\\"
                 + str(username)
                 + "_"
                 + str(object)
@@ -656,7 +658,7 @@ def takeShot(request: HttpRequest) -> HttpResponse:
             roi = outline[y : y + height, x : x + width]
             roi = cv2.copyMakeBorder(roi, 15, 15, 15, 15, cv2.BORDER_CONSTANT, value=0)
             cv2.imwrite(
-                "app\\static\\images\\objects\\"
+                "backend\\static\\images\\objects\\"
                 + str(username)
                 + "_"
                 + str(object)
@@ -1090,7 +1092,7 @@ def deleteImageObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         object_owner = request.POST.get("object_owner")
         object_name = request.POST.get("object_name")
-        dir = "app\\static\\images\\objects"
+        dir = "backend\\static\\images\\objects"
         files = listdir(dir)
         for file in files:
             if file.startswith(object_owner + "_" + object_name):
@@ -1401,7 +1403,6 @@ def checkLibrariesXML(request: HttpRequest) -> HttpResponse:
 def runTask(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
-
             taskname = request.POST.get("taskName")
             username = request.POST.get("username")
             robot = request.POST.get("robot")
@@ -1663,7 +1664,11 @@ def search_object(
     caoRobot = ctrl.AddRobot("robot0", "")
 
     original = cv2.imread(
-        "app\\static\\images\\objects\\" + username + "_" + object_name + "_shape.png",
+        "backend\\static\\images\\objects\\"
+        + username
+        + "_"
+        + object_name
+        + "_shape.png",
         cv2.IMREAD_GRAYSCALE,
     )
     (cnts, _) = cv2.findContours(

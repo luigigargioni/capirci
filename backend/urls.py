@@ -6,8 +6,6 @@ from django.conf import settings
 from django.views.static import serve
 from django.views.generic import TemplateView
 
-# TODO Try https://django-ninja.rest-framework.com/
-
 API = "api/"
 
 
@@ -18,17 +16,13 @@ class PathEnum(Enum):
 
 
 urlpatterns = [
+    path("login/", views.login_view, name="login"),
     # admin
     # API
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),
-    # Views
-    path("home_new/", views.home_view, name="home_new"),
-    path("chat_new/<str:task_name>/", views.chat_view, name="chat_new"),
-    path("graphic/<str:task_name>/", views.graphic_view, name="graphic"),
-    path("login/", views.login_view, name="login"),
     # OLD Views
-    path("", views.home, name="home"),
+    # path("", views.home, name="home"),
     path("chat/<str:task_name>/", views.chat, name="chat"),
     path("task/<str:task_name>/", views.task, name="task"),
     # FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION -- FUNCTION
