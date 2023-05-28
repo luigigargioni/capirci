@@ -17,18 +17,9 @@ import { Formik } from 'formik'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { LocalStorageKey, setToLocalStorage } from 'utils/localStorageUtils'
-import { defaultPath, USER_ROLE } from 'utils/constants'
+import { defaultPath } from 'utils/constants'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
-
-export interface UserLoginInterface {
-  id: string
-  email: string
-  first_name: string
-  last_name: string
-  role: USER_ROLE
-}
 
 interface LoginFormProps {
   setResetPassword: (value: boolean) => void
@@ -40,45 +31,36 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
 
   const onSubmit = async (
     values: {
-      email: string
+      username: string
       password: string
     },
     { setErrors, setStatus, setSubmitting }
   ) => {
-    fetchApi({
-      mod: endpoints.user.login.mod,
-      fnz: endpoints.user.login.fnz,
-      body: values,
-      methodApi: MethodHTTP.POST,
+    fetchApi(endpoints.authentication.login, MethodHTTP.POST, {
+      username: values.username,
+      password: values.password,
     })
-      .then((res) => {
-        if (res?.bool) {
-          const userInfo: UserLoginInterface = {
-            id: res.data.id,
-            email: res.data.email,
-            first_name: res.data.first_name,
-            last_name: res.data.last_name,
-            role: res.data.role as USER_ROLE,
-          }
-          setToLocalStorage(LocalStorageKey.TOKEN, res.data.token)
-          setToLocalStorage(LocalStorageKey.USER, userInfo)
-          navigate(defaultPath)
-          setStatus({ success: true })
-          return
-        }
-        setStatus({ success: false })
-        if (res?.bool === false) {
-          setErrors({
-            email: MessageText.invalidCredentials,
-            password: MessageText.invalidCredentials,
-          })
-          return
-        }
+    .then((response: any) => {
+      const { authError }: { authError: boolean } = response
+      if (!authError) {
+        navigate(defaultPath)
+                  setStatus({ success: true })
+        return
+      }
+      setStatus({ success: false })
+
+      if (authError) {
         setErrors({
-          email: MessageText.noConnection,
-          password: MessageText.noConnection,
+          username: MessageText.invalidCredentials,
+          password: MessageText.invalidCredentials,
         })
+        return
+      }
+      setErrors({
+        username: MessageText.noConnection,
+        password: MessageText.noConnection,
       })
+    })
       .finally(() => {
         setSubmitting(false)
       })
@@ -87,12 +69,11 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
   return (
     <Formik
       initialValues={{
-        email: '',
+        username: '',
         password: '',
       }}
       validationSchema={YupObject().shape({
-        email: YupString()
-          .email(MessageText.emailNotValid)
+        username: YupString()
           .max(255, MessageTextMaxLength(255))
           .required(MessageText.requiredField),
         password: YupString()
@@ -115,23 +96,23 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
             <Grid item xs={12}>
               <Stack spacing={1}>
                 <TextField
-                  id="email-login"
-                  type="email"
-                  value={values.email}
-                  name="email"
-                  label="Email"
+                  id="username-login"
+                  type="username"
+                  value={values.username}
+                  name="username"
+                  label="Username"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   fullWidth
-                  error={Boolean(touched.email && errors.email)}
+                  error={Boolean(touched.username && errors.username)}
                 />
-                {touched.email && errors.email && (
+                {touched.username && errors.username && (
                   <FormHelperText
                     error
-                    id="helper-text-email-login"
+                    id="helper-text-username-login"
                     style={{ marginTop: 3 }}
                   >
-                    {errors.email}
+                    {errors.username}
                   </FormHelperText>
                 )}
               </Stack>
@@ -158,7 +139,7 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label="inverti visibilità password"
+                          aria-label="toggle password visibility"
                           onClick={() => setShowPassword(!showPassword)}
                           onMouseDown={(e) => e.preventDefault()}
                           edge="end"
@@ -205,8 +186,9 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
                 variant="text"
                 color="primary"
                 onClick={() => setResetPassword(true)}
+                disabled
               >
-                Dimenticato la password?
+                Forgot the password?
               </Button>
             </Grid>
           </Grid>

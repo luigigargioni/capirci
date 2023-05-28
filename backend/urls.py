@@ -16,9 +16,9 @@ class PathEnum(Enum):
 
 
 urlpatterns = [
-    path("login/", views.login_view, name="login"),
-    # admin
     # API
+    path(API + "login/", views.login_view, name="login"),
+    # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),
     # OLD Views

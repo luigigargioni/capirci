@@ -5,7 +5,7 @@ import { LogoBackground } from 'components/Logo/Logo'
 
 export const AuthBackground = () => (
   <Box
-    sx={{ position: 'absolute', filter: 'blur(18px)', zIndex: -1, bottom: 0 }}
+    sx={{ position: 'absolute', zIndex: -1, bottom: 0, width: '100%', height: '100%' }}
   >
     <LogoBackground />
   </Box>

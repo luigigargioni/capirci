@@ -19,10 +19,10 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({
   children,
 }: ProtectedRouteProps): JSX.Element => {
-  const [loading, setLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
 
-  const verifyToken = async () => {
+/*   const verifyToken = async () => {
     return fetchApi({
       mod: endpoints.user.verifyToken.mod,
       fnz: endpoints.user.verifyToken.fnz,
@@ -44,7 +44,7 @@ export const ProtectedRoute = ({
 
   useEffect(() => {
     verifyToken()
-  }, [])
+  }, []) */
 
   if (isAuthenticated) return children
   return loading ? <LoadingSpinner /> : <Navigate to="/login" replace />

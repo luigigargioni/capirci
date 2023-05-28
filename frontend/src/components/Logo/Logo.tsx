@@ -1,8 +1,6 @@
 import React from 'react'
 
-import logo from './logo.png'
-
-export const Logo = () => <img src={logo} alt="logo" width="50" />
+export const Logo = () => <img src="http://localhost:3000/src/components/Logo/logo.png" alt="logo" width="30" style={{marginRight: '1rem'}}/>
 export const LogoBackground = () => (
-  <img src={logo} alt="logo" width="900" height="900" />
+  <img src="http://localhost:3000/src/components/Logo/backgroundLogin.png" alt="logo" width="100%" height="100%" />
 )

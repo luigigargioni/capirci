@@ -1,26 +1,26 @@
 export enum MessageText {
-  requiredField = 'Campo obbligatorio',
-  emailNotValid = 'Formato email non valido',
-  lengthNotValid = 'Lunghezza non valida',
-  invalidForm = 'Dati non validi',
-  sessioneExpired = 'Sessione scaduta',
-  onlyEdit = 'Disponibile solo in modifica',
-  passwordsNotEqual = 'Le password non corrispondono',
-  newPasswordEqualOld = 'La nuova password corrisponde a quella attuale',
-  incorrectPassword = 'Password errata',
-  invalidCredentials = 'Credenziali non valide',
-  serverError = 'Errore del server',
-  logoutSuccess = 'Logout effettuato con successo',
-  noConnection = 'Problema connessione server',
-  passwordMismatch = 'Le password non corrispondono',
-  emailAlreadyExists = 'Email già esistente',
-  success = 'Operazione effettuata con successo',
-  valueNotValid = 'Valore non valido',
-  invalidDate = 'La data di inizio deve essere precedente alla data di fine',
-}
+  requiredField = 'Required field',
+  emailNotValid = 'Invalid email format',
+  lengthNotValid = 'Invalid length',
+  invalidForm = 'Invalid data',
+  sessioneExpired = 'Session expired',
+  onlyEdit = 'Available only in edit mode',
+  passwordsNotEqual = 'Passwords do not match',
+  newPasswordEqualOld = 'The new password is the same as the current one',
+  incorrectPassword = 'Incorrect password',
+  invalidCredentials = 'Invalid credentials',
+  serverError = 'Server error',
+  logoutSuccess = 'Logged out successfully',
+  noConnection = 'Server connection problem',
+  passwordMismatch = 'Passwords do not match',
+  emailAlreadyExists = 'Email already exists',
+  success = 'Operation completed successfully',
+  valueNotValid = 'Invalid value',
+  invalidDate = 'The start date must be before the end date',
+  }
 
-export const MessageTextMinLength = (minLength: number) =>
-  `Lunghezza minima ${minLength} caratteri`
-
-export const MessageTextMaxLength = (maxLength: number) =>
-  `Lunghezza massima ${maxLength} caratteri`
+  export const MessageTextMinLength = (minLength: number) =>
+  `Minimum length ${minLength} characters`
+  
+  export const MessageTextMaxLength = (maxLength: number) =>
+  `Maximum length ${maxLength} characters`

@@ -9,9 +9,12 @@
 -->
 
 <head>
+
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CAPIRCI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <meta name="theme-color" content="#1f1f1f" />
+    <meta name="title" content="CAPIRCI" />
 
     {% if debug %}
     <script type="module" src="http://localhost:3000/@vite/client"></script>
@@ -30,7 +33,7 @@
 </head>
 
 <body>
-    {% csrf_token %}
+    {% load static %}
     <div id="root"></div>
 
     {% if debug %}

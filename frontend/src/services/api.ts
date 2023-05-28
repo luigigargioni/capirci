@@ -1,92 +1,69 @@
 import { BareFetcher, Key, Middleware, SWRConfiguration, SWRHook } from 'swr'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { toast } from 'react-toastify'
-
 import { MessageText } from 'utils/messages'
-import {
-  clearLocalStorage,
-  getFromLocalStorage,
-  LocalStorageKey,
-} from 'utils/localStorageUtils'
-
-const PROTOCOL = 'https://'
-const HOST = 'capriccididama.altervista.org'
-export const SERVER_API = PROTOCOL + HOST
-const URL_API = `${SERVER_API}/api/`
 
 export enum MethodHTTP {
   GET = 'GET',
   POST = 'POST',
+  DELETE = 'DELETE',
+  PUT = 'PUT',
 }
 
 export interface ResponseInterface {
   msg: string
   timestamp: string
-  bool: boolean
-  data: any
+  status: number
+  payload: any
 }
 
 axios.defaults.timeout = 10000
 
-interface FetchApiParamsInterface {
-  mod: string
-  fnz: string
-  body?: any
-  methodApi?: MethodHTTP
-}
+const getToken = () =>
+  document.getElementsByName('csrfmiddlewaretoken')[0]?.getAttribute('value')
 
-export const fetchApi = async ({
-  mod,
-  fnz,
-  body = {},
-  methodApi = MethodHTTP.GET,
-}: FetchApiParamsInterface) => {
-  const token = getFromLocalStorage(LocalStorageKey.TOKEN)
-  const authorizationHeader = token ? { Authorization: `Bearer ${token}` } : {}
-  const url = URL_API
-  const apiValues = { mod, fnz, ...body }
-  const apiParameters = methodApi === MethodHTTP.GET ? { ...apiValues } : {}
-  const apiData = methodApi !== MethodHTTP.GET ? { ...apiValues } : {}
+axios.defaults.timeout = 10000
+
+export const fetchApi = async (
+  url: string,
+  methodApi?: MethodHTTP,
+  body?: any
+) => {
+  const token = getToken()
   const options: AxiosRequestConfig = {
-    headers: {
-      ...authorizationHeader,
-      prod: 0,
-    },
+    headers: { 'Content-Type': 'multipart/form-data' },
     url,
     method: methodApi, // Axios default is GET
-    data: { ...apiData },
-    params: { ...apiParameters },
+    data: {
+      ...body,
+      ...(token && { csrfmiddlewaretoken: token }),
+    },
   }
 
   return axios(options)
     .then((response: AxiosResponse) => response.data)
-    .then((response: ResponseInterface) => {
-      // Using SWR
-      if (methodApi === MethodHTTP.GET) {
-        if (!response.bool) return null
-        if (response.data && response.data.records)
-          return {
-            records: response.data.records,
-            total: response.data?.cnt || 0,
-          }
-        if (response.data) return response.data
-        return response
-      }
-      return response
-    })
-    .catch((error: AxiosError) => {
-      if (error.code === 'ERR_NETWORK') {
-        toast.error(MessageText.noConnection)
-      }
+    .then((response: ResponseInterface) =>
+      response.payload.records !== undefined
+        ? response.payload.records
+        : response.payload
+    )
+    .catch((error: AxiosError<any>) => {
       if (error.response) {
-        const { status } = error.response
-        if (status === 401) {
-          clearLocalStorage()
-          history.pushState(null, '', '/login?expired=1')
-          history.go()
-          return null
+        const err = new Error(error.response.data?.message || 'No connection')
+        err.name = error.response.status.toString()
+        switch (error.response.status) {
+          case 0:
+            toast.error(MessageText.noConnection)
+            break
+          case 400:
+            toast.error(err.message)
+            throw err
+          case 500:
+            toast.error(err.message)
+            break
+          default:
+            toast.error(err.message)
         }
-        toast.error(MessageText.serverError)
       }
       return null
     })
