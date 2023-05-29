@@ -1,16 +1,16 @@
 import { getFromLocalStorage, LocalStorageKey } from 'utils/localStorageUtils'
 import { USER_ROLE } from 'utils/constants'
-import { stampe } from './registro'
-import { generale } from './generale'
-import { gestione } from './gestione'
+import { programming } from './programming'
+import { libraries } from './libraries'
 import { MenuItem } from './types'
-import { avanzate } from './avanzate'
+import { management } from './management'
 
 export const getMenuItems = (): MenuItem[] => {
   const { role } = getFromLocalStorage(LocalStorageKey.USER)
-  const defaultItems = [generale, gestione, stampe]
+  const defaultItems = [programming, libraries]
 
-  if (role === USER_ROLE.ADMIN) return [...defaultItems, avanzate]
+  return [...defaultItems, management]
+/*   if (role === USER_ROLE.ADMIN) return [...defaultItems, management]
 
-  return defaultItems
+  return defaultItems */
 }

@@ -1,6 +1,7 @@
 import React from 'react'
+import { devServerUrl } from 'utils/constants'
 
-export const Logo = () => <img src="http://localhost:3000/src/components/Logo/logo.png" alt="logo" width="30" style={{marginRight: '1rem'}}/>
+export const Logo = () => <img src={`${devServerUrl}/src/components/Logo/logo.png`} alt="logo" width="30" style={{marginRight: '1rem'}}/>
 export const LogoBackground = () => (
-  <img src="http://localhost:3000/src/components/Logo/backgroundLogin.png" alt="logo" width="100%" height="100%" />
+  <img src={`${devServerUrl}/src/components/Logo/backgroundLogin.png`} alt="logo" width="100%" height="100%" />
 )

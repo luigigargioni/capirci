@@ -4,7 +4,6 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
-  DotChartOutlined,
   VideoCameraFilled,
 } from '@ant-design/icons'
 import { Palette } from 'themes/palette'
@@ -34,16 +33,6 @@ export const iconMap = {
   ),
   webcamOff: (
     <VideoCameraFilled
-      style={{ color: themePalette.palette.secondary.light, fontSize: '2em' }}
-    />
-  ),
-  bathOn: (
-    <DotChartOutlined
-      style={{ color: themePalette.palette.primary.main, fontSize: '2em' }}
-    />
-  ),
-  bathOff: (
-    <DotChartOutlined
       style={{ color: themePalette.palette.secondary.light, fontSize: '2em' }}
     />
   ),

@@ -1,7 +1,7 @@
 import { TablePaginationConfig } from 'antd'
 
 export const drawerWidth = 260
-export const defaultOpenItem = 'checkin'
+export const defaultOpenItem = 'tasks'
 export const defaultPath = '/'
 
 export enum USER_ROLE {
@@ -20,3 +20,5 @@ export const defaultPaginationConfig: TablePaginationConfig = {
 
 export const timerTimeoutAutocomplete = 500
 export const minCharsAutocomplete = 1
+
+export const devServerUrl = 'http://localhost:3000'

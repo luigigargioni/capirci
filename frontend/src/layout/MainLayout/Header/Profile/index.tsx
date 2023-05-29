@@ -83,14 +83,14 @@ export const Profile = () => {
           borderRadius: 1,
           '&:hover': { bgcolor: 'secondary.lighter' },
         }}
-        aria-label="apri profilo"
+        aria-label="open profile"
         ref={anchorRef}
         aria-controls={open ? 'profile-grow' : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profilo utente" sx={{ width: 32, height: 32 }}>
+          <Avatar alt="user profile" sx={{ width: 32, height: 32 }}>
             <RandomDogIcon />
           </Avatar>
           <Typography variant="subtitle1">{userName}</Typography>

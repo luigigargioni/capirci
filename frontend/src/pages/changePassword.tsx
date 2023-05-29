@@ -13,9 +13,9 @@ import {
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 
-const CambioPassword = () => {
+const ChangePassword = () => {
   return (
-    <MainCard title="Cambio password">
+    <MainCard title="Change password">
       <Formik
         initialValues={{
           oldPassword: '',
@@ -34,14 +34,9 @@ const CambioPassword = () => {
         })}
         onSubmit={async (values, { setStatus, setSubmitting }) => {
           const { oldPassword, newPassword } = values
-          fetchApi({
-            mod: endpoints.user.changePassword.mod,
-            fnz: endpoints.user.changePassword.fnz,
-            body: {
-              oldPassword,
-              newPassword,
-            },
-            methodApi: MethodHTTP.POST,
+          fetchApi(endpoints.home.user.changePassword, MethodHTTP.POST, {
+            oldPassword,
+            newPassword,
           })
             .then((res) => {
               if (res?.bool) {
@@ -81,7 +76,7 @@ const CambioPassword = () => {
                     type="password"
                     value={values.oldPassword}
                     name="oldPassword"
-                    label="Password attuale"
+                    label="Current password"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     error={Boolean(touched.oldPassword && errors.oldPassword)}
@@ -104,7 +99,7 @@ const CambioPassword = () => {
                     type="password"
                     value={values.newPassword}
                     name="newPassword"
-                    label="Nuova password"
+                    label="New password"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
@@ -128,7 +123,7 @@ const CambioPassword = () => {
                     type="password"
                     value={values.confirmNewPassword}
                     name="confirmNewPassword"
-                    label="Conferma nuova password"
+                    label="Confirm new password"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     fullWidth={false}
@@ -151,7 +146,7 @@ const CambioPassword = () => {
                   variant="contained"
                   color="primary"
                 >
-                  Conferma
+                  Save
                 </Button>
               </Grid>
             </Grid>
@@ -162,4 +157,4 @@ const CambioPassword = () => {
   )
 }
 
-export default CambioPassword
+export default ChangePassword

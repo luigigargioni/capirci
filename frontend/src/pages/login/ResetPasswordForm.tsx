@@ -4,8 +4,7 @@ import { string as YupString, object as YupObject } from 'yup'
 import { Formik } from 'formik'
 
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { fetchApi, MethodHTTP } from 'services/api'
-import { endpoints } from 'services/endpoints'
+import { fetchApi } from 'services/api'
 import { toast } from 'react-toastify'
 
 interface ResetPasswordFormProps {
@@ -21,12 +20,7 @@ export const ResetPasswordForm = ({
     },
     { setStatus, setSubmitting }
   ) => {
-    fetchApi({
-      mod: endpoints.user.resetPwd.mod,
-      fnz: endpoints.user.resetPwd.fnz,
-      body: { email: values.email },
-      methodApi: MethodHTTP.POST,
-    })
+    fetchApi('aaa')
       .then((res) => {
         if (res?.bool) {
           toast.success(MessageText.success)
@@ -116,7 +110,7 @@ export const ResetPasswordForm = ({
                 color="primary"
                 onClick={() => setResetPassword(false)}
               >
-                Torna al login
+                Back to login
               </Button>
             </Grid>
           </Grid>

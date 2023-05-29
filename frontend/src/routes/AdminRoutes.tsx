@@ -12,18 +12,7 @@ const GestioneUtenti = Loadable(
 const DettaglioUtente = Loadable(
   lazy(() => import('pages/utenti/dettaglioUtente'))
 )
-const GestioneClienti = Loadable(
-  lazy(() => import('pages/clienti/gestioneClienti'))
-)
-const DettaglioCliente = Loadable(
-  lazy(() => import('pages/clienti/dettaglioCliente'))
-)
-const GestioneVeterinari = Loadable(
-  lazy(() => import('pages/veterinari/gestioneVeterinari'))
-)
-const DettaglioVeterinario = Loadable(
-  lazy(() => import('pages/veterinari/dettaglioVeterinario'))
-)
+
 const DettaglioAnimale = Loadable(
   lazy(() => import('pages/animali/dettaglioAnimale'))
 )
@@ -31,7 +20,7 @@ const GestioneAnimali = Loadable(
   lazy(() => import('pages/animali/gestioneAnimali'))
 )
 
-export const AdminRoutes: RouteObject = {
+export const ManagerRoutes: RouteObject = {
   path: defaultPath,
   element: (
     <ProtectedRoute>
@@ -40,7 +29,7 @@ export const AdminRoutes: RouteObject = {
   ),
   children: [
     {
-      path: 'animali',
+      path: 'users',
       element: (
         <ProtectedRoute>
           <RoleRoute>
@@ -50,7 +39,7 @@ export const AdminRoutes: RouteObject = {
       ),
     },
     {
-      path: 'animale/:id',
+      path: 'user/:id',
       element: (
         <ProtectedRoute>
           <RoleRoute>
@@ -60,7 +49,7 @@ export const AdminRoutes: RouteObject = {
       ),
     },
     {
-      path: 'utenti',
+      path: 'robots',
       element: (
         <ProtectedRoute>
           <RoleRoute>
@@ -70,51 +59,11 @@ export const AdminRoutes: RouteObject = {
       ),
     },
     {
-      path: 'utente/:id',
+      path: 'robot/:id',
       element: (
         <ProtectedRoute>
           <RoleRoute>
             <DettaglioUtente />
-          </RoleRoute>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'clienti',
-      element: (
-        <ProtectedRoute>
-          <RoleRoute>
-            <GestioneClienti />
-          </RoleRoute>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'cliente/:id',
-      element: (
-        <ProtectedRoute>
-          <RoleRoute>
-            <DettaglioCliente />
-          </RoleRoute>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'veterinari',
-      element: (
-        <ProtectedRoute>
-          <RoleRoute>
-            <GestioneVeterinari />
-          </RoleRoute>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'veterinario/:id',
-      element: (
-        <ProtectedRoute>
-          <RoleRoute>
-            <DettaglioVeterinario />
           </RoleRoute>
         </ProtectedRoute>
       ),

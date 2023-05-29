@@ -51,12 +51,12 @@ export const ProfileTab = ({ setOpen }: ProfileTabProps) => {
     >
       <ListItemButton
         selected={selectedIndex === 0}
-        onClick={() => handleListItemClick(0, 'cambiopassword')}
+        onClick={() => handleListItemClick(0, 'changepassword')}
       >
         <ListItemIcon>
           <KeyOutlined />
         </ListItemIcon>
-        <ListItemText primary="Cambio password" />
+        <ListItemText primary="Change password" />
       </ListItemButton>
 
       <ListItemButton selected={selectedIndex === 1} onClick={handleLogout}>

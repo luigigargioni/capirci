@@ -6,7 +6,7 @@ import { MainLayout } from 'layout/MainLayout'
 import { defaultPath } from 'utils/constants'
 import { ProtectedRoute } from './ProtectedRoute'
 
-const CambioPassword = Loadable(lazy(() => import('pages/cambioPassword')))
+const ChangePassword = Loadable(lazy(() => import('pages/changePassword')))
 
 export const UserRoutes: RouteObject = {
   path: defaultPath,
@@ -17,10 +17,10 @@ export const UserRoutes: RouteObject = {
   ),
   children: [
     {
-      path: 'cambiopassword',
+      path: 'changepassword',
       element: (
         <ProtectedRoute>
-          <CambioPassword />
+          <ChangePassword />
         </ProtectedRoute>
       ),
     },

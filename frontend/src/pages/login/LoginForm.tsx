@@ -17,9 +17,17 @@ import { Formik } from 'formik'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { defaultPath } from 'utils/constants'
+import { USER_ROLE, defaultPath } from 'utils/constants'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
+
+export interface UserLoginInterface {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  role: USER_ROLE
+}
 
 interface LoginFormProps {
   setResetPassword: (value: boolean) => void
