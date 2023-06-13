@@ -12,6 +12,7 @@ import {
 } from 'utils/messages'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
+import { LocalStorageKey, getFromLocalStorage } from 'utils/localStorageUtils'
 
 const ChangePassword = () => {
   return (
@@ -33,19 +34,18 @@ const ChangePassword = () => {
             .oneOf([YupRef('newPassword')], MessageText.passwordMismatch),
         })}
         onSubmit={async (values, { setStatus, setSubmitting }) => {
-          const { oldPassword, newPassword } = values
-          fetchApi(endpoints.home.user.changePassword, MethodHTTP.POST, {
-            oldPassword,
-            newPassword,
+          const { newPassword } = values
+          fetchApi({
+            url: endpoints.home.user.changePassword,
+            method: MethodHTTP.POST,
+            body: {
+              id: getFromLocalStorage(LocalStorageKey.USER).id,
+              newPassword,
+            },
           })
-            .then((res) => {
-              if (res?.bool) {
-                toast.success(MessageText.success)
-                setStatus({ success: true })
-                return
-              }
-              toast.error(MessageText.serverError)
-              setStatus({ success: false })
+            .then(() => {
+              toast.success(MessageText.success)
+              setStatus({ success: true })
             })
             .finally(() => {
               setSubmitting(false)

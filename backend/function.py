@@ -45,7 +45,7 @@ from pythoncom import CoInitialize
 from xml.etree.ElementTree import fromstring
 from django.http import HttpResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from backend.utils.string import get_or_default
 
 
@@ -53,8 +53,9 @@ from backend.utils.string import get_or_default
 def login_func(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
-            username: str = get_or_default(request.POST.get("username"))
-            password: str = get_or_default(request.POST.get("password"))
+            data = loads(request.body)
+            username: str = get_or_default(data.get("username"))
+            password: str = get_or_default(data.get("password"))
 
             authError: bool = True
             data = {"authError": authError}
@@ -95,7 +96,8 @@ def logout_func(request: HttpRequest) -> HttpResponse:
 def verifyToken(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
-            user_id: str = get_or_default(request.POST.get("id"))
+            data = loads(request.body)
+            user_id: str = get_or_default(data.get("id"))
 
             authError: bool = True
             data = {"authError": authError}
@@ -118,6 +120,7 @@ def verifyToken(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
+@csrf_exempt
 def getTaskList(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -135,6 +138,7 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
+@csrf_exempt
 def taskDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -629,16 +633,25 @@ def checkEditRobot(request: HttpRequest) -> HttpResponse:
         return HttpResponse("ERROR")
 
 
+@csrf_exempt
 def changePassword(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("newPassword")
-        user = User.objects.get(username=username)
-        user.set_password(password)
-        user.save()
-        return HttpResponse("oki")
-    else:
-        return HttpResponse("ERROR")
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                user_id = data.get("id")
+                password = data.get("newPassword")
+                user = User.objects.get(id=user_id)
+                user.set_password(password)
+                user.save()
+                update_session_auth_hash(request, user)
+                return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
 
 
 def createNewUser(request: HttpRequest) -> HttpResponse:

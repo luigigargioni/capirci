@@ -14,6 +14,7 @@ import { activeItem } from 'store/reducers/menu'
 import { MessageText } from 'utils/messages'
 import { MethodHTTP, fetchApi } from 'services/api'
 import { endpoints } from 'services/endpoints'
+import { Palette } from 'themes/palette'
 
 interface ProfileTabProps {
   setOpen: (open: boolean) => void
@@ -39,11 +40,13 @@ export const ProfileTab = ({ setOpen }: ProfileTabProps) => {
       method: MethodHTTP.POST,
     }).then(() => {
       setSelectedIndex(1)
-      removeFromLocalStorage(LocalStorageKey.TOKEN)
+      removeFromLocalStorage(LocalStorageKey.USER)
       toast.success(MessageText.logoutSuccess)
       navigate('/login')
     })
   }
+
+  const themePalette = Palette('light')
 
   return (
     <List
@@ -66,9 +69,13 @@ export const ProfileTab = ({ setOpen }: ProfileTabProps) => {
         <ListItemText primary="Change password" />
       </ListItemButton>
 
-      <ListItemButton selected={selectedIndex === 1} onClick={handleLogout}>
+      <ListItemButton
+        selected={selectedIndex === 1}
+        onClick={handleLogout}
+        sx={{ color: themePalette.palette.error.main }}
+      >
         <ListItemIcon>
-          <LogoutOutlined />
+          <LogoutOutlined style={{ color: themePalette.palette.error.main }} />
         </ListItemIcon>
         <ListItemText primary="Logout" />
       </ListItemButton>

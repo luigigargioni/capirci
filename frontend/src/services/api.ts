@@ -21,7 +21,7 @@ axios.defaults.timeout = 10000
 axios.defaults.withCredentials = true
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 
 interface FetchApiParamsInterface {
   url: string

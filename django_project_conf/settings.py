@@ -127,7 +127,7 @@ CORS_ORIGIN_WHITELIST = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "content-type",
-    "x-csrftoken",
+    "X-CSRFToken",
     # Add any other headers you need to allow
 ]
 
