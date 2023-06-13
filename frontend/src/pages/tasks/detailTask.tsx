@@ -8,15 +8,17 @@ import { MainCard } from 'components/MainCard'
 import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
 import { backgroundForm } from 'themes/theme'
-import { FormAnimale } from './formTask'
-import { TaskType } from './types'
+import { FormTask } from './formTask'
+import { TaskDetailType } from './types'
 
 const DetailTask = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<TaskType, Error>(!insertMode ? null : null)
+  const { data, isLoading } = useSWR<TaskDetailType, Error>(
+    !insertMode ? { url: endpoints.home.libraries.task, body: { id } } : null
+  )
 
   const backFunction = () => {
     dispatch(activeItem('tasks'))
@@ -32,7 +34,7 @@ const DetailTask = () => {
       {isLoading && !insertMode && <CircularProgress />}
       {data === null && <Typography>Task with ID {id} not found</Typography>}
       {(data || insertMode) && (
-        <FormAnimale
+        <FormTask
           data={data}
           insertMode={insertMode}
           backFunction={backFunction}

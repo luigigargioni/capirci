@@ -25,6 +25,25 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "owner":
+                response_data[key] = self.owner
+            elif key == "description":
+                response_data[key] = self.description
+            elif key == "last_modified":
+                response_data[key] = self.last_modified
+            elif key == "shared":
+                response_data[key] = self.shared
+            elif key == "code":
+                response_data[key] = self.code
+        return response_data
+
 
 class Object(models.Model):
     id = models.AutoField(primary_key=True)

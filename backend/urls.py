@@ -13,8 +13,11 @@ CHAT = API + "chat/"
 
 urlpatterns = [
     # API
+    # # AUTH
     path(API + "login/", views.login_view, name="login"),
+    # # HOME
     path(HOME + "tasks/", function.getTaskList, name="getTaskList"),
+    path(HOME + "task/", function.taskDetail, name="taskDetail"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),

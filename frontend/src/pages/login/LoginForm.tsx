@@ -44,31 +44,35 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
     },
     { setErrors, setStatus, setSubmitting }
   ) => {
-    fetchApi(endpoints.authentication.login, MethodHTTP.POST, {
-      username: values.username,
-      password: values.password,
+    fetchApi({
+      url: endpoints.authentication.login,
+      method: MethodHTTP.POST,
+      body: {
+        username: values.username,
+        password: values.password,
+      },
     })
-    .then((response: any) => {
-      const { authError }: { authError: boolean } = response
-      if (!authError) {
-        navigate(defaultPath)
-                  setStatus({ success: true })
-        return
-      }
-      setStatus({ success: false })
+      .then((response: any) => {
+        const { authError }: { authError: boolean } = response
+        if (!authError) {
+          navigate(defaultPath)
+          setStatus({ success: true })
+          return
+        }
+        setStatus({ success: false })
 
-      if (authError) {
+        if (authError) {
+          setErrors({
+            username: MessageText.invalidCredentials,
+            password: MessageText.invalidCredentials,
+          })
+          return
+        }
         setErrors({
-          username: MessageText.invalidCredentials,
-          password: MessageText.invalidCredentials,
+          username: MessageText.noConnection,
+          password: MessageText.noConnection,
         })
-        return
-      }
-      setErrors({
-        username: MessageText.noConnection,
-        password: MessageText.noConnection,
       })
-    })
       .finally(() => {
         setSubmitting(false)
       })

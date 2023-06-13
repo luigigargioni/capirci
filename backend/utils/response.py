@@ -23,9 +23,10 @@ def unauthorized_request():
 
 
 def success_response(data):
-    payload = (
-        loads(dumps(list(data), default=str)) if isinstance(data, QuerySet) else data
-    )
+    payload = data
+    if isinstance(data, QuerySet):
+        payload = loads(dumps(list(data), default=str))
+
     payload = {"records": payload} if isinstance(payload, Sequence) else payload
     return JsonResponse(
         {

@@ -95,7 +95,7 @@ export const MainCard = forwardRef(
                   </Button>
                 ))}
                 {backFunction && (
-                  <Button onClick={() => backFunction()}>Indietro</Button>
+                  <Button onClick={() => backFunction()}>Back</Button>
                 )}
               </>
             }

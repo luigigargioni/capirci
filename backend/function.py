@@ -63,6 +63,22 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
+def taskDetail(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                task_id = request.GET.get("id")
+                task = Task.objects.get(id=task_id)
+                task_fields = task.to_dict(["id", "name", "description", "shared"])
+                return success_response(task_fields)
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
 def checkTaskName(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}

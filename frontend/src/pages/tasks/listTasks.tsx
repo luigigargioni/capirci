@@ -32,18 +32,27 @@ const ListTasks = () => {
   const [tableCurrentPage, setTableCurrentPage] = useState(defaultCurrentPage)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { data, mutate, isLoading } = useSWR<TaskType[], Error>(
-    endpoints.home.libraries.tasks
-  )
+  const { data, mutate, isLoading } = useSWR<TaskType[], Error>({
+    url: endpoints.home.libraries.tasks,
+  })
 
   const handleDetail = (id: number) => {
     dispatch(activeItem(''))
     navigate(`/task/${id}`)
   }
 
+  const handleEdit = (id: number) => {
+    dispatch(activeItem(''))
+    navigate(`/graphic/${id}`)
+  }
+
   const handleDelete = (id: number) => {
-    fetchApi(endpoints.home.libraries.task, MethodHTTP.DELETE, {
-      id,
+    fetchApi({
+      url: endpoints.home.libraries.task,
+      method: MethodHTTP.DELETE,
+      body: {
+        id,
+      },
     }).then((res) => {
       if (res?.bool) {
         toast.success(MessageText.success)
@@ -68,6 +77,7 @@ const ListTasks = () => {
           onClick={() => handleDetail(record.id)}
           color="primary"
           aria-label="detail"
+          disabled={record.shared}
         >
           <EyeOutlined style={{ fontSize: '2em' }} />
         </IconButton>
@@ -87,12 +97,6 @@ const ListTasks = () => {
       key: 'owner',
       title: 'Owner',
       dataIndex: 'owner',
-      render: (_, record) => {
-        if (record.shared) {
-          return record.owner
-        }
-        return 'You'
-      },
     },
     {
       key: 'shared',
@@ -125,6 +129,7 @@ const ListTasks = () => {
           >
             <Button>Delete</Button>
           </Popconfirm>
+          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
         </Space>
       ),
     },

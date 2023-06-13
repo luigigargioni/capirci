@@ -14,15 +14,14 @@ const RegistroNeutro = Loadable(
   lazy(() => import('pages/registro/registroNeutro'))
 )
 const ListTasks = Loadable(lazy(() => import('pages/tasks/listTasks')))
+const DetailTask = Loadable(lazy(() => import('pages/tasks/detailTask')))
 const GestioneCheckout = Loadable(
   lazy(() => import('pages/prenotazioni/gestioneCheckout'))
 )
 const GestioneStorico = Loadable(
   lazy(() => import('pages/prenotazioni/gestioneStorico'))
 )
-const DettaglioPrenotazione = Loadable(
-  lazy(() => import('pages/prenotazioni/dettaglioPrenotazione'))
-)
+
 const Presenze = Loadable(lazy(() => import('pages/presenze')))
 const Servizi = Loadable(lazy(() => import('pages/servizi')))
 
@@ -59,10 +58,10 @@ export const MainRoutes: RouteObject = {
       ),
     },
     {
-      path: 'prenotazione/:id',
+      path: 'task/:id',
       element: (
         <ProtectedRoute>
-          <DettaglioPrenotazione />
+          <DetailTask />
         </ProtectedRoute>
       ),
     },

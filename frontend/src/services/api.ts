@@ -21,19 +21,26 @@ axios.defaults.timeout = 10000
 axios.defaults.withCredentials = true
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'
 
-export const fetchApi = async (
-  url: string,
-  methodApi?: MethodHTTP,
+interface FetchApiParamsInterface {
+  url: string
   body?: any
-) => {
+  method?: MethodHTTP
+}
+
+export const fetchApi = async ({
+  url,
+  body = {},
+  method = MethodHTTP.GET,
+}: FetchApiParamsInterface) => {
+  const apiParameters = method === MethodHTTP.GET ? { ...body } : {}
+  const apiData = method !== MethodHTTP.GET ? { ...body } : {}
   const options: AxiosRequestConfig = {
-    headers: { 'Content-Type': 'multipart/form-data' },
     url,
-    method: methodApi, // Axios default is GET
-    data: {
-      ...body,
-    },
+    method, // Axios default is GET
+    data: { ...apiData },
+    params: { ...apiParameters },
   }
 
   return axios(options)
