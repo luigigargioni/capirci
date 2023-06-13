@@ -41,7 +41,7 @@ import {
 } from 'pages/prenotazioni/types'
 import dayjs from 'dayjs'
 import { iconMap } from 'utils/iconMap'
-import { AnimaleType } from 'pages/animali/types'
+import { AnimaleType } from 'pages/tasks/types'
 import { ServiceDeliveredListType } from 'pages/servizi/types'
 import { downloadPdf } from 'utils'
 import { PetCollapse } from './petCollapse'

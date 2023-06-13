@@ -9,8 +9,6 @@ SECRET_KEY = "pe=ipw6q4g-2d+*7n76g70c#ps+!n=i3-d91i^l9adjh@o)8+!"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -97,7 +95,7 @@ LOGGING = {
 # Add these to your main settings.py file, or modify it accordingly.
 
 # Needed for production. Avoid using '*'.
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost"]
 
 # Needed for 'debug' to be available inside templates.
 # https://docs.djangoproject.com/en/3.2/ref/templates/api/#django-template-context-processors-debug
@@ -117,3 +115,20 @@ STATICFILES_DIRS = [
     path.join(VITE_APP_DIR, "dist"),
 ]
 STATIC_ROOT = path.join(BASE_DIR, "staticfiles")
+
+# Add the following lines at the end of the settings.py file
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Replace with the actual origin of your frontend application
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "x-csrftoken",
+    # Add any other headers you need to allow
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    # Add any additional authentication backends here
+]

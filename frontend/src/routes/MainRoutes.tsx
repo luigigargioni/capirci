@@ -13,9 +13,7 @@ const RegistroCompilazione = Loadable(
 const RegistroNeutro = Loadable(
   lazy(() => import('pages/registro/registroNeutro'))
 )
-const GestioneCheckin = Loadable(
-  lazy(() => import('pages/prenotazioni/gestioneCheckin'))
-)
+const ListTasks = Loadable(lazy(() => import('pages/tasks/listTasks')))
 const GestioneCheckout = Loadable(
   lazy(() => import('pages/prenotazioni/gestioneCheckout'))
 )
@@ -40,7 +38,7 @@ export const MainRoutes: RouteObject = {
       path: defaultPath,
       element: (
         <ProtectedRoute>
-          <GestioneCheckin />
+          <ListTasks />
         </ProtectedRoute>
       ),
     },
@@ -53,10 +51,10 @@ export const MainRoutes: RouteObject = {
       ),
     },
     {
-      path: 'checkin',
+      path: 'tasks',
       element: (
         <ProtectedRoute>
-          <GestioneCheckin />
+          <ListTasks />
         </ProtectedRoute>
       ),
     },

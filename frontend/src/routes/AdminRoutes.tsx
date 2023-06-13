@@ -13,12 +13,8 @@ const DettaglioUtente = Loadable(
   lazy(() => import('pages/utenti/dettaglioUtente'))
 )
 
-const DettaglioAnimale = Loadable(
-  lazy(() => import('pages/animali/dettaglioAnimale'))
-)
-const GestioneAnimali = Loadable(
-  lazy(() => import('pages/animali/gestioneAnimali'))
-)
+const DettaglioAnimale = Loadable(lazy(() => import('pages/tasks/detailTask')))
+const GestioneAnimali = Loadable(lazy(() => import('pages/tasks/listTasks')))
 
 export const ManagerRoutes: RouteObject = {
   path: defaultPath,

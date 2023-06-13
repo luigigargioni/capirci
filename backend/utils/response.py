@@ -18,8 +18,14 @@ def invalid_request_method():
     return error_response("Invalid request method", 405)
 
 
+def unauthorized_request():
+    return error_response("Unauthorized request", 401)
+
+
 def success_response(data):
-    payload = loads(dumps(list(data))) if isinstance(data, QuerySet) else data
+    payload = (
+        loads(dumps(list(data), default=str)) if isinstance(data, QuerySet) else data
+    )
     payload = {"records": payload} if isinstance(payload, Sequence) else payload
     return JsonResponse(
         {

@@ -8,41 +8,29 @@ import { MainCard } from 'components/MainCard'
 import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
 import { backgroundForm } from 'themes/theme'
-import { FormAnimale } from './formAnimale'
-import { AnimaleType } from './types'
+import { FormAnimale } from './formTask'
+import { TaskType } from './types'
 
-const DettaglioAnimale = () => {
+const DetailTask = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<AnimaleType, Error>(
-    !insertMode
-      ? {
-          mod: endpoints.pet.get.mod,
-          fnz: endpoints.pet.get.fnz,
-          body: {
-            id,
-          },
-        }
-      : null
-  )
+  const { data, isLoading } = useSWR<TaskType, Error>(!insertMode ? null : null)
 
   const backFunction = () => {
-    dispatch(activeItem('animali'))
-    navigate('/animali')
+    dispatch(activeItem('tasks'))
+    navigate('/tasks')
   }
 
   return (
     <MainCard
-      title={insertMode ? 'Aggiunta animale' : 'Dettaglio animale'}
+      title={insertMode ? 'Add task' : 'Task detail'}
       backFunction={backFunction}
       sx={{ background: backgroundForm }}
     >
       {isLoading && !insertMode && <CircularProgress />}
-      {data === null && (
-        <Typography>Animale con ID {id} non trovato</Typography>
-      )}
+      {data === null && <Typography>Task with ID {id} not found</Typography>}
       {(data || insertMode) && (
         <FormAnimale
           data={data}
@@ -54,4 +42,4 @@ const DettaglioAnimale = () => {
   )
 }
 
-export default DettaglioAnimale
+export default DetailTask

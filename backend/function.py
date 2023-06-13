@@ -13,6 +13,7 @@ from backend.utils.response import (
     invalid_request_method,
     error_response,
     success_response,
+    unauthorized_request,
 )
 
 from .utils.date import getDateTimeNow
@@ -46,13 +47,20 @@ from django.http import HttpResponse, HttpRequest
 
 
 def getTaskList(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        username = request.POST.get("username")
-        tasks = Task.objects.filter(Q(owner=username) | Q(shared=True))
-        qs_json = serialize("json", tasks)
-        return HttpResponse(qs_json, content_type="application/json")
-    else:
-        return HttpResponse("ERROR")
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                username = request.user
+                tasks = Task.objects.filter(Q(owner=username) | Q(shared=True)).values(
+                    "id", "name", "description", "last_modified", "owner", "shared"
+                )
+                return success_response(tasks)
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
 
 
 def checkTaskName(request: HttpRequest) -> HttpResponse:

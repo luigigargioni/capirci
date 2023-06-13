@@ -55,6 +55,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
             authError: bool = True
 
             user = authenticate(request, username=username, password=password)
+            print(username)
             if user is not None:
                 login(request, user)
                 authError = False

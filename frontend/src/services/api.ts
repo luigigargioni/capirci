@@ -18,25 +18,21 @@ export interface ResponseInterface {
 }
 
 axios.defaults.timeout = 10000
-
-const getToken = () =>
-  document.getElementsByName('csrfmiddlewaretoken')[0]?.getAttribute('value')
-
-axios.defaults.timeout = 10000
+axios.defaults.withCredentials = true
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+axios.defaults.xsrfCookieName = 'csrftoken'
 
 export const fetchApi = async (
   url: string,
   methodApi?: MethodHTTP,
   body?: any
 ) => {
-  const token = getToken()
   const options: AxiosRequestConfig = {
     headers: { 'Content-Type': 'multipart/form-data' },
     url,
     method: methodApi, // Axios default is GET
     data: {
       ...body,
-      ...(token && { csrfmiddlewaretoken: token }),
     },
   }
 

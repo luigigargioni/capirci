@@ -22,11 +22,6 @@ import {
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import {
-  AnimaleSizeArray,
-  AnimaleType,
-  AnimaleTypeArray,
-} from 'pages/animali/types'
 import { EyeOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { AutocompleteCustomer } from 'pages/prenotazioni/autocompleteCustomer'

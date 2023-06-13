@@ -1,4 +1,3 @@
-from enum import Enum
 from django.urls import path, re_path
 from . import views
 from . import function
@@ -7,17 +6,15 @@ from django.views.static import serve
 from django.views.generic import TemplateView
 
 API = "api/"
-
-
-class PathEnum(Enum):
-    HOME = API + "home/"
-    GRAPHIC = API + "graphic/"
-    CHAT = API + "chat/"
+HOME = API + "home/"
+GRAPHIC = API + "graphic/"
+CHAT = API + "chat/"
 
 
 urlpatterns = [
     # API
     path(API + "login/", views.login_view, name="login"),
+    path(HOME + "tasks/", function.getTaskList, name="getTaskList"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),
@@ -127,22 +124,22 @@ urlpatterns = [
     ############################
     # Graphic
     path(
-        PathEnum.GRAPHIC.value + "getActionList/",
+        GRAPHIC + "getActionList/",
         function.getActionListGraphic,
         name="getActionListGraphic",
     ),
     path(
-        PathEnum.GRAPHIC.value + "getObjectList/",
+        GRAPHIC + "getObjectList/",
         function.getObjectListGraphic,
         name="getObjectListGraphic",
     ),
     path(
-        PathEnum.GRAPHIC.value + "getLocationList/",
+        GRAPHIC + "getLocationList/",
         function.getLocationListGraphic,
         name="getLocationListGraphic",
     ),
     path(
-        PathEnum.GRAPHIC.value + "getTaskList/",
+        GRAPHIC + "getTaskList/",
         function.getTaskListGraphic,
         name="getTaskListGraphic",
     ),
