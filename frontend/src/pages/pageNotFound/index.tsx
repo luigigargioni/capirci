@@ -8,14 +8,14 @@ const PageNotFound = () => (
     <section id="not-found">
       <div id="title">
         <a id="title-link" href={defaultPath}>
-          Torna indietro
+          Back
         </a>
       </div>
       <div className="circles">
         <p>
           404
           <br />
-          <small>Pagina non trovata</small>
+          <small>Page not found</small>
         </p>
         <span className="circle big" />
         <span className="circle med" />
