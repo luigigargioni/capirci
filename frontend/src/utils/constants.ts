@@ -4,9 +4,9 @@ export const drawerWidth = 260
 export const defaultOpenItem = 'tasks'
 export const defaultPath = '/'
 
-export enum USER_ROLE {
-  ADMIN = 100,
-  OPERATOR = 50,
+export enum USER_GROUP {
+  MANAGER = 'Manager',
+  OPERATOR = 'Operator',
 }
 
 export const defaultPageSizeSelection = 10

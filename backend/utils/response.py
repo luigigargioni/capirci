@@ -22,7 +22,7 @@ def unauthorized_request():
     return error_response("Unauthorized request", 401)
 
 
-def success_response(data):
+def success_response(data=None):
     payload = data
     if isinstance(data, QuerySet):
         payload = loads(dumps(list(data), default=str))

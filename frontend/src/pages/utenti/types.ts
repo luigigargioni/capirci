@@ -1,10 +1,10 @@
-import { USER_ROLE } from 'utils/constants'
+import { USER_GROUP } from 'utils/constants'
 
 export interface UserType {
   id: number
   first_name: string
   last_name: string
   email: string
-  role: USER_ROLE | null
+  role: USER_GROUP | null
   active: number
 }

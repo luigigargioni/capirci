@@ -29,7 +29,7 @@ import {
   defaultCurrentPage,
   defaultPageSizeSelection,
   defaultPaginationConfig,
-  USER_ROLE,
+  USER_GROUP,
 } from 'utils/constants'
 import { UserType } from 'pages/utenti/types'
 
@@ -126,7 +126,7 @@ const GestioneUtenti = () => {
       dataIndex: 'role',
       render: (_, record) => (
         <span>
-          {record.role === USER_ROLE.ADMIN ? 'Amministratore' : 'Operatore'}
+          {record.role === USER_GROUP.ADMIN ? 'Amministratore' : 'Operatore'}
         </span>
       ),
     },

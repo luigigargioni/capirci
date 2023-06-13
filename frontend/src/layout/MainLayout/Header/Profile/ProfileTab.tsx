@@ -12,6 +12,8 @@ import {
 } from 'utils/localStorageUtils'
 import { activeItem } from 'store/reducers/menu'
 import { MessageText } from 'utils/messages'
+import { MethodHTTP, fetchApi } from 'services/api'
+import { endpoints } from 'services/endpoints'
 
 interface ProfileTabProps {
   setOpen: (open: boolean) => void
@@ -32,10 +34,15 @@ export const ProfileTab = ({ setOpen }: ProfileTabProps) => {
   }
 
   const handleLogout = async () => {
-    setSelectedIndex(1)
-    removeFromLocalStorage(LocalStorageKey.TOKEN)
-    toast.success(MessageText.logoutSuccess)
-    navigate('/login')
+    fetchApi({
+      url: endpoints.auth.logout,
+      method: MethodHTTP.POST,
+    }).then(() => {
+      setSelectedIndex(1)
+      removeFromLocalStorage(LocalStorageKey.TOKEN)
+      toast.success(MessageText.logoutSuccess)
+      navigate('/login')
+    })
   }
 
   return (

@@ -1,9 +1,4 @@
-import {
-  BugOutlined,
-  ExperimentOutlined,
-  TagsOutlined,
-  TeamOutlined,
-} from '@ant-design/icons'
+import { RocketFilled, TeamOutlined } from '@ant-design/icons'
 import { MenuItem } from 'menu-items/types'
 
 export const management: MenuItem = {
@@ -16,14 +11,14 @@ export const management: MenuItem = {
       title: 'Users',
       type: 'item',
       url: '/users',
-      icon: BugOutlined,
+      icon: TeamOutlined,
     },
     {
       id: 'robots',
       title: 'Robots',
       type: 'item',
       url: '/robots',
-      icon: TagsOutlined,
+      icon: RocketFilled,
     },
   ],
 }

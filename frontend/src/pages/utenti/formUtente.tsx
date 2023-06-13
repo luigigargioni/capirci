@@ -24,7 +24,7 @@ import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { UserType } from 'pages/utenti/types'
-import { USER_ROLE } from 'utils/constants'
+import { USER_GROUP } from 'utils/constants'
 
 interface FormUtenteProps {
   data: UserType | undefined
@@ -89,9 +89,9 @@ export const FormUtente = ({
           .email(MessageText.emailNotValid)
           .max(255, MessageTextMaxLength(255))
           .required(MessageText.requiredField),
-        role: YupMixed<USER_ROLE>()
+        role: YupMixed<USER_GROUP>()
           .oneOf(
-            [USER_ROLE.ADMIN, USER_ROLE.OPERATOR],
+            [USER_GROUP.ADMIN, USER_GROUP.OPERATOR],
             MessageText.valueNotValid
           )
           .required(MessageText.requiredField),
@@ -185,8 +185,8 @@ export const FormUtente = ({
                     onChange={handleChange}
                     error={Boolean(touched.role && errors.role)}
                   >
-                    <MenuItem value={USER_ROLE.OPERATOR}>Operatore</MenuItem>
-                    <MenuItem value={USER_ROLE.ADMIN}>Amministratore</MenuItem>
+                    <MenuItem value={USER_GROUP.OPERATOR}>Operatore</MenuItem>
+                    <MenuItem value={USER_GROUP.ADMIN}>Amministratore</MenuItem>
                   </Select>
                   {touched.role && errors.role && (
                     <FormHelperText error id="helper-text-role">

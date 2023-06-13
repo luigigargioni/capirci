@@ -6,6 +6,7 @@ from django.views.static import serve
 from django.views.generic import TemplateView
 
 API = "api/"
+AUTH = API + "auth/"
 HOME = API + "home/"
 GRAPHIC = API + "graphic/"
 CHAT = API + "chat/"
@@ -14,7 +15,9 @@ CHAT = API + "chat/"
 urlpatterns = [
     # API
     # # AUTH
-    path(API + "login/", views.login_view, name="login"),
+    path(AUTH + "login/", function.login_func, name="login_func"),
+    path(AUTH + "logout/", function.logout_func, name="logout_func"),
+    path(AUTH + "verifyToken/", function.verifyToken, name="verifyToken"),
     # # HOME
     path(HOME + "tasks/", function.getTaskList, name="getTaskList"),
     path(HOME + "task/", function.taskDetail, name="taskDetail"),

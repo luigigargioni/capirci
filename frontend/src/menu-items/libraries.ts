@@ -1,8 +1,8 @@
 import {
-  HistoryOutlined,
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
-  CalendarOutlined,
+  AimOutlined,
+  ApartmentOutlined,
+  TagOutlined,
+  SubnodeOutlined,
 } from '@ant-design/icons'
 import { MenuItem } from 'menu-items/types'
 
@@ -16,28 +16,28 @@ export const libraries: MenuItem = {
       title: 'Tasks',
       type: 'item',
       url: '/tasks',
-      icon: ArrowRightOutlined,
+      icon: ApartmentOutlined,
     },
     {
       id: 'objects',
       title: 'Objects',
       type: 'item',
       url: '/objects',
-      icon: ArrowLeftOutlined,
+      icon: TagOutlined,
     },
     {
       id: 'actions',
       title: 'Actions',
       type: 'item',
       url: '/actions',
-      icon: HistoryOutlined,
+      icon: SubnodeOutlined,
     },
     {
       id: 'locations',
       title: 'Locations',
       type: 'item',
       url: '/locations',
-      icon: CalendarOutlined,
+      icon: AimOutlined,
     },
   ],
 }

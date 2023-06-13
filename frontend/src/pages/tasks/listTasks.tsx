@@ -120,6 +120,7 @@ const ListTasks = () => {
       key: 'operation',
       render: (_, record) => (
         <Space size="middle">
+          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
           <Popconfirm
             title="Delete?"
             onConfirm={() => handleDelete(record.id)}
@@ -127,9 +128,8 @@ const ListTasks = () => {
             cancelText="Cancel"
             icon={iconMap.deleteCircle}
           >
-            <Button>Delete</Button>
+            <Button color="error">Delete</Button>
           </Popconfirm>
-          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
         </Space>
       ),
     },

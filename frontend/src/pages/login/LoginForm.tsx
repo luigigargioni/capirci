@@ -17,16 +17,15 @@ import { Formik } from 'formik'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { USER_ROLE, defaultPath } from 'utils/constants'
+import { USER_GROUP, defaultPath } from 'utils/constants'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
+import { LocalStorageKey, setToLocalStorage } from 'utils/localStorageUtils'
 
 export interface UserLoginInterface {
   id: string
-  email: string
-  first_name: string
-  last_name: string
-  role: USER_ROLE
+  username: string
+  group: USER_GROUP
 }
 
 interface LoginFormProps {
@@ -45,7 +44,7 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
     { setErrors, setStatus, setSubmitting }
   ) => {
     fetchApi({
-      url: endpoints.authentication.login,
+      url: endpoints.auth.login,
       method: MethodHTTP.POST,
       body: {
         username: values.username,
@@ -53,8 +52,15 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
       },
     })
       .then((response: any) => {
-        const { authError }: { authError: boolean } = response
+        const {
+          authError,
+          username,
+          id,
+          group,
+        }: { authError: boolean; username: string; id: number; group: string } =
+          response
         if (!authError) {
+          setToLocalStorage(LocalStorageKey.USER, { username, id, group })
           navigate(defaultPath)
           setStatus({ success: true })
           return
@@ -191,7 +197,7 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
                 Login
               </Button>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ display: 'none' }}>
               <Button
                 fullWidth
                 size="small"

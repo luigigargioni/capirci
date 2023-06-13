@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router-dom'
 import { Loadable } from 'components/Loadable'
 import { MainLayout } from 'layout/MainLayout'
 import { defaultPath } from 'utils/constants'
-import { ProtectedRoute, RoleRoute } from './ProtectedRoute'
+import { ProtectedRoute, GroupRoute } from './ProtectedRoute'
 
 const GestioneUtenti = Loadable(
   lazy(() => import('pages/utenti/gestioneUtenti'))
@@ -28,9 +28,9 @@ export const ManagerRoutes: RouteObject = {
       path: 'users',
       element: (
         <ProtectedRoute>
-          <RoleRoute>
+          <GroupRoute>
             <GestioneAnimali />
-          </RoleRoute>
+          </GroupRoute>
         </ProtectedRoute>
       ),
     },
@@ -38,9 +38,9 @@ export const ManagerRoutes: RouteObject = {
       path: 'user/:id',
       element: (
         <ProtectedRoute>
-          <RoleRoute>
+          <GroupRoute>
             <DettaglioAnimale />
-          </RoleRoute>
+          </GroupRoute>
         </ProtectedRoute>
       ),
     },
@@ -48,9 +48,9 @@ export const ManagerRoutes: RouteObject = {
       path: 'robots',
       element: (
         <ProtectedRoute>
-          <RoleRoute>
+          <GroupRoute>
             <GestioneUtenti />
-          </RoleRoute>
+          </GroupRoute>
         </ProtectedRoute>
       ),
     },
@@ -58,9 +58,9 @@ export const ManagerRoutes: RouteObject = {
       path: 'robot/:id',
       element: (
         <ProtectedRoute>
-          <RoleRoute>
+          <GroupRoute>
             <DettaglioUtente />
-          </RoleRoute>
+          </GroupRoute>
         </ProtectedRoute>
       ),
     },

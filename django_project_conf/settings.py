@@ -121,6 +121,9 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Replace with the actual origin of your frontend application
 ]
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "content-type",

@@ -20,7 +20,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { MainCard } from 'components/MainCard'
 import { Transitions } from 'components/Transitions'
 import { getFromLocalStorage, LocalStorageKey } from 'utils/localStorageUtils'
-import { RandomDogIcon } from 'assets/dogs'
+import { RandomDogIcon } from 'assets/robots'
 import { ProfileTab } from './ProfileTab'
 
 interface TabPanelProps {
@@ -48,10 +48,8 @@ TabPanel.defaultProps = {
 
 export const Profile = () => {
   const theme = useTheme()
-  const userName = `${getFromLocalStorage(LocalStorageKey.USER).first_name} ${
-    getFromLocalStorage(LocalStorageKey.USER).last_name
-  }`
-  const userEmail = getFromLocalStorage(LocalStorageKey.USER).email
+  const userName = getFromLocalStorage(LocalStorageKey.USER).username
+  const userGroup = getFromLocalStorage(LocalStorageKey.USER).group
 
   const anchorRef = useRef<any>(null)
   const [open, setOpen] = useState<boolean>(false)
@@ -151,7 +149,7 @@ export const Profile = () => {
                             <Stack>
                               <Typography variant="h6">{userName}</Typography>
                               <Typography variant="body2" color="textSecondary">
-                                {userEmail}
+                                {userGroup}
                               </Typography>
                             </Stack>
                           </Stack>
@@ -183,7 +181,7 @@ export const Profile = () => {
                                   }}
                                 />
                               }
-                              label="Profilo"
+                              label="Profile"
                               id="profile-tab-0"
                               aria-controls="profile-tabpanel-0"
                             />

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
 import { UserLoginInterface } from 'pages/login/LoginForm'
-import { fetchApi } from 'services/api'
+import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
-import { defaultPath, USER_ROLE } from 'utils/constants'
+import { defaultPath, USER_GROUP } from 'utils/constants'
 import {
   getFromLocalStorage,
   LocalStorageKey,
@@ -19,21 +19,20 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({
   children,
 }: ProtectedRouteProps): JSX.Element => {
-  const [loading, setLoading] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-/*   const verifyToken = async () => {
+  const verifyToken = async () => {
     return fetchApi({
-      mod: endpoints.user.verifyToken.mod,
-      fnz: endpoints.user.verifyToken.fnz,
+      url: endpoints.auth.verifyToken,
+      method: MethodHTTP.POST,
+      body: { id: getFromLocalStorage(LocalStorageKey.USER).id },
     }).then((res) => {
-      if (res) {
+      if (!res.authError) {
         const userInfo: UserLoginInterface = {
           id: res.id,
-          email: res.email,
-          first_name: res.first_name,
-          last_name: res.last_name,
-          role: res.role as USER_ROLE,
+          username: res.username,
+          group: res.group as USER_GROUP,
         }
         setToLocalStorage(LocalStorageKey.USER, userInfo)
         setIsAuthenticated(true)
@@ -44,26 +43,26 @@ export const ProtectedRoute = ({
 
   useEffect(() => {
     verifyToken()
-  }, []) */
+  }, [])
 
   if (isAuthenticated) return children
   return loading ? <LoadingSpinner /> : <Navigate to="/login" replace />
 }
 
 export const PublicRoute = ({ children }: ProtectedRouteProps) => {
-  const token = getFromLocalStorage(LocalStorageKey.TOKEN)
+  const user = getFromLocalStorage(LocalStorageKey.USER)
 
-  if (token) {
+  if (user) {
     return <Navigate to={defaultPath} replace />
   }
 
   return children
 }
 
-export const RoleRoute = ({ children }: ProtectedRouteProps) => {
+export const GroupRoute = ({ children }: ProtectedRouteProps) => {
   const { role } = getFromLocalStorage(LocalStorageKey.USER)
 
-  if (role !== USER_ROLE.ADMIN) {
+  if (role !== USER_GROUP.MANAGER) {
     return <Navigate to={defaultPath} replace />
   }
 

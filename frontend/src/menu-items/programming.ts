@@ -1,4 +1,4 @@
-import { TableOutlined, FolderOpenOutlined } from '@ant-design/icons'
+import { ToolOutlined, MessageOutlined, BuildOutlined } from '@ant-design/icons'
 import { MenuItem } from 'menu-items/types'
 
 export const programming: MenuItem = {
@@ -11,21 +11,21 @@ export const programming: MenuItem = {
       title: 'Chat',
       type: 'item',
       url: '/programmingchat',
-      icon: TableOutlined,
+      icon: MessageOutlined,
     },
     {
       id: 'programminggraphical',
       title: 'Graphical interface',
       type: 'item',
       url: '/programminggraphical',
-      icon: FolderOpenOutlined,
+      icon: BuildOutlined,
     },
     {
       id: 'myrobots',
       title: 'My robots',
       type: 'item',
       url: '/myrobots',
-      icon: FolderOpenOutlined,
+      icon: ToolOutlined,
     },
   ],
 }

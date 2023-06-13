@@ -6,14 +6,16 @@ const API = '/api'
 const SERVER = PROTOCOL + HOST + PORT
 const SERVER_API = SERVER + API
 
+const AUTH_API = `${SERVER_API}/auth`
 const HOME_API = `${SERVER_API}/home`
 const GRAPHIC_API = `${SERVER_API}/graphic`
 const CHAT_API = `${SERVER_API}/chat`
 
 export const endpoints = {
-  authentication: {
-    login: `${SERVER_API}/login/`,
-    logout: `${SERVER_API}/logout/`,
+  auth: {
+    login: `${AUTH_API}/login/`,
+    logout: `${AUTH_API}/logout/`,
+    verifyToken: `${AUTH_API}/verifyToken/`,
   },
   home: {
     user: {
