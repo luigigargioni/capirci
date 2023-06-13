@@ -25,6 +25,7 @@ import {
   defaultPaginationConfig,
 } from 'utils/constants'
 import { formatDateFrontend } from 'utils/date'
+import { getFromLocalStorage } from 'utils/localStorageUtils'
 import { TaskType } from './types'
 
 const ListTasks = () => {
@@ -53,16 +54,12 @@ const ListTasks = () => {
       body: {
         id,
       },
-    }).then((res) => {
-      if (res?.bool) {
-        toast.success(MessageText.success)
-        mutate()
-        if (data?.length === 1 && tableCurrentPage > 1) {
-          setTableCurrentPage(tableCurrentPage - 1)
-        }
-        return
+    }).then(() => {
+      toast.success(MessageText.success)
+      mutate()
+      if (data?.length === 1 && tableCurrentPage > 1) {
+        setTableCurrentPage(tableCurrentPage - 1)
       }
-      toast.error(MessageText.serverError)
     })
   }
 
@@ -77,7 +74,7 @@ const ListTasks = () => {
           onClick={() => handleDetail(record.id)}
           color="primary"
           aria-label="detail"
-          disabled={record.shared}
+          disabled={record.owner !== getFromLocalStorage('user')?.username}
         >
           <EyeOutlined style={{ fontSize: '2em' }} />
         </IconButton>
@@ -120,7 +117,12 @@ const ListTasks = () => {
       key: 'operation',
       render: (_, record) => (
         <Space size="middle">
-          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
+          <Button
+            onClick={() => handleEdit(record.id)}
+            disabled={record.owner !== getFromLocalStorage('user')?.username}
+          >
+            Edit
+          </Button>
           <Popconfirm
             title="Delete?"
             onConfirm={() => handleDelete(record.id)}
@@ -128,7 +130,12 @@ const ListTasks = () => {
             cancelText="Cancel"
             icon={iconMap.deleteCircle}
           >
-            <Button color="error">Delete</Button>
+            <Button
+              color="error"
+              disabled={record.owner !== getFromLocalStorage('user')?.username}
+            >
+              Delete
+            </Button>
           </Popconfirm>
         </Space>
       ),

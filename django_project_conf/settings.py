@@ -135,3 +135,5 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     # Add any additional authentication backends here
 ]
+
+USE_TZ = True

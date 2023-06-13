@@ -38,15 +38,10 @@ export const FormTask = ({
   ) => {
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.libraries.task, method, body: values })
-      .then((res) => {
-        if (res?.bool) {
+      .then(() => {
           setStatus({ success: true })
           toast.success(MessageText.success)
           backFunction()
-          return
-        }
-        toast.error(MessageText.serverError)
-        setStatus({ success: false })
       })
       .finally(() => {
         setSubmitting(false)

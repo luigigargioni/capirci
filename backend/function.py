@@ -147,6 +147,41 @@ def taskDetail(request: HttpRequest) -> HttpResponse:
                 task = Task.objects.get(id=task_id)
                 task_fields = task.to_dict(["id", "name", "description", "shared"])
                 return success_response(task_fields)
+            if request.method == HttpMethod.DELETE.value:
+                data = loads(request.body)
+                task_id = data.get("id")
+                task = Task.objects.filter(id=task_id)
+                task.delete()
+                return success_response()
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                task_name = data.get("name")
+                task_shared = data.get("shared")
+                task_description = data.get("description")
+                task_owner = request.user.id
+                date = getDateTimeNow()
+                Task.objects.create(
+                    name=task_name,
+                    owner=task_owner,
+                    description=task_description,
+                    shared=task_shared,
+                    last_modified=date,
+                )
+                return success_response()
+            if request.method == HttpMethod.PUT.value:
+                data = loads(request.body)
+                task_id = data.get("id")
+                task_name = data.get("name")
+                task_shared = data.get("shared")
+                task_description = data.get("description")
+                date = getDateTimeNow()
+                Task.objects.filter(id=task_id).update(
+                    name=task_name,
+                    description=task_description,
+                    shared=task_shared,
+                    last_modified=date,
+                )
+                return success_response()
             else:
                 return invalid_request_method
         else:
