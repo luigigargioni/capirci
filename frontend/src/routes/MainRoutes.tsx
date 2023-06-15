@@ -10,6 +10,14 @@ const ListTasks = Loadable(lazy(() => import('pages/tasks/listTasks')))
 const DetailTask = Loadable(lazy(() => import('pages/tasks/detailTask')))
 const ListObjects = Loadable(lazy(() => import('pages/objects/listObjects')))
 const DetailObject = Loadable(lazy(() => import('pages/objects/detailObject')))
+const ListLocations = Loadable(
+  lazy(() => import('pages/locations/listLocations'))
+)
+const DetailLocation = Loadable(
+  lazy(() => import('pages/locations/detailLocation'))
+)
+const ListActions = Loadable(lazy(() => import('pages/actions/listActions')))
+const DetailAction = Loadable(lazy(() => import('pages/actions/detailAction')))
 
 export const MainRoutes: RouteObject = {
   path: defaultPath,
@@ -56,6 +64,38 @@ export const MainRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <DetailObject />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'locations',
+      element: (
+        <ProtectedRoute>
+          <ListLocations />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'location/:id',
+      element: (
+        <ProtectedRoute>
+          <DetailLocation />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'actions',
+      element: (
+        <ProtectedRoute>
+          <ListActions />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'action/:id',
+      element: (
+        <ProtectedRoute>
+          <DetailAction />
         </ProtectedRoute>
       ),
     },

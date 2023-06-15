@@ -23,6 +23,10 @@ urlpatterns = [
     path(HOME + "task/", function.taskDetail, name="taskDetail"),
     path(HOME + "objects/", function.getObjectList, name="getObjectList"),
     path(HOME + "object/", function.objectDetail, name="objectDetail"),
+    path(HOME + "locations/", function.getLocationList, name="getLocationList"),
+    path(HOME + "location/", function.locationDetail, name="locationDetail"),
+    path(HOME + "actions/", function.getActionList, name="getActionList"),
+    path(HOME + "action/", function.actionDetail, name="actionDetail"),
     path(HOME + "changePassword/", function.changePassword, name="changePassword"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),

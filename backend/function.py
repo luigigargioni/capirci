@@ -251,6 +251,130 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
+def getActionList(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                username = request.user
+                user = User.objects.get(username=username)
+                actions = Action.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                    "id", "name", "shared", "point", "robot", "owner"
+                )
+                return success_response(actions)
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+@csrf_exempt
+def actionDetail(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                action_id = request.GET.get("id")
+                action = Action.objects.get(id=action_id)
+                action_fields = action.to_dict(["id", "name", "shared"])
+                return success_response(action_fields)
+            if request.method == HttpMethod.DELETE.value:
+                data = loads(request.body)
+                action_id = data.get("id")
+                action = Action.objects.filter(id=action_id)
+                action.delete()
+                return success_response()
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                action_name = data.get("name")
+                action_shared = data.get("shared")
+                action_owner = request.user.id
+                Action.objects.create(
+                    name=action_name,
+                    owner=action_owner,
+                    shared=action_shared,
+                )
+                return success_response()
+            if request.method == HttpMethod.PUT.value:
+                data = loads(request.body)
+                action_id = data.get("id")
+                action_name = data.get("name")
+                action_shared = data.get("shared")
+                Action.objects.filter(id=action_id).update(
+                    name=action_name,
+                    shared=action_shared,
+                )
+                return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getLocationList(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                username = request.user
+                user = User.objects.get(username=username)
+                locations = Location.objects.filter(
+                    Q(owner=user) | Q(shared=True)
+                ).values("id", "name", "shared", "position", "robot", "owner")
+                return success_response(locations)
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+@csrf_exempt
+def locationDetail(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                location_id = request.GET.get("id")
+                location = Location.objects.get(id=location_id)
+                location_fields = location.to_dict(["id", "name", "shared"])
+                return success_response(location_fields)
+            if request.method == HttpMethod.DELETE.value:
+                data = loads(request.body)
+                location_id = data.get("id")
+                location = Location.objects.filter(id=location_id)
+                location.delete()
+                return success_response()
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                location_name = data.get("name")
+                location_shared = data.get("shared")
+                location_owner = request.user.id
+                Location.objects.create(
+                    name=location_name,
+                    owner=location_owner,
+                    shared=location_shared,
+                )
+                return success_response()
+            if request.method == HttpMethod.PUT.value:
+                data = loads(request.body)
+                location_id = data.get("id")
+                location_name = data.get("name")
+                location_shared = data.get("shared")
+                Location.objects.filter(id=location_id).update(
+                    name=location_name,
+                    shared=location_shared,
+                )
+                return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
 def checkTaskName(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         data_result = {"nameExist": False}
@@ -334,7 +458,7 @@ def getRobotList(request: HttpRequest) -> HttpResponse:
         return HttpResponse("ERROR")
 
 
-def getLocationList(request: HttpRequest) -> HttpResponse:
+""" def getLocationList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         user = User.objects.get(username=username)
@@ -342,17 +466,17 @@ def getLocationList(request: HttpRequest) -> HttpResponse:
         qs_json = serialize("json", locations)
         return HttpResponse(qs_json, content_type="application/json")
     else:
-        return HttpResponse("ERROR")
+        return HttpResponse("ERROR") """
 
 
-def getActionList(request: HttpRequest) -> HttpResponse:
+""" def getActionList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         user = User.objects.get(username=request.user)
         actions = Action.objects.filter(Q(owner=user) | Q(shared=True))
         qs_json = serialize("json", actions)
         return HttpResponse(qs_json, content_type="application/json")
     else:
-        return HttpResponse("ERROR")
+        return HttpResponse("ERROR") """
 
 
 def getActionListGraphic(request: HttpRequest) -> HttpResponse:
