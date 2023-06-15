@@ -120,7 +120,6 @@ def verifyToken(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def getTaskList(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -180,6 +179,68 @@ def taskDetail(request: HttpRequest) -> HttpResponse:
                     description=task_description,
                     shared=task_shared,
                     last_modified=date,
+                )
+                return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getObjectList(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                username = request.user
+                user = User.objects.get(username=username)
+                objects = Object.objects.filter(Q(owner=user) | Q(shared=True)).values(
+                    "id", "name", "shared", "force", "height", "owner", "keywords"
+                )
+                return success_response(objects)
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+@csrf_exempt
+def objectDetail(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                object_id = request.GET.get("id")
+                object = Object.objects.get(id=object_id)
+                object_fields = object.to_dict(["id", "name", "keywords", "shared"])
+                return success_response(object_fields)
+            if request.method == HttpMethod.DELETE.value:
+                data = loads(request.body)
+                object_id = data.get("id")
+                object = Object.objects.filter(id=object_id)
+                object.delete()
+                return success_response()
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                object_name = data.get("name")
+                object_shared = data.get("shared")
+                object_owner = request.user.id
+                Object.objects.create(
+                    name=object_name,
+                    owner=object_owner,
+                    shared=object_shared,
+                )
+                return success_response()
+            if request.method == HttpMethod.PUT.value:
+                data = loads(request.body)
+                object_id = data.get("id")
+                object_name = data.get("name")
+                object_shared = data.get("shared")
+                Object.objects.filter(id=object_id).update(
+                    name=object_name,
+                    shared=object_shared,
                 )
                 return success_response()
             else:
@@ -268,17 +329,6 @@ def getRobotList(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         robots = Robot.objects.all()
         qs_json = serialize("json", robots)
-        return HttpResponse(qs_json, content_type="application/json")
-    else:
-        return HttpResponse("ERROR")
-
-
-def getObjectList(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        username = request.POST.get("username")
-        user = User.objects.get(username=username)
-        objects = Object.objects.filter(Q(owner=user) | Q(shared=True))
-        qs_json = serialize("json", objects)
         return HttpResponse(qs_json, content_type="application/json")
     else:
         return HttpResponse("ERROR")

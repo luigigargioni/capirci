@@ -67,6 +67,25 @@ class Object(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "owner":
+                response_data[key] = self.owner
+            elif key == "keywords":
+                response_data[key] = self.keywords
+            elif key == "shared":
+                response_data[key] = self.shared
+            elif key == "force":
+                response_data[key] = self.force
+            elif key == "height":
+                response_data[key] = self.height
+        return response_data
+
 
 class robot_type(Enum):
     C = "Cobotta"
@@ -91,6 +110,23 @@ class Robot(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "ip":
+                response_data[key] = self.ip
+            elif key == "model":
+                response_data[key] = self.model
+            elif key == "port":
+                response_data[key] = self.port
+            elif key == "cameraip":
+                response_data[key] = self.cameraip
+        return response_data
+
 
 class UserRobot(models.Model):
     id = models.AutoField(primary_key=True)
@@ -103,6 +139,19 @@ class UserRobot(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "user":
+                response_data[key] = self.user
+            elif key == "robot":
+                response_data[key] = self.robot
+        return response_data
 
 
 class Location(models.Model):
@@ -121,6 +170,23 @@ class Location(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "owner":
+                response_data[key] = self.owner
+            elif key == "shared":
+                response_data[key] = self.shared
+            elif key == "position":
+                response_data[key] = self.position
+            elif key == "robot":
+                response_data[key] = self.robot
+        return response_data
+
 
 class Action(models.Model):
     id = models.AutoField(primary_key=True)
@@ -137,3 +203,20 @@ class Action(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_dict(self, keys):
+        response_data = {}
+        for key in keys:
+            if key == "id":
+                response_data[key] = self.id
+            elif key == "name":
+                response_data[key] = self.name
+            elif key == "owner":
+                response_data[key] = self.owner
+            elif key == "point":
+                response_data[key] = self.point
+            elif key == "shared":
+                response_data[key] = self.shared
+            elif key == "robot":
+                response_data[key] = self.robot
+        return response_data

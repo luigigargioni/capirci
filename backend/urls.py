@@ -21,6 +21,8 @@ urlpatterns = [
     # # HOME
     path(HOME + "tasks/", function.getTaskList, name="getTaskList"),
     path(HOME + "task/", function.taskDetail, name="taskDetail"),
+    path(HOME + "objects/", function.getObjectList, name="getObjectList"),
+    path(HOME + "object/", function.objectDetail, name="objectDetail"),
     path(HOME + "changePassword/", function.changePassword, name="changePassword"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),

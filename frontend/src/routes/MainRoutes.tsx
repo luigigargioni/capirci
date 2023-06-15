@@ -6,24 +6,10 @@ import { MainLayout } from 'layout/MainLayout'
 import { defaultPath } from 'utils/constants'
 import { ProtectedRoute } from './ProtectedRoute'
 
-const Dashboard = Loadable(lazy(() => import('pages/dashboard/index')))
-const RegistroCompilazione = Loadable(
-  lazy(() => import('pages/registro/registroCompilazione'))
-)
-const RegistroNeutro = Loadable(
-  lazy(() => import('pages/registro/registroNeutro'))
-)
 const ListTasks = Loadable(lazy(() => import('pages/tasks/listTasks')))
 const DetailTask = Loadable(lazy(() => import('pages/tasks/detailTask')))
-const GestioneCheckout = Loadable(
-  lazy(() => import('pages/prenotazioni/gestioneCheckout'))
-)
-const GestioneStorico = Loadable(
-  lazy(() => import('pages/prenotazioni/gestioneStorico'))
-)
-
-const Presenze = Loadable(lazy(() => import('pages/presenze')))
-const Servizi = Loadable(lazy(() => import('pages/servizi')))
+const ListObjects = Loadable(lazy(() => import('pages/objects/listObjects')))
+const DetailObject = Loadable(lazy(() => import('pages/objects/detailObject')))
 
 export const MainRoutes: RouteObject = {
   path: defaultPath,
@@ -38,14 +24,6 @@ export const MainRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <ListTasks />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'dashboard',
-      element: (
-        <ProtectedRoute>
-          <Dashboard />
         </ProtectedRoute>
       ),
     },
@@ -66,58 +44,18 @@ export const MainRoutes: RouteObject = {
       ),
     },
     {
-      path: 'checkout',
+      path: 'objects',
       element: (
         <ProtectedRoute>
-          <GestioneCheckout />
+          <ListObjects />
         </ProtectedRoute>
       ),
     },
     {
-      path: 'storico',
+      path: 'object/:id',
       element: (
         <ProtectedRoute>
-          <GestioneStorico />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'registroneutro',
-      element: (
-        <ProtectedRoute>
-          <RegistroNeutro />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'registrocompilazione',
-      element: (
-        <ProtectedRoute>
-          <RegistroCompilazione />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'presenze',
-      element: (
-        <ProtectedRoute>
-          <Presenze />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'servizi/:id',
-      element: (
-        <ProtectedRoute>
-          <Servizi />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: 'servizi',
-      element: (
-        <ProtectedRoute>
-          <Servizi />
+          <DetailObject />
         </ProtectedRoute>
       ),
     },
