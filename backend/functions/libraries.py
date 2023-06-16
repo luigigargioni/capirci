@@ -53,14 +53,15 @@ def taskDetail(request: HttpRequest) -> HttpResponse:
                 task_description = data.get("description")
                 task_owner = request.user.id
                 date = getDateTimeNow()
-                Task.objects.create(
+                task_created = Task.objects.create(
                     name=task_name,
                     owner=task_owner,
                     description=task_description,
                     shared=task_shared,
                     last_modified=date,
                 )
-                return success_response()
+                response = {"id": task_created.id}
+                return success_response(response)
             if request.method == HttpMethod.PUT.value:
                 data = loads(request.body)
                 task_id = data.get("id")

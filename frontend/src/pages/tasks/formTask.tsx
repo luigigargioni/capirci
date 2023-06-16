@@ -15,9 +15,14 @@ import { string as YupString, object as YupObject } from 'yup'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BuildOutlined } from '@ant-design/icons'
 import { TaskDetailType } from './types'
+
+export enum TypeNewTask {
+  CHAT = 'chat',
+  GRAPHICAL = 'graphical',
+}
 
 interface FormTaskProps {
   data: TaskDetailType | undefined
@@ -27,6 +32,8 @@ interface FormTaskProps {
 
 export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const type = searchParams.get('type')
 
   const onSubmit = async (
     values: TaskDetailType,
@@ -34,9 +41,18 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
   ) => {
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.libraries.task, method, body: values })
-      .then(() => {
+      .then((res) => {
+        const newTaskId = res.id
         setStatus({ success: true })
         toast.success(MessageText.success)
+        if (type === TypeNewTask.CHAT) {
+          navigate(`/chat/${newTaskId}`)
+          return
+        }
+        if (type === TypeNewTask.GRAPHICAL) {
+          navigate(`/graphical${newTaskId}`)
+          return
+        }
         backFunction()
       })
       .finally(() => {
@@ -77,21 +93,23 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
           }}
         >
           <Grid container spacing={3} columns={{ xs: 1, sm: 6, md: 12 }}>
-            <Grid item xs={1}>
-              <Stack spacing={1}>
-                <Button
-                  onClick={() => navigate(`/graphic/${values.id}`)}
-                  color="primary"
-                  aria-label="detail"
-                  size="medium"
-                  title="Edit task"
-                  startIcon={<BuildOutlined style={{ fontSize: '2em' }} />}
-                >
-                  Edit
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid item xs={2}>
+            {!insertMode && (
+              <Grid item xs={1}>
+                <Stack spacing={1}>
+                  <Button
+                    onClick={() => navigate(`/graphic/${values.id}`)}
+                    color="primary"
+                    aria-label="detail"
+                    size="medium"
+                    title="Edit task"
+                    startIcon={<BuildOutlined style={{ fontSize: '2em' }} />}
+                  >
+                    Edit
+                  </Button>
+                </Stack>
+              </Grid>
+            )}
+            <Grid item xs={insertMode ? 3 : 2}>
               <Stack spacing={1}>
                 <TextField
                   id="name"

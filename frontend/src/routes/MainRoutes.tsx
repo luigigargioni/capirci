@@ -22,6 +22,8 @@ const ListMyRobots = Loadable(lazy(() => import('pages/myrobots/listMyRobots')))
 const DetailMyRobot = Loadable(
   lazy(() => import('pages/myrobots/detailMyRobot'))
 )
+const Chat = Loadable(lazy(() => import('pages/chat')))
+const Graphic = Loadable(lazy(() => import('pages/graphic')))
 
 export const MainRoutes: RouteObject = {
   path: defaultPath,
@@ -116,6 +118,22 @@ export const MainRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <DetailMyRobot />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'chat/:id',
+      element: (
+        <ProtectedRoute>
+          <Chat />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: 'graphic/:id',
+      element: (
+        <ProtectedRoute>
+          <Graphic />
         </ProtectedRoute>
       ),
     },

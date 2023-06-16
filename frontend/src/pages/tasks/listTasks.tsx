@@ -171,6 +171,7 @@ const ListTasks = () => {
           color="primary"
           onClick={handleAdd}
           startIcon={<PlusCircleOutlined />}
+          sx={{ display: 'none' }}
         >
           Add
         </Button>
