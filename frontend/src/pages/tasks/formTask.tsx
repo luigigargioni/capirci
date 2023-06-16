@@ -19,17 +19,13 @@ import { useNavigate } from 'react-router-dom'
 import { BuildOutlined } from '@ant-design/icons'
 import { TaskDetailType } from './types'
 
-interface FormAnimaleProps {
+interface FormTaskProps {
   data: TaskDetailType | undefined
   insertMode: boolean
   backFunction: () => void
 }
 
-export const FormTask = ({
-  data,
-  insertMode,
-  backFunction,
-}: FormAnimaleProps) => {
+export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
   const navigate = useNavigate()
 
   const onSubmit = async (
@@ -39,9 +35,9 @@ export const FormTask = ({
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.libraries.task, method, body: values })
       .then(() => {
-          setStatus({ success: true })
-          toast.success(MessageText.success)
-          backFunction()
+        setStatus({ success: true })
+        toast.success(MessageText.success)
+        backFunction()
       })
       .finally(() => {
         setSubmitting(false)

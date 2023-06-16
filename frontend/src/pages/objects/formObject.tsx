@@ -17,7 +17,7 @@ import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { ObjectDetailType } from './types'
 
-interface FormAnimaleProps {
+interface FormObjectProps {
   data: ObjectDetailType | undefined
   insertMode: boolean
   backFunction: () => void
@@ -27,7 +27,7 @@ export const FormObject = ({
   data,
   insertMode,
   backFunction,
-}: FormAnimaleProps) => {
+}: FormObjectProps) => {
   const onSubmit = async (
     values: ObjectDetailType,
     { setStatus, setSubmitting }

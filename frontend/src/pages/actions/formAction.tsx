@@ -17,7 +17,7 @@ import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { ActionDetailType } from './types'
 
-interface FormAnimaleProps {
+interface FormActionProps {
   data: ActionDetailType | undefined
   insertMode: boolean
   backFunction: () => void
@@ -27,7 +27,7 @@ export const FormAction = ({
   data,
   insertMode,
   backFunction,
-}: FormAnimaleProps) => {
+}: FormActionProps) => {
   const onSubmit = async (
     values: ActionDetailType,
     { setStatus, setSubmitting }

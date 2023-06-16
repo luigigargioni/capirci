@@ -2,49 +2,41 @@ import React from 'react'
 import { CircularProgress, Typography } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import useSWR from 'swr'
+import { useDispatch } from 'react-redux'
 
 import { MainCard } from 'components/MainCard'
 import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
-import { useDispatch } from 'react-redux'
 import { backgroundForm } from 'themes/theme'
-import { FormVeterinario } from './formVeterinario'
-import { VeterinarianType } from './types'
+import { FormMyRobot } from './formMyRobot'
+import { MyRobotDetailType } from './types'
 
-const DettaglioVeterinario = () => {
+const DetailMyRobot = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<VeterinarianType, Error>(
-    !insertMode
-      ? {
-          mod: endpoints.veterinarian.get.mod,
-          fnz: endpoints.veterinarian.get.fnz,
-          body: {
-            id,
-          },
-        }
-      : null
+  const { data, isLoading } = useSWR<MyRobotDetailType, Error>(
+    !insertMode ? { url: endpoints.home.libraries.myRobot, body: { id } } : null
   )
 
   const backFunction = () => {
-    dispatch(activeItem('veterinari'))
-    navigate('/veterinari')
+    dispatch(activeItem('myrobots'))
+    navigate('/myrobots')
   }
 
   return (
     <MainCard
-      title={insertMode ? 'Aggiunta veterinario' : 'Dettaglio veterinario'}
+      title={insertMode ? 'Add My Robot' : 'My Robot detail'}
       backFunction={backFunction}
       sx={{ background: backgroundForm }}
     >
       {isLoading && !insertMode && <CircularProgress />}
       {data === null && (
-        <Typography>Veterinario con ID {id} non trovato</Typography>
+        <Typography>My Robot with ID {id} not found</Typography>
       )}
       {(data || insertMode) && (
-        <FormVeterinario
+        <FormMyRobot
           data={data}
           insertMode={insertMode}
           backFunction={backFunction}
@@ -54,4 +46,4 @@ const DettaglioVeterinario = () => {
   )
 }
 
-export default DettaglioVeterinario
+export default DetailMyRobot

@@ -3,6 +3,7 @@ import {
   ApartmentOutlined,
   TagOutlined,
   SubnodeOutlined,
+  ToolOutlined,
 } from '@ant-design/icons'
 import { MenuItem } from 'menu-items/types'
 
@@ -38,6 +39,13 @@ export const libraries: MenuItem = {
       type: 'item',
       url: '/locations',
       icon: AimOutlined,
+    },
+    {
+      id: 'myrobots',
+      title: 'My robots',
+      type: 'item',
+      url: '/myrobots',
+      icon: ToolOutlined,
     },
   ],
 }

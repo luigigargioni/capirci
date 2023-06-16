@@ -30,6 +30,8 @@ export const endpoints = {
       location: `${HOME_API}/location/`,
       actions: `${HOME_API}/actions/`,
       action: `${HOME_API}/action/`,
+      myRobots: `${HOME_API}/myRobots/`,
+      myRobot: `${HOME_API}/myRobot/`,
     },
     management: {
       users: `${HOME_API}/users/`,
@@ -37,10 +39,7 @@ export const endpoints = {
       robots: `${HOME_API}/robots/`,
       robot: `${HOME_API}/robot/`,
     },
-    programming: {
-      myRobots: `${HOME_API}/myRobots/`,
-      myRobot: `${HOME_API}/myRobot/`,
-    },
+    programming: {},
   },
   graphic: {
     actions: `${GRAPHIC_API}/getActionList/`,

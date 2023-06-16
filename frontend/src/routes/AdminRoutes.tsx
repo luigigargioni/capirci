@@ -6,15 +6,10 @@ import { MainLayout } from 'layout/MainLayout'
 import { defaultPath } from 'utils/constants'
 import { ProtectedRoute, GroupRoute } from './ProtectedRoute'
 
-const GestioneUtenti = Loadable(
-  lazy(() => import('pages/utenti/gestioneUtenti'))
-)
-const DettaglioUtente = Loadable(
-  lazy(() => import('pages/utenti/dettaglioUtente'))
-)
-
-const DettaglioAnimale = Loadable(lazy(() => import('pages/tasks/detailTask')))
-const GestioneAnimali = Loadable(lazy(() => import('pages/tasks/listTasks')))
+const ListUsers = Loadable(lazy(() => import('pages/users/listUsers')))
+const DetailUser = Loadable(lazy(() => import('pages/users/detailUser')))
+const ListRobots = Loadable(lazy(() => import('pages/robots/listRobots')))
+const DetailRobot = Loadable(lazy(() => import('pages/robots/detailRobot')))
 
 export const ManagerRoutes: RouteObject = {
   path: defaultPath,
@@ -29,7 +24,7 @@ export const ManagerRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <GroupRoute>
-            <GestioneAnimali />
+            <ListUsers />
           </GroupRoute>
         </ProtectedRoute>
       ),
@@ -39,7 +34,7 @@ export const ManagerRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <GroupRoute>
-            <DettaglioAnimale />
+            <DetailUser />
           </GroupRoute>
         </ProtectedRoute>
       ),
@@ -49,7 +44,7 @@ export const ManagerRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <GroupRoute>
-            <GestioneUtenti />
+            <ListRobots />
           </GroupRoute>
         </ProtectedRoute>
       ),
@@ -59,7 +54,7 @@ export const ManagerRoutes: RouteObject = {
       element: (
         <ProtectedRoute>
           <GroupRoute>
-            <DettaglioUtente />
+            <DetailRobot />
           </GroupRoute>
         </ProtectedRoute>
       ),
