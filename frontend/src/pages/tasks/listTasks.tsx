@@ -24,7 +24,7 @@ import {
   defaultPageSizeSelection,
   defaultPaginationConfig,
 } from 'utils/constants'
-import { formatDateFrontend } from 'utils/date'
+import { formatDateTimeFrontend } from 'utils/date'
 import { getFromLocalStorage } from 'utils/localStorageUtils'
 import { TaskType } from './types'
 
@@ -110,7 +110,7 @@ const ListTasks = () => {
       key: 'last_modified',
       title: 'Last modified',
       dataIndex: 'last_modified',
-      render: (_, record) => formatDateFrontend(record.last_modified),
+      render: (_, record) => formatDateTimeFrontend(record.last_modified),
     },
     {
       title: 'Operations',

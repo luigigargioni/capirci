@@ -6,7 +6,7 @@ from backend.utils.response import (
     success_response,
     unauthorized_request,
 )
-from backend.models import Task, Object, UserRobot, Location, Action
+from backend.models import Task, Object, UserRobot, Location, Action, Robot
 from django.db.models import Q
 from json import loads
 from backend.utils.date import getDateTimeNow
@@ -179,7 +179,7 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
                 data = loads(request.body)
                 action_name = data.get("name")
                 action_shared = data.get("shared")
-                action_owner = request.user.id
+                action_owner = User.objects.get(id=request.user.id)
                 Action.objects.create(
                     name=action_name,
                     owner=action_owner,
@@ -227,24 +227,31 @@ def locationDetail(request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
                 location_id = request.GET.get("id")
-                location = Location.objects.get(id=location_id)
-                location_fields = location.to_dict(["id", "name", "shared"])
+                location = Location.objects.get(Q(id=location_id))
+                location_fields = location.to_dict(
+                    ["id", "name", "shared", "position", "robot"]
+                )
                 return success_response(location_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)
                 location_id = data.get("id")
-                location = Location.objects.filter(id=location_id)
+                user = User.objects.get(id=request.user.id)
+                location = Location.objects.filter(Q(id=location_id) & Q(owner=user))
                 location.delete()
                 return success_response()
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)
                 location_name = data.get("name")
                 location_shared = data.get("shared")
-                location_owner = request.user.id
+                location_position = data.get("position")
+                location_robot = Robot.objects.get(id=data.get("robot"))
+                location_owner = User.objects.get(id=request.user.id)
                 Location.objects.create(
                     name=location_name,
                     owner=location_owner,
                     shared=location_shared,
+                    position=location_position,
+                    robot=location_robot,
                 )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
@@ -252,9 +259,13 @@ def locationDetail(request: HttpRequest) -> HttpResponse:
                 location_id = data.get("id")
                 location_name = data.get("name")
                 location_shared = data.get("shared")
+                location_position = data.get("position")
+                location_robot = UserRobot.objects.get(id=data.get("robot"))
                 Location.objects.filter(id=location_id).update(
                     name=location_name,
                     shared=location_shared,
+                    position=location_position,
+                    robot=location_robot,
                 )
                 return success_response()
             else:
@@ -300,8 +311,12 @@ def myRobotDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)
                 myRobot_name = data.get("name")
-                myRobot_user = request.user.id
-                UserRobot.objects.create(name=myRobot_name, user=myRobot_user, robot=0)
+                myRobot_robot_id = data.get("robot")
+                myRobot_user = User.objects.get(id=request.user.id)
+                myRobot_robot = Robot.objects.get(id=myRobot_robot_id)
+                UserRobot.objects.create(
+                    name=myRobot_name, user=myRobot_user, robot=myRobot_robot
+                )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
                 data = loads(request.body)

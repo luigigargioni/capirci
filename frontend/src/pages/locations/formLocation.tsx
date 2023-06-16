@@ -2,9 +2,13 @@ import React from 'react'
 import {
   Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
   FormHelperText,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -15,16 +19,20 @@ import { string as YupString, object as YupObject } from 'yup'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
+import { AimOutlined } from '@ant-design/icons'
+import { MyRobotType } from 'pages/myrobots/types'
 import { LocationDetailType } from './types'
 
 interface FormLocationProps {
-  data: LocationDetailType | undefined
+  dataLocation: LocationDetailType | undefined
+  dataMyRobots: MyRobotType[]
   insertMode: boolean
   backFunction: () => void
 }
 
 export const FormLocation = ({
-  data,
+  dataLocation,
+  dataMyRobots,
   insertMode,
   backFunction,
 }: FormLocationProps) => {
@@ -44,13 +52,18 @@ export const FormLocation = ({
       })
   }
 
+  const handleGetPosition = () => {
+    const a = 0
+  }
+
   return (
     <Formik
       initialValues={{
-        id: data?.id || -1,
-        name: data?.name || '',
-        shared: data?.shared || false,
-        position: data?.position || '',
+        id: dataLocation?.id || -1,
+        name: dataLocation?.name || '',
+        shared: dataLocation?.shared || false,
+        position: dataLocation?.position || '',
+        robot: dataLocation?.robot || -1,
       }}
       validationSchema={YupObject().shape({
         name: YupString()
@@ -95,6 +108,34 @@ export const FormLocation = ({
                 )}
               </Stack>
             </Grid>
+            <Grid item xs={9}>
+              <Stack spacing={1}>
+                <FormControl fullWidth>
+                  <InputLabel id="robot-id-label">Robot</InputLabel>
+                  <Select
+                    labelId="robot-id-label"
+                    id="robot"
+                    value={values.robot || null}
+                    label="Robot"
+                    name="robot"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    error={Boolean(touched.robot && errors.robot)}
+                  >
+                    {dataMyRobots?.map((myRobot) => (
+                      <MenuItem value={myRobot.id} key={myRobot.id}>
+                        {myRobot.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {touched.robot && errors.robot && (
+                    <FormHelperText error id="helper-text-robot">
+                      {errors.robot}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Stack>
+            </Grid>
             <Grid item xs={1}>
               <Stack spacing={1}>
                 <FormControlLabel
@@ -109,6 +150,31 @@ export const FormLocation = ({
                     />
                   }
                   label="Shared"
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <Button
+                  onClick={() => handleGetPosition()}
+                  color="primary"
+                  aria-label="detail"
+                  size="medium"
+                  title="Get position"
+                  startIcon={<AimOutlined style={{ fontSize: '2em' }} />}
+                >
+                  Get position
+                </Button>
+              </Stack>
+            </Grid>
+            <Grid item xs={10}>
+              <Stack spacing={1}>
+                <TextField
+                  id="position"
+                  value={values.position || ''}
+                  name="position"
+                  label="Position"
+                  disabled
                 />
               </Stack>
             </Grid>

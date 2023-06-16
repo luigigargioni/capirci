@@ -7,4 +7,4 @@ export interface LocationType {
   robot: number
 }
 
-export type LocationDetailType = Omit<LocationType, 'owner' | 'robot'>
+export type LocationDetailType = Omit<LocationType, 'owner'>

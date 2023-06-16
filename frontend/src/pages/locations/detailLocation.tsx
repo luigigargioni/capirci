@@ -8,6 +8,7 @@ import { MainCard } from 'components/MainCard'
 import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
 import { backgroundForm } from 'themes/theme'
+import { MyRobotType } from 'pages/myrobots/types'
 import { FormLocation } from './formLocation'
 import { LocationDetailType } from './types'
 
@@ -16,7 +17,10 @@ const DetailLocation = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<LocationDetailType, Error>(
+  const { data: dataLocation, isLoading: isLoadingLocation } = useSWR<
+    LocationDetailType,
+    Error
+  >(
     !insertMode
       ? { url: endpoints.home.libraries.location, body: { id } }
       : null
@@ -26,6 +30,16 @@ const DetailLocation = () => {
     dispatch(activeItem('locations'))
     navigate('/locations')
   }
+
+  const { data: dataMyRobots, isLoading: isLoadingMyRobots } = useSWR<
+    MyRobotType[],
+    Error
+  >({
+    url: endpoints.home.libraries.myRobots,
+  })
+
+  const isLoading = isLoadingLocation || isLoadingMyRobots
+  const data = dataLocation && dataMyRobots
 
   return (
     <MainCard
@@ -39,7 +53,8 @@ const DetailLocation = () => {
       )}
       {(data || insertMode) && (
         <FormLocation
-          data={data}
+          dataLocation={dataLocation}
+          dataMyRobots={dataMyRobots || []}
           insertMode={insertMode}
           backFunction={backFunction}
         />
