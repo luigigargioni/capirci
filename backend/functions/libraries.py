@@ -7,7 +7,6 @@ from backend.utils.response import (
     unauthorized_request,
 )
 from backend.models import Task, Object, UserRobot, Location, Action
-from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from json import loads
 from backend.utils.date import getDateTimeNow
@@ -31,7 +30,6 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def taskDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -102,7 +100,6 @@ def getObjectList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def objectDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -121,7 +118,7 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 data = loads(request.body)
                 object_name = data.get("name")
                 object_shared = data.get("shared")
-                object_owner = request.user.id
+                object_owner = User.objects.get(id=request.user.id)
                 Object.objects.create(
                     name=object_name,
                     owner=object_owner,
@@ -164,7 +161,6 @@ def getActionList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def actionDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -226,7 +222,6 @@ def getLocationList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def locationDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -288,7 +283,6 @@ def getMyRobotList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def myRobotDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:

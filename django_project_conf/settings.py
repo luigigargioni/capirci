@@ -130,6 +130,9 @@ CORS_ALLOW_HEADERS = [
     "X-CSRFToken",
     # Add any other headers you need to allow
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

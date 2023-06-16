@@ -7,7 +7,6 @@ from backend.utils.response import (
     unauthorized_request,
 )
 from backend.models import Robot
-from django.views.decorators.csrf import csrf_exempt
 from json import loads
 from django.contrib.auth.models import User
 
@@ -26,7 +25,6 @@ def getUserList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def userDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
@@ -82,7 +80,6 @@ def getRobotList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def robotDetail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:

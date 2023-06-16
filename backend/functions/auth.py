@@ -1,4 +1,3 @@
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpRequest
 from json import loads
 from backend.utils.response import (
@@ -12,7 +11,6 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.models import User, Group
 
 
-@csrf_exempt
 def login_func(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
@@ -43,7 +41,6 @@ def login_func(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def logout_func(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
@@ -55,7 +52,6 @@ def logout_func(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def verifyToken(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
@@ -83,7 +79,6 @@ def verifyToken(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-@csrf_exempt
 def changePassword(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
