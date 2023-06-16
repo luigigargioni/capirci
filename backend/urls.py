@@ -1,5 +1,24 @@
 from django.urls import path, re_path
 from . import views
+from .functions.auth import login_func, logout_func, verifyToken, changePassword
+from .functions.libraries import (
+    getTaskList,
+    taskDetail,
+    getObjectList,
+    objectDetail,
+    getLocationList,
+    locationDetail,
+    getActionList,
+    actionDetail,
+    getMyRobotList,
+    myRobotDetail,
+)
+from .functions.management import (
+    getRobotList,
+    robotDetail,
+    getUserList,
+    userDetail,
+)
 from . import function
 from django.conf import settings
 from django.views.static import serve
@@ -13,21 +32,27 @@ CHAT = API + "chat/"
 
 
 urlpatterns = [
-    # API
-    # # AUTH
-    path(AUTH + "login/", function.login_func, name="login_func"),
-    path(AUTH + "logout/", function.logout_func, name="logout_func"),
-    path(AUTH + "verifyToken/", function.verifyToken, name="verifyToken"),
-    # # HOME
-    path(HOME + "tasks/", function.getTaskList, name="getTaskList"),
-    path(HOME + "task/", function.taskDetail, name="taskDetail"),
-    path(HOME + "objects/", function.getObjectList, name="getObjectList"),
-    path(HOME + "object/", function.objectDetail, name="objectDetail"),
-    path(HOME + "locations/", function.getLocationList, name="getLocationList"),
-    path(HOME + "location/", function.locationDetail, name="locationDetail"),
-    path(HOME + "actions/", function.getActionList, name="getActionList"),
-    path(HOME + "action/", function.actionDetail, name="actionDetail"),
-    path(HOME + "changePassword/", function.changePassword, name="changePassword"),
+    # AUTH
+    path(AUTH + "login/", login_func, name="login_func"),
+    path(AUTH + "logout/", logout_func, name="logout_func"),
+    path(AUTH + "verifyToken/", verifyToken, name="verifyToken"),
+    path(HOME + "changePassword/", changePassword, name="changePassword"),
+    # LIBRARIES
+    path(HOME + "tasks/", getTaskList, name="getTaskList"),
+    path(HOME + "task/", taskDetail, name="taskDetail"),
+    path(HOME + "objects/", getObjectList, name="getObjectList"),
+    path(HOME + "object/", objectDetail, name="objectDetail"),
+    path(HOME + "locations/", getLocationList, name="getLocationList"),
+    path(HOME + "location/", locationDetail, name="locationDetail"),
+    path(HOME + "actions/", getActionList, name="getActionList"),
+    path(HOME + "action/", actionDetail, name="actionDetail"),
+    path(HOME + "myRobots/", getMyRobotList, name="getMyRobotList"),
+    path(HOME + "myRobot/", myRobotDetail, name="myRobotDetail"),
+    # MANAGEMENT
+    path(HOME + "robots/", getRobotList, name="getRobotList"),
+    path(HOME + "robot/", robotDetail, name="robotDetail"),
+    path(HOME + "users/", getUserList, name="getUserList"),
+    path(HOME + "user/", userDetail, name="userDetail"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),
@@ -43,8 +68,6 @@ urlpatterns = [
         function.ajaxCallParserAction,
         name="ajaxCallParserAction",
     ),
-    path("getTaskList/", function.getTaskList, name="getTaskList"),
-    path("getObjectList/", function.getObjectList, name="getObjectList"),
     path("getUserList/", function.getUserList, name="getUserList"),
     path("getRobotList/", function.getRobotList, name="getRobotList"),
     path(
@@ -82,7 +105,6 @@ urlpatterns = [
     path("createNewUser/", function.createNewUser, name="createNewUser"),
     path("createNewRobot/", function.createNewRobot, name="createNewRobot"),
     path("createMyNewRobot/", function.createMyNewRobot, name="createMyNewRobot"),
-    path("changePassword/", function.changePassword, name="changePassword"),
     path("robotOfUser/", function.robotOfUser, name="robotOfUser"),
     path("takeShot/", function.takeShot, name="takeShot"),
     path(
@@ -105,7 +127,6 @@ urlpatterns = [
     path(
         "checkTaskNameModify/", function.checkTaskNameModify, name="checkTaskNameModify"
     ),
-    path("getLocationList/", function.getLocationList, name="getLocationList"),
     path(
         "getUsernameFromUserId/",
         function.getUsernameFromUserId,
@@ -130,7 +151,6 @@ urlpatterns = [
     ),
     path("modifyLocation/", function.modifyLocation, name="modifyLocation"),
     path("deleteImageObject/", function.deleteImageObject, name="deleteImageObject"),
-    path("getActionList/", function.getActionList, name="getActionList"),
     path("checkLibrariesXML/", function.checkLibrariesXML, name="checkLibrariesXML"),
     path("runTask/", function.runTask, name="runTask"),
     # Home

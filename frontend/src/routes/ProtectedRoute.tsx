@@ -60,11 +60,13 @@ export const PublicRoute = ({ children }: ProtectedRouteProps) => {
 }
 
 export const GroupRoute = ({ children }: ProtectedRouteProps) => {
-  const { role } = getFromLocalStorage(LocalStorageKey.USER)
+  // const { role } = getFromLocalStorage(LocalStorageKey.USER)
 
+  /*
   if (role !== USER_GROUP.MANAGER) {
     return <Navigate to={defaultPath} replace />
   }
+  */
 
   return children
 }

@@ -1,6 +1,6 @@
 from numpy import pi, absolute, array
 from math import cos, sin, radians, ceil, sqrt, atan2, degrees, asin
-from .pybcapclient.bcapclient import BCAPClient
+from ..pybcapclient.bcapclient import BCAPClient
 from win32com.client import Dispatch
 from PIL import Image
 from io import BytesIO
