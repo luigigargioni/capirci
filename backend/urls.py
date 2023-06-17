@@ -12,6 +12,7 @@ from .functions.libraries import (
     actionDetail,
     getMyRobotList,
     myRobotDetail,
+    takePositionLocation,
 )
 from .functions.management import (
     getRobotList,
@@ -48,6 +49,11 @@ urlpatterns = [
     path(HOME + "action/", actionDetail, name="actionDetail"),
     path(HOME + "myRobots/", getMyRobotList, name="getMyRobotList"),
     path(HOME + "myRobot/", myRobotDetail, name="myRobotDetail"),
+    path(
+        HOME + "takePositionLocation/",
+        takePositionLocation,
+        name="takePositionLocation",
+    ),
     # MANAGEMENT
     path(HOME + "robots/", getRobotList, name="getRobotList"),
     path(HOME + "robot/", robotDetail, name="robotDetail"),
@@ -133,11 +139,6 @@ urlpatterns = [
         name="getUsernameFromUserId",
     ),
     path("takePosition/", function.takePosition, name="takePosition"),
-    path(
-        "takePositionLocation/",
-        function.takePositionLocation,
-        name="takePositionLocation",
-    ),
     path("takePositionObject/", function.takePositionObject, name="takePositionObject"),
     path("locationExist/", function.locationExist, name="locationExist"),
     path("actionExist/", function.actionExist, name="actionExist"),

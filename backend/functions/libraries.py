@@ -11,6 +11,12 @@ from django.db.models import Q
 from json import loads
 from backend.utils.date import getDateTimeNow
 from django.contrib.auth.models import User
+from .robot import (
+    connect,
+    disconnect,
+    robot_getvar,
+)
+from pythonping import ping
 
 
 def getTaskList(request: HttpRequest) -> HttpResponse:
@@ -326,6 +332,42 @@ def myRobotDetail(request: HttpRequest) -> HttpResponse:
                     name=myRobot_name,
                 )
                 return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def takePositionLocation(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                robot_id = data.get("robot")
+                user_robot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=user_robot.robot.id)
+                ResponseList = ping(robot.ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
+                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                    position = {
+                        "X": "" + str(curr_pos[0]) + "",
+                        "Y": "" + str(curr_pos[1]) + "",
+                        "Z": "" + str(curr_pos[2]) + "",
+                        "RX": "" + str(curr_pos[3]) + "",
+                        "RY": "" + str(curr_pos[4]) + "",
+                        "RZ": "" + str(curr_pos[5]) + "",
+                        "FIG": "" + str(curr_pos[6]) + "",
+                    }
+                    disconnect(client, hCtrl, hRobot)
+                    return success_response(position)
+                else:
+                    return error_response(str("Robot not connected"))
             else:
                 return invalid_request_method
         else:

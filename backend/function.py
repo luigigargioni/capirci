@@ -829,37 +829,6 @@ def modifyTask(request: HttpRequest) -> HttpResponse:
         return HttpResponse("ERROR")
 
 
-def takePositionLocation(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        try:
-            user = request.POST.get("user")
-            robotname = request.POST.get("robotname")
-            if str(robotname).isdigit():
-                robot = UserRobot.objects.get(pk=robotname)
-                robot = Robot.objects.filter(name=robot.robot)
-            else:
-                robot = UserRobot.objects.filter(user=user).filter(name=robotname)
-                robot = Robot.objects.filter(name=robot[0].robot)
-            (client, hCtrl, hRobot) = connect(robot[0].ip, robot[0].port, 14400)
-            curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-            position = {
-                "X": "" + str(curr_pos[0]) + "",
-                "Y": "" + str(curr_pos[1]) + "",
-                "Z": "" + str(curr_pos[2]) + "",
-                "RX": "" + str(curr_pos[3]) + "",
-                "RY": "" + str(curr_pos[4]) + "",
-                "RZ": "" + str(curr_pos[5]) + "",
-                "FIG": "" + str(curr_pos[6]) + "",
-            }
-            json_result = dumps(position)
-            disconnect(client, hCtrl, hRobot)
-            return HttpResponse(json_result)
-        except Exception as e:
-            return HttpResponse(type(e).__name__)
-    else:
-        return HttpResponse("ERROR")
-
-
 def takePositionObject(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:

@@ -14,7 +14,11 @@ import {
 } from '@mui/material'
 import { Formik } from 'formik'
 import { toast } from 'react-toastify'
-import { string as YupString, object as YupObject } from 'yup'
+import {
+  string as YupString,
+  object as YupObject,
+  number as YupNumber,
+} from 'yup'
 
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
@@ -52,8 +56,26 @@ export const FormLocation = ({
       })
   }
 
-  const handleGetPosition = () => {
-    const a = 0
+  const handleGetPosition = (
+    robot: number,
+    setFieldValue: (field: string, value: any) => void,
+    setFieldError: (field: string, value: any) => void,
+    setFieldTouched: (field: string, touched: any) => void
+  ) => {
+    if (robot === -1) {
+      setFieldTouched('robot', true)
+      setFieldError('robot', MessageText.requiredField)
+      return
+    }
+    fetchApi({
+      url: endpoints.home.libraries.takePositionLocation,
+      method: MethodHTTP.POST,
+      body: { robot },
+    }).then((response) => {
+      if (response) {
+        setFieldValue('position', response.position)
+      }
+    })
   }
 
   return (
@@ -69,6 +91,10 @@ export const FormLocation = ({
         name: YupString()
           .max(255, MessageTextMaxLength(255))
           .required(MessageText.requiredField),
+        robot: YupNumber()
+          .required(MessageText.requiredField)
+          .min(0, MessageText.requiredField),
+        position: YupString().required(MessageText.requiredField),
       })}
       onSubmit={onSubmit}
     >
@@ -81,6 +107,8 @@ export const FormLocation = ({
         touched,
         values,
         setFieldValue,
+        setFieldError,
+        setFieldTouched,
       }) => (
         <form
           noValidate
@@ -119,7 +147,10 @@ export const FormLocation = ({
                     label="Robot"
                     name="robot"
                     onBlur={handleBlur}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      setFieldValue('robot', e.target.value)
+                      setFieldValue('position', '')
+                    }}
                     error={Boolean(touched.robot && errors.robot)}
                   >
                     {dataMyRobots?.map((myRobot) => (
@@ -156,7 +187,14 @@ export const FormLocation = ({
             <Grid item xs={2}>
               <Stack spacing={1}>
                 <Button
-                  onClick={() => handleGetPosition()}
+                  onClick={() =>
+                    handleGetPosition(
+                      values.robot,
+                      setFieldValue,
+                      setFieldError,
+                      setFieldTouched
+                    )
+                  }
                   color="primary"
                   aria-label="detail"
                   size="medium"
@@ -175,7 +213,13 @@ export const FormLocation = ({
                   name="position"
                   label="Position"
                   disabled
+                  error={Boolean(touched.position && errors.position)}
                 />
+                {touched.position && errors.position && (
+                  <FormHelperText error id="helper-text-position">
+                    {errors.position}
+                  </FormHelperText>
+                )}
               </Stack>
             </Grid>
             <Grid item xs={12}>
