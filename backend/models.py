@@ -218,5 +218,5 @@ class Action(models.Model):
             elif key == "shared":
                 response_data[key] = self.shared
             elif key == "robot":
-                response_data[key] = self.robot
+                response_data[key] = self.robot.id
         return response_data

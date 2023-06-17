@@ -4,7 +4,8 @@ export interface LocationType {
   shared: boolean
   position: string
   owner: number
+  owner__username: string
   robot: number
 }
 
-export type LocationDetailType = Omit<LocationType, 'owner'>
+export type LocationDetailType = Omit<LocationType, 'owner' | 'owner__username'>

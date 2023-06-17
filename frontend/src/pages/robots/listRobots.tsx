@@ -24,7 +24,7 @@ import {
   defaultPageSizeSelection,
   defaultPaginationConfig,
 } from 'utils/constants'
-import { RobotType } from './types'
+import { RobotModel, RobotType } from './types'
 
 const ListRobots = () => {
   const [tablePageSize, setTablePageSize] = useState(defaultPageSizeSelection)
@@ -76,6 +76,27 @@ const ListRobots = () => {
       key: 'name',
       title: 'Name',
       dataIndex: 'name',
+    },
+    {
+      key: 'ip',
+      title: 'IP',
+      dataIndex: 'ip',
+    },
+    {
+      key: 'model',
+      title: 'Model',
+      dataIndex: 'model',
+      render: (model) => RobotModel[model],
+    },
+    {
+      key: 'port',
+      title: 'Port',
+      dataIndex: 'port',
+    },
+    {
+      key: 'cameraip',
+      title: 'Camera IP',
+      dataIndex: 'cameraip',
     },
     {
       title: 'Operations',

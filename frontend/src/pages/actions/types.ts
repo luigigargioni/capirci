@@ -4,7 +4,12 @@ export interface ActionType {
   point: string
   shared: boolean
   owner: number
+  owner__username: string
   robot: number
+  robot__name: string
 }
 
-export type ActionDetailType = Omit<ActionType, 'owner' | 'robot'>
+export type ActionDetailType = Omit<
+  ActionType,
+  'owner' | 'owner__username' | 'robot__name'
+>

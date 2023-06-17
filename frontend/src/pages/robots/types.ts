@@ -6,3 +6,8 @@ export interface RobotType {
   model: string
   cameraip: string
 }
+
+export enum RobotModel {
+  C = 'Cobotta',
+  V = 'VS-060',
+}

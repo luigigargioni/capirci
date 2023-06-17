@@ -80,9 +80,9 @@ const ListLocations = () => {
       dataIndex: 'name',
     },
     {
-      key: 'owner',
+      key: 'owner__username',
       title: 'Owner',
-      dataIndex: 'owner',
+      dataIndex: 'owner__username',
     },
     {
       key: 'shared',

@@ -156,7 +156,14 @@ def getActionList(request: HttpRequest) -> HttpResponse:
                 username = request.user
                 user = User.objects.get(username=username)
                 actions = Action.objects.filter(Q(owner=user) | Q(shared=True)).values(
-                    "id", "name", "shared", "point", "robot", "owner"
+                    "id",
+                    "name",
+                    "shared",
+                    "point",
+                    "robot",
+                    "owner",
+                    "owner__username",
+                    "robot__name",
                 )
                 return success_response(actions)
             else:
@@ -173,7 +180,9 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 action_id = request.GET.get("id")
                 action = Action.objects.get(id=action_id)
-                action_fields = action.to_dict(["id", "name", "shared"])
+                action_fields = action.to_dict(
+                    ["id", "name", "shared", "robot", "point"]
+                )
                 return success_response(action_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)
@@ -185,11 +194,15 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
                 data = loads(request.body)
                 action_name = data.get("name")
                 action_shared = data.get("shared")
+                action_robot = UserRobot.objects.get(id=data.get("robot"))
+                action_point = data.get("point")
                 action_owner = User.objects.get(id=request.user.id)
                 Action.objects.create(
                     name=action_name,
                     owner=action_owner,
                     shared=action_shared,
+                    robot=action_robot,
+                    point=action_point,
                 )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
@@ -197,9 +210,13 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
                 action_id = data.get("id")
                 action_name = data.get("name")
                 action_shared = data.get("shared")
+                action_robot = UserRobot.objects.get(id=data.get("robot"))
+                action_point = data.get("point")
                 Action.objects.filter(id=action_id).update(
                     name=action_name,
                     shared=action_shared,
+                    robot=action_robot,
+                    point=action_point,
                 )
                 return success_response()
             else:
@@ -218,7 +235,15 @@ def getLocationList(request: HttpRequest) -> HttpResponse:
                 user = User.objects.get(username=username)
                 locations = Location.objects.filter(
                     Q(owner=user) | Q(shared=True)
-                ).values("id", "name", "shared", "position", "robot", "owner")
+                ).values(
+                    "id",
+                    "name",
+                    "shared",
+                    "position",
+                    "robot",
+                    "owner",
+                    "owner__username",
+                )
                 return success_response(locations)
             else:
                 return invalid_request_method
@@ -289,7 +314,7 @@ def getMyRobotList(request: HttpRequest) -> HttpResponse:
                 username = request.user
                 user = User.objects.get(username=username)
                 myRobots = UserRobot.objects.filter(Q(user=user)).values(
-                    "id", "name", "user", "robot"
+                    "id", "name", "robot__name", "robot"
                 )
                 return success_response(myRobots)
             else:
@@ -364,6 +389,50 @@ def takePositionLocation(request: HttpRequest) -> HttpResponse:
                         "RZ": "" + str(curr_pos[5]) + "",
                         "FIG": "" + str(curr_pos[6]) + "",
                     }
+                    disconnect(client, hCtrl, hRobot)
+                    return success_response(position)
+                else:
+                    return error_response(str("Robot not connected"))
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def takePointAction(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                robot_id = data.get("robot")
+                user_robot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=user_robot.robot.id)
+                ResponseList = ping(robot.ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
+                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                    position = (
+                        "::"
+                        + str(curr_pos[0])
+                        + ","
+                        + str(curr_pos[1])
+                        + ","
+                        + str(curr_pos[2])
+                        + ","
+                        + str(curr_pos[3])
+                        + ","
+                        + str(curr_pos[4])
+                        + ","
+                        + str(curr_pos[5])
+                        + ","
+                        + str(curr_pos[6])
+                        + "::"
+                    )
                     disconnect(client, hCtrl, hRobot)
                     return success_response(position)
                 else:

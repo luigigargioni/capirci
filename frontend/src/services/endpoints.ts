@@ -33,6 +33,7 @@ export const endpoints = {
       myRobots: `${HOME_API}/myRobots/`,
       myRobot: `${HOME_API}/myRobot/`,
       takePositionLocation: `${HOME_API}/takePositionLocation/`,
+      takePointAction: `${HOME_API}/takePointAction/`,
     },
     management: {
       users: `${HOME_API}/users/`,

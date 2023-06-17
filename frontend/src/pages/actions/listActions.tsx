@@ -80,9 +80,14 @@ const ListActions = () => {
       dataIndex: 'name',
     },
     {
-      key: 'owner',
+      key: 'owner__username',
       title: 'Owner',
-      dataIndex: 'owner',
+      dataIndex: 'owner__username',
+    },
+    {
+      key: 'robot__name',
+      title: 'Robot',
+      dataIndex: 'robot__name',
     },
     {
       key: 'shared',

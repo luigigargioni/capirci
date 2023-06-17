@@ -78,6 +78,11 @@ const ListMyRobots = () => {
       dataIndex: 'name',
     },
     {
+      key: 'robot__name',
+      title: 'Robot',
+      dataIndex: 'robot__name',
+    },
+    {
       title: 'Operations',
       key: 'operation',
       render: (_, record) => (
