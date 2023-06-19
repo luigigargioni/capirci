@@ -24,14 +24,15 @@ import {
   defaultPageSizeSelection,
   defaultPaginationConfig,
 } from 'utils/constants'
-import { UserType } from './types'
+import { formatDateTimeFrontend } from 'utils/date'
+import { UserListType } from './types'
 
 const ListUsers = () => {
   const [tablePageSize, setTablePageSize] = useState(defaultPageSizeSelection)
   const [tableCurrentPage, setTableCurrentPage] = useState(defaultCurrentPage)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { data, mutate, isLoading } = useSWR<UserType[], Error>({
+  const { data, mutate, isLoading } = useSWR<UserListType[], Error>({
     url: endpoints.home.management.users,
   })
 
@@ -40,12 +41,13 @@ const ListUsers = () => {
     navigate(`/user/${id}`)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDisable = (id: number, updatedActive: boolean) => {
     fetchApi({
       url: endpoints.home.management.user,
       method: MethodHTTP.DELETE,
       body: {
         id,
+        active: updatedActive,
       },
     }).then(() => {
       toast.success(MessageText.success)
@@ -56,7 +58,7 @@ const ListUsers = () => {
     })
   }
 
-  const columns: TableColumnsType<UserType> = [
+  const columns: TableColumnsType<UserListType> = [
     {
       key: 'detail',
       title: 'Detail',
@@ -78,18 +80,53 @@ const ListUsers = () => {
       dataIndex: 'username',
     },
     {
+      key: 'email',
+      title: 'Email',
+      dataIndex: 'email',
+    },
+    {
+      key: 'role',
+      title: 'Role',
+      dataIndex: 'role',
+    },
+    {
+      key: 'last_login',
+      title: 'Last login',
+      dataIndex: 'last_login',
+      render: (_, record) => formatDateTimeFrontend(record.last_login),
+    },
+    {
+      key: 'date_joined',
+      title: 'Date joined',
+      dataIndex: 'date_joined',
+      render: (_, record) => formatDateTimeFrontend(record.date_joined),
+    },
+    {
+      key: 'is_active',
+      title: 'Active',
+      dataIndex: 'is_active',
+      render: (active) => {
+        if (active > 0) {
+          return iconMap.successData
+        }
+        return iconMap.deleteCircle
+      },
+    },
+    {
       title: 'Operations',
       key: 'operation',
       render: (_, record) => (
         <Space size="middle">
           <Popconfirm
-            title="Delete?"
-            onConfirm={() => handleDelete(record.id)}
+            title={record.is_active ? 'Disable' : 'Enable'}
+            onConfirm={() => handleDisable(record.id, !record.is_active)}
             okText="Ok"
             cancelText="Cancel"
             icon={iconMap.deleteCircle}
           >
-            <Button color="error">Delete</Button>
+            <Button color="error">
+              {record.is_active ? 'Disable' : 'Enable'}
+            </Button>
           </Popconfirm>
         </Space>
       ),

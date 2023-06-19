@@ -9,14 +9,14 @@ import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
 import { backgroundForm } from 'themes/theme'
 import { FormUser } from './formUser'
-import { UserType } from './types'
+import { UserListType } from './types'
 
 const DetailUser = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<UserType, Error>(
+  const { data, isLoading } = useSWR<UserListType, Error>(
     !insertMode ? { url: endpoints.home.management.user, body: { id } } : null
   )
 

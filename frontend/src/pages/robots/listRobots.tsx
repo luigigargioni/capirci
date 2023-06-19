@@ -78,15 +78,15 @@ const ListRobots = () => {
       dataIndex: 'name',
     },
     {
-      key: 'ip',
-      title: 'IP',
-      dataIndex: 'ip',
-    },
-    {
       key: 'model',
       title: 'Model',
       dataIndex: 'model',
       render: (model) => RobotModel[model],
+    },
+    {
+      key: 'ip',
+      title: 'IP',
+      dataIndex: 'ip',
     },
     {
       key: 'port',

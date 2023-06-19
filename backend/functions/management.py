@@ -8,14 +8,30 @@ from backend.utils.response import (
 )
 from backend.models import Robot
 from json import loads
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.db.models import OuterRef, Subquery
 
 
 def getUserList(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                users = User.objects.values("id", "username")
+                users = (
+                    User.objects.filter(is_superuser=False)
+                    .values(
+                        "id",
+                        "username",
+                        "last_login",
+                        "email",
+                        "is_active",
+                        "date_joined",
+                    )
+                    .annotate(
+                        role=Subquery(
+                            Group.objects.filter(user=OuterRef("id")).values("name")[:1]
+                        )
+                    )
+                )
                 return success_response(users)
             else:
                 return invalid_request_method
@@ -31,15 +47,22 @@ def userDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 user_id = request.GET.get("id")
                 user = User.objects.get(id=user_id)
+                group = user.groups.values("name")[0]["name"]
                 user_fields = {}
                 user_fields["id"] = user.id
                 user_fields["username"] = user.username
+                user_fields["first_name"] = user.first_name
+                user_fields["last_name"] = user.last_name
+                user_fields["email"] = user.email
+                user_fields["role"] = group
                 return success_response(user_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)
                 user_id = data.get("id")
-                user = User.objects.filter(id=user_id)
-                user.delete()
+                user_active = data.get("active")
+                user = User.objects.filter(id=user_id).update(
+                    is_active=user_active,
+                )
                 return success_response()
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)

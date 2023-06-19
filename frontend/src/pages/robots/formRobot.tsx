@@ -114,7 +114,7 @@ export const FormRobot = ({
                   <Select
                     labelId="model-label"
                     id="model"
-                    value={values.model || null}
+                    value={values.model || ''}
                     label="Model"
                     name="model"
                     onBlur={handleBlur}
