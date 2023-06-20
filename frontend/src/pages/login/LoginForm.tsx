@@ -17,10 +17,12 @@ import { Formik } from 'formik'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { USER_GROUP, defaultPath } from 'utils/constants'
+import { USER_GROUP, defaultOpenItem, defaultPath } from 'utils/constants'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { LocalStorageKey, setToLocalStorage } from 'utils/localStorageUtils'
+import { useDispatch } from 'react-redux'
+import { activeItem } from 'store/reducers/menu'
 
 export interface UserLoginInterface {
   id: string
@@ -35,6 +37,7 @@ interface LoginFormProps {
 export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const onSubmit = async (
     values: {
@@ -62,6 +65,7 @@ export const LoginForm = ({ setResetPassword }: LoginFormProps) => {
         if (!authError) {
           setToLocalStorage(LocalStorageKey.USER, { username, id, group })
           navigate(defaultPath)
+          dispatch(activeItem(defaultOpenItem))
           setStatus({ success: true })
           return
         }
