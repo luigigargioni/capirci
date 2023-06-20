@@ -124,7 +124,7 @@ const ListUsers = () => {
             cancelText="Cancel"
             icon={iconMap.deleteCircle}
           >
-            <Button color="error">
+            <Button color={record.is_active ? 'error' : 'primary'}>
               {record.is_active ? 'Disable' : 'Enable'}
             </Button>
           </Popconfirm>

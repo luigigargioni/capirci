@@ -10,6 +10,7 @@ from backend.models import Robot
 from json import loads
 from django.contrib.auth.models import User, Group
 from django.db.models import OuterRef, Subquery
+from django.contrib.auth import update_session_auth_hash
 
 
 def getUserList(request: HttpRequest) -> HttpResponse:
@@ -47,7 +48,7 @@ def userDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 user_id = request.GET.get("id")
                 user = User.objects.get(id=user_id)
-                group = user.groups.values("name")[0]["name"]
+                group = user.groups.values("id")[0]["id"]
                 user_fields = {}
                 user_fields["id"] = user.id
                 user_fields["username"] = user.username
@@ -67,17 +68,45 @@ def userDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)
                 user_name = data.get("username")
-                User.objects.create(
+                user_email = data.get("email")
+                user_first_name = data.get("first_name")
+                user_last_name = data.get("last_name")
+                user_role = data.get("role")
+                new_user = User.objects.create(
                     username=user_name,
+                    email=user_email,
+                    first_name=user_first_name,
+                    last_name=user_last_name,
                 )
+                new_user.set_password("test")
+                new_user.save()
+                update_session_auth_hash(request, new_user)
+                group = Group.objects.get(id=user_role)
+                group.user_set.add(new_user)
                 return success_response()
             if request.method == HttpMethod.PUT.value:
                 data = loads(request.body)
                 user_id = data.get("id")
                 user_name = data.get("username")
-                User.objects.filter(id=user_id).update(
+                user_email = data.get("email")
+                user_first_name = data.get("first_name")
+                user_last_name = data.get("last_name")
+                user_role = data.get("role")
+                user = User.objects.filter(id=user_id)
+                user.update(
                     username=user_name,
+                    email=user_email,
+                    first_name=user_first_name,
+                    last_name=user_last_name,
                 )
+                user = User.objects.get(id=user_id)
+                old_group_id = user.groups.values("id")[0]["id"]
+                if old_group_id != user_role:
+                    user.groups.clear()
+                    old_group = Group.objects.get(id=old_group_id)
+                    old_group.user_set.remove(user)
+                    new_group = Group.objects.get(id=user_role)
+                    new_group.user_set.add(user)
                 return success_response()
             else:
                 return invalid_request_method
@@ -150,6 +179,20 @@ def robotDetail(request: HttpRequest) -> HttpResponse:
                     cameraip=robot_cameraip,
                 )
                 return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getGroupList(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.GET.value:
+                groups = Group.objects.values("id", "name")
+                return success_response(groups)
             else:
                 return invalid_request_method
         else:

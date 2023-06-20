@@ -20,6 +20,7 @@ from .functions.management import (
     robotDetail,
     getUserList,
     userDetail,
+    getGroupList,
 )
 from . import function
 from django.conf import settings
@@ -61,6 +62,7 @@ urlpatterns = [
     path(HOME + "robot/", robotDetail, name="robotDetail"),
     path(HOME + "users/", getUserList, name="getUserList"),
     path(HOME + "user/", userDetail, name="userDetail"),
+    path(HOME + "groups/", getGroupList, name="getGroupList"),
     # Views
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
     re_path(r"^.*$", TemplateView.as_view(template_name="base.html")),

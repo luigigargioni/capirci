@@ -5,4 +5,4 @@ export interface MyRobotType {
   robot_name: string
 }
 
-export type MyRobotDetailType = Omit<MyRobotType, 'robot'>
+export type MyRobotDetailType = Omit<MyRobotType, 'robot_name'>

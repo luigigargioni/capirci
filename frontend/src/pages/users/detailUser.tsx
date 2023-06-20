@@ -9,21 +9,32 @@ import { endpoints } from 'services/endpoints'
 import { activeItem } from 'store/reducers/menu'
 import { backgroundForm } from 'themes/theme'
 import { FormUser } from './formUser'
-import { UserListType } from './types'
+import { RoleType, UserDetailType } from './types'
 
 const DetailUser = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const insertMode = id === 'add'
-  const { data, isLoading } = useSWR<UserListType, Error>(
-    !insertMode ? { url: endpoints.home.management.user, body: { id } } : null
-  )
+  const { data: dataUser, isLoading: isLoadingUser } = useSWR<
+    UserDetailType,
+    Error
+  >(!insertMode ? { url: endpoints.home.management.user, body: { id } } : null)
 
   const backFunction = () => {
     dispatch(activeItem('users'))
     navigate('/users')
   }
+
+  const { data: dataRoles, isLoading: isLoadingRoles } = useSWR<
+    RoleType[],
+    Error
+  >({
+    url: endpoints.home.management.groups,
+  })
+
+  const isLoading = isLoadingUser || isLoadingRoles
+  const data = dataUser && dataRoles
 
   return (
     <MainCard
@@ -35,7 +46,8 @@ const DetailUser = () => {
       {data === null && <Typography>User with ID {id} not found</Typography>}
       {(data || insertMode) && (
         <FormUser
-          data={data}
+          dataUser={dataUser}
+          dataRoles={dataRoles || []}
           insertMode={insertMode}
           backFunction={backFunction}
         />

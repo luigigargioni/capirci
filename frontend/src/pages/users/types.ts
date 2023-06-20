@@ -16,3 +16,8 @@ export interface UserDetailType {
   last_name: string
   role: number
 }
+
+export interface RoleType {
+  id: number
+  name: string
+}

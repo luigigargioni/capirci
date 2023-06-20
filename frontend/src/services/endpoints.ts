@@ -40,6 +40,7 @@ export const endpoints = {
       user: `${HOME_API}/user/`,
       robots: `${HOME_API}/robots/`,
       robot: `${HOME_API}/robot/`,
+      groups: `${HOME_API}/groups/`,
     },
     programming: {},
   },

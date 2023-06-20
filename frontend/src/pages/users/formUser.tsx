@@ -1,21 +1,41 @@
 import React from 'react'
-import { Button, FormHelperText, Grid, Stack, TextField } from '@mui/material'
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { Formik } from 'formik'
 import { toast } from 'react-toastify'
-import { string as YupString, object as YupObject } from 'yup'
+import {
+  string as YupString,
+  object as YupObject,
+  number as YupNumber,
+} from 'yup'
 
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { UserDetailType } from './types'
+import { RoleType, UserDetailType } from './types'
 
 interface FormUserProps {
-  data: UserDetailType | undefined
+  dataUser: UserDetailType | undefined
+  dataRoles: RoleType[]
   insertMode: boolean
   backFunction: () => void
 }
 
-export const FormUser = ({ data, insertMode, backFunction }: FormUserProps) => {
+export const FormUser = ({
+  dataUser,
+  dataRoles,
+  insertMode,
+  backFunction,
+}: FormUserProps) => {
   const onSubmit = async (
     values: UserDetailType,
     { setStatus, setSubmitting }
@@ -35,17 +55,23 @@ export const FormUser = ({ data, insertMode, backFunction }: FormUserProps) => {
   return (
     <Formik
       initialValues={{
-        id: data?.id || -1,
-        username: data?.username || '',
-        email: data?.email || '',
-        first_name: data?.first_name || '',
-        last_name: data?.last_name || '',
-        role: data?.role || -1,
+        id: dataUser?.id || -1,
+        username: dataUser?.username || '',
+        email: dataUser?.email || '',
+        first_name: dataUser?.first_name || '',
+        last_name: dataUser?.last_name || '',
+        role: dataUser?.role || -1,
       }}
       validationSchema={YupObject().shape({
         username: YupString()
           .max(255, MessageTextMaxLength(255))
           .required(MessageText.requiredField),
+        role: YupNumber()
+          .required(MessageText.requiredField)
+          .min(0, MessageText.requiredField),
+        email: YupString()
+          .email(MessageText.emailNotValid)
+          .max(255, MessageTextMaxLength(255)),
       })}
       onSubmit={onSubmit}
     >
@@ -82,6 +108,76 @@ export const FormUser = ({ data, insertMode, backFunction }: FormUserProps) => {
                     {errors.username}
                   </FormHelperText>
                 )}
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <TextField
+                  id="email"
+                  value={values.email || ''}
+                  name="email"
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  error={Boolean(touched.email && errors.email)}
+                />
+                {touched.email && errors.email && (
+                  <FormHelperText error id="helper-text-email">
+                    {errors.email}
+                  </FormHelperText>
+                )}
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <TextField
+                  id="first_name"
+                  value={values.first_name || ''}
+                  name="first_name"
+                  label="First name"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <TextField
+                  id="last_name"
+                  value={values.last_name || ''}
+                  name="last_name"
+                  label="Last name"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={4}>
+              <Stack spacing={1}>
+                <FormControl fullWidth>
+                  <InputLabel id="role-label">Role</InputLabel>
+                  <Select
+                    labelId="role-label"
+                    id="role"
+                    value={values.role || -1}
+                    label="Role"
+                    name="role"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    error={Boolean(touched.role && errors.role)}
+                  >
+                    {dataRoles?.map((role) => (
+                      <MenuItem value={role.id} key={role.id}>
+                        {role.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {touched.role && errors.role && (
+                    <FormHelperText error id="helper-text-role">
+                      {errors.role}
+                    </FormHelperText>
+                  )}
+                </FormControl>
               </Stack>
             </Grid>
             <Grid item xs={12}>
