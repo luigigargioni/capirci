@@ -17,6 +17,8 @@ import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BuildOutlined } from '@ant-design/icons'
+import { useDispatch } from 'react-redux'
+import { activeItem } from 'store/reducers/menu'
 import { TaskDetailType } from './types'
 
 export enum TypeNewTask {
@@ -32,6 +34,7 @@ interface FormTaskProps {
 
 export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [searchParams] = useSearchParams()
   const type = searchParams.get('type')
 
@@ -97,7 +100,10 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
               <Grid item xs={1}>
                 <Stack spacing={1}>
                   <Button
-                    onClick={() => navigate(`/graphic/${values.id}`)}
+                    onClick={() => {
+                      dispatch(activeItem('programminggraphical'))
+                      navigate(`/graphic/${values.id}`)
+                    }}
                     color="primary"
                     aria-label="detail"
                     size="medium"

@@ -14,7 +14,7 @@ export interface UserDetailType {
   email: string
   first_name: string
   last_name: string
-  role: number
+  role: number | null
 }
 
 export interface RoleType {

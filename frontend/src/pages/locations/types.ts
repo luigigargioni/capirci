@@ -5,7 +5,7 @@ export interface LocationType {
   position: string
   owner: number
   owner__username: string
-  robot: number
+  robot: number | null
 }
 
 export type LocationDetailType = Omit<LocationType, 'owner' | 'owner__username'>

@@ -60,7 +60,7 @@ export const FormUser = ({
         email: dataUser?.email || '',
         first_name: dataUser?.first_name || '',
         last_name: dataUser?.last_name || '',
-        role: dataUser?.role || -1,
+        role: dataUser?.role || null,
       }}
       validationSchema={YupObject().shape({
         username: YupString()

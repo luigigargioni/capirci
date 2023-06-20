@@ -57,7 +57,7 @@ export const FormLocation = ({
   }
 
   const handleGetPosition = (
-    robot: number,
+    robot: number | null,
     setFieldValue: (field: string, value: any) => void,
     setFieldError: (field: string, value: any) => void,
     setFieldTouched: (field: string, touched: any) => void
@@ -85,7 +85,7 @@ export const FormLocation = ({
         name: dataLocation?.name || '',
         shared: dataLocation?.shared || false,
         position: dataLocation?.position || '',
-        robot: dataLocation?.robot || -1,
+        robot: dataLocation?.robot || null,
       }}
       validationSchema={YupObject().shape({
         name: YupString()
@@ -143,7 +143,7 @@ export const FormLocation = ({
                   <Select
                     labelId="robot-id-label"
                     id="robot"
-                    value={values.robot || null}
+                    value={values.robot || ''}
                     label="Robot"
                     name="robot"
                     onBlur={handleBlur}

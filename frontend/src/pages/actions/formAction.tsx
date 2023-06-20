@@ -58,7 +58,7 @@ export const FormAction = ({
         name: dataAction?.name || '',
         shared: dataAction?.shared || false,
         point: dataAction?.point || '',
-        robot: dataAction?.robot || -1,
+        robot: dataAction?.robot || null,
       }}
       validationSchema={YupObject().shape({
         name: YupString()
@@ -110,7 +110,7 @@ export const FormAction = ({
                   <Select
                     labelId="robot-id-label"
                     id="robot"
-                    value={values.robot || null}
+                    value={values.robot || ''}
                     label="Robot"
                     name="robot"
                     onBlur={handleBlur}

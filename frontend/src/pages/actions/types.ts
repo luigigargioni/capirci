@@ -5,7 +5,7 @@ export interface ActionType {
   shared: boolean
   owner: number
   owner__username: string
-  robot: number
+  robot: number | null
   robot__name: string
 }
 
