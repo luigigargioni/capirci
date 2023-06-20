@@ -60,6 +60,7 @@ export const PublicRoute = ({ children }: ProtectedRouteProps) => {
 }
 
 export const GroupRoute = ({ children }: ProtectedRouteProps) => {
+  // TODO - implement group route
   // const { role } = getFromLocalStorage(LocalStorageKey.USER)
 
   /*
