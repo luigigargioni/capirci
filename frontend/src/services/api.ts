@@ -59,14 +59,18 @@ export const fetchApi = async ({
             toast.error(MessageText.noConnection)
             break
           case 400:
-            toast.error(err.message)
-            throw err
+            toast.error(MessageText.badRequest)
+            break
+          case 403:
+            toast.error(MessageText.forbidden)
+            break
           case 500:
             toast.error(err.message)
             break
           default:
             toast.error(err.message)
         }
+        throw err
       }
       return null
     })

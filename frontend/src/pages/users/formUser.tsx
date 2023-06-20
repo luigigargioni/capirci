@@ -159,7 +159,7 @@ export const FormUser = ({
                   <Select
                     labelId="role-label"
                     id="role"
-                    value={values.role || -1}
+                    value={values.role || ''}
                     label="Role"
                     name="role"
                     onBlur={handleBlur}

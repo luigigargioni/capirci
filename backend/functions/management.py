@@ -199,3 +199,22 @@ def getGroupList(request: HttpRequest) -> HttpResponse:
             return unauthorized_request()
     except Exception as e:
         return error_response(str(e))
+
+
+def resetPassword(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                user_id = data.get("id")
+                user = User.objects.get(id=user_id)
+                user.set_password("reset")
+                user.save()
+                update_session_auth_hash(request, user)
+                return success_response()
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))

@@ -9,8 +9,10 @@ from backend.utils.response import (
 )
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User, Group
+from django.views.decorators.csrf import csrf_exempt
 
 
+@csrf_exempt
 def login_func(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:

@@ -38,6 +38,7 @@ export const endpoints = {
     management: {
       users: `${HOME_API}/users/`,
       user: `${HOME_API}/user/`,
+      resetPassword: `${HOME_API}/resetPassword/`,
       robots: `${HOME_API}/robots/`,
       robot: `${HOME_API}/robot/`,
       groups: `${HOME_API}/groups/`,

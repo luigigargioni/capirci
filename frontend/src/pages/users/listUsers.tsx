@@ -52,10 +52,17 @@ const ListUsers = () => {
     }).then(() => {
       toast.success(MessageText.success)
       mutate()
-      if (data?.length === 1 && tableCurrentPage > 1) {
-        setTableCurrentPage(tableCurrentPage - 1)
-      }
     })
+  }
+
+  const handleResetPassword = (id: number) => {
+    fetchApi({
+      url: endpoints.home.management.resetPassword,
+      method: MethodHTTP.POST,
+      body: {
+        id,
+      },
+    }).then(() => toast.success(MessageText.success))
   }
 
   const columns: TableColumnsType<UserListType> = [
@@ -118,7 +125,16 @@ const ListUsers = () => {
       render: (_, record) => (
         <Space size="middle">
           <Popconfirm
-            title={record.is_active ? 'Disable' : 'Enable'}
+            title="Reset password?"
+            onConfirm={() => handleResetPassword(record.id)}
+            okText="Ok"
+            cancelText="Cancel"
+            icon={iconMap.deleteCircle}
+          >
+            <Button>Reset password</Button>
+          </Popconfirm>
+          <Popconfirm
+            title={record.is_active ? 'Disable?' : 'Enable?'}
             onConfirm={() => handleDisable(record.id, !record.is_active)}
             okText="Ok"
             cancelText="Cancel"

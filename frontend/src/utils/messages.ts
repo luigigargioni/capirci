@@ -17,10 +17,12 @@ export enum MessageText {
   success = 'Operation completed successfully',
   valueNotValid = 'Invalid value',
   invalidDate = 'The start date must be before the end date',
-  }
+  forbidden = 'Forbidden',
+  badRequest = 'Bad request',
+}
 
-  export const MessageTextMinLength = (minLength: number) =>
+export const MessageTextMinLength = (minLength: number) =>
   `Minimum length ${minLength} characters`
-  
-  export const MessageTextMaxLength = (maxLength: number) =>
+
+export const MessageTextMaxLength = (maxLength: number) =>
   `Maximum length ${maxLength} characters`

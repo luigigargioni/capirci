@@ -28,7 +28,7 @@ export const ProtectedRoute = ({
       method: MethodHTTP.POST,
       body: { id: getFromLocalStorage(LocalStorageKey.USER).id },
     }).then((res) => {
-      if (!res.authError) {
+      if (res && !res.authError) {
         const userInfo: UserLoginInterface = {
           id: res.id,
           username: res.username,
