@@ -51,7 +51,7 @@ export const FormObject = ({
         name: data?.name || '',
         shared: data?.shared || false,
         force: data?.force || 0,
-        height: data?.height || 100,
+        height: data?.height || null,
         keywords: data?.keywords || '',
       }}
       validationSchema={YupObject().shape({
@@ -112,6 +112,25 @@ export const FormObject = ({
                   }
                   label="Shared"
                 />
+              </Stack>
+            </Grid>
+            <Grid item xs={3}>
+              <Stack spacing={1}>
+                <TextField
+                  id="height"
+                  value={values.height || ''}
+                  name="height"
+                  label="Height"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  disabled
+                  error={Boolean(touched.height && errors.height)}
+                />
+                {touched.height && errors.height && (
+                  <FormHelperText error id="helper-text-height">
+                    {errors.height}
+                  </FormHelperText>
+                )}
               </Stack>
             </Grid>
             <Grid item xs={12}>

@@ -25,7 +25,13 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 username = request.user
                 tasks = Task.objects.filter(Q(owner=username) | Q(shared=True)).values(
-                    "id", "name", "description", "last_modified", "owner", "shared"
+                    "id",
+                    "name",
+                    "description",
+                    "last_modified",
+                    "owner",
+                    "owner__username",
+                    "shared",
                 )
                 return success_response(tasks)
             else:
@@ -112,7 +118,9 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 object_id = request.GET.get("id")
                 object = Object.objects.get(id=object_id)
-                object_fields = object.to_dict(["id", "name", "keywords", "shared"])
+                object_fields = object.to_dict(
+                    ["id", "name", "keywords", "shared", "force", "height"]
+                )
                 return success_response(object_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)
@@ -331,7 +339,7 @@ def myRobotDetail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 myRobot_id = request.GET.get("id")
                 myRobot = UserRobot.objects.get(id=myRobot_id)
-                myRobot_fields = myRobot.to_dict(["id", "name"])
+                myRobot_fields = myRobot.to_dict(["id", "name", "robot"])
                 return success_response(myRobot_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)

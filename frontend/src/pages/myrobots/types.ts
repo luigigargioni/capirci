@@ -1,7 +1,7 @@
 export interface MyRobotType {
   id: number
   name: string
-  robot: number
+  robot: number | null
   robot_name: string
 }
 

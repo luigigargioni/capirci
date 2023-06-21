@@ -13,7 +13,7 @@ from enum import Enum
 class Task(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
-    owner = models.CharField(max_length=200, default=None, null=True, blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = models.CharField(max_length=200, default=None, null=True, blank=True)
     last_modified = models.DateTimeField(default=now)
     shared = models.BooleanField(default=False)
@@ -150,7 +150,7 @@ class UserRobot(models.Model):
             elif key == "user":
                 response_data[key] = self.user
             elif key == "robot":
-                response_data[key] = self.robot
+                response_data[key] = self.robot.id
         return response_data
 
 

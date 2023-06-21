@@ -74,7 +74,7 @@ const ListTasks = () => {
           onClick={() => handleDetail(record.id)}
           color="primary"
           aria-label="detail"
-          disabled={record.owner !== getFromLocalStorage('user')?.username}
+          disabled={record.owner !== getFromLocalStorage('user')?.id}
         >
           <EyeOutlined style={{ fontSize: '2em' }} />
         </IconButton>
@@ -91,9 +91,9 @@ const ListTasks = () => {
       dataIndex: 'description',
     },
     {
-      key: 'owner',
+      key: 'owner__username',
       title: 'Owner',
-      dataIndex: 'owner',
+      dataIndex: 'owner__username',
     },
     {
       key: 'shared',
@@ -119,7 +119,7 @@ const ListTasks = () => {
         <Space size="middle">
           <Button
             onClick={() => handleEdit(record.id)}
-            disabled={record.owner !== getFromLocalStorage('user')?.username}
+            disabled={record.owner !== getFromLocalStorage('user')?.id}
           >
             Edit
           </Button>
@@ -132,7 +132,7 @@ const ListTasks = () => {
           >
             <Button
               color="error"
-              disabled={record.owner !== getFromLocalStorage('user')?.username}
+              disabled={record.owner !== getFromLocalStorage('user')?.id}
             >
               Delete
             </Button>

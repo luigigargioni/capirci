@@ -3,7 +3,7 @@ export interface ObjectType {
   name: string
   shared: boolean
   force: number
-  height: number
+  height: number | null
   owner: string
   keywords: string
 }
