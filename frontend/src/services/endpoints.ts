@@ -34,6 +34,7 @@ export const endpoints = {
       myRobot: `${HOME_API}/myRobot/`,
       takePositionLocation: `${HOME_API}/takePositionLocation/`,
       takePointAction: `${HOME_API}/takePointAction/`,
+      takeObjectHeight: `${HOME_API}/takeObjectHeight/`,
     },
     management: {
       users: `${HOME_API}/users/`,

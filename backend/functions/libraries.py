@@ -132,11 +132,17 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 data = loads(request.body)
                 object_name = data.get("name")
                 object_shared = data.get("shared")
+                object_force = data.get("force")
+                object_height = data.get("height")
+                object_keywords = data.get("keywords")
                 object_owner = User.objects.get(id=request.user.id)
                 Object.objects.create(
                     name=object_name,
                     owner=object_owner,
                     shared=object_shared,
+                    force=object_force,
+                    height=object_height,
+                    keywords=object_keywords,
                 )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
@@ -144,9 +150,15 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 object_id = data.get("id")
                 object_name = data.get("name")
                 object_shared = data.get("shared")
+                object_force = data.get("force")
+                object_height = data.get("height")
+                object_keywords = data.get("keywords")
                 Object.objects.filter(id=object_id).update(
                     name=object_name,
                     shared=object_shared,
+                    force=object_force,
+                    height=object_height,
+                    keywords=object_keywords,
                 )
                 return success_response()
             else:
@@ -389,13 +401,13 @@ def takePositionLocation(request: HttpRequest) -> HttpResponse:
                     (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
                     curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
                     position = {
-                        "X": "" + str(curr_pos[0]) + "",
-                        "Y": "" + str(curr_pos[1]) + "",
-                        "Z": "" + str(curr_pos[2]) + "",
-                        "RX": "" + str(curr_pos[3]) + "",
-                        "RY": "" + str(curr_pos[4]) + "",
-                        "RZ": "" + str(curr_pos[5]) + "",
-                        "FIG": "" + str(curr_pos[6]) + "",
+                        "X": +curr_pos[0],
+                        "Y": +curr_pos[1],
+                        "Z": +curr_pos[2],
+                        "RX": +curr_pos[3],
+                        "RY": +curr_pos[4],
+                        "RZ": +curr_pos[5],
+                        "FIG": +curr_pos[6],
                     }
                     disconnect(client, hCtrl, hRobot)
                     return success_response(position)
@@ -443,6 +455,34 @@ def takePointAction(request: HttpRequest) -> HttpResponse:
                     )
                     disconnect(client, hCtrl, hRobot)
                     return success_response(position)
+                else:
+                    return error_response(str("Robot not connected"))
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def takeObjectHeight(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                robot_id = data.get("robot")
+                user_robot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=user_robot.robot.id)
+                ResponseList = ping(robot.ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
+                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                    response = {"height": str(curr_pos[2])}
+                    disconnect(client, hCtrl, hRobot)
+                    return success_response(response)
                 else:
                     return error_response(str("Robot not connected"))
             else:

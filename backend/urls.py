@@ -14,6 +14,7 @@ from .functions.libraries import (
     myRobotDetail,
     takePositionLocation,
     takePointAction,
+    takeObjectHeight,
 )
 from .functions.management import (
     getRobotList,
@@ -58,6 +59,7 @@ urlpatterns = [
         name="takePositionLocation",
     ),
     path(HOME + "takePointAction/", takePointAction, name="takePointAction"),
+    path(HOME + "takeObjectHeight/", takeObjectHeight, name="takeObjectHeight"),
     # MANAGEMENT
     path(HOME + "robots/", getRobotList, name="getRobotList"),
     path(HOME + "robot/", robotDetail, name="robotDetail"),

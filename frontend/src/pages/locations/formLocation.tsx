@@ -84,7 +84,7 @@ export const FormLocation = ({
         id: dataLocation?.id || -1,
         name: dataLocation?.name || '',
         shared: dataLocation?.shared || false,
-        position: dataLocation?.position || '',
+        position: dataLocation?.position || null,
         robot: dataLocation?.robot || null,
       }}
       validationSchema={YupObject().shape({
@@ -209,7 +209,7 @@ export const FormLocation = ({
               <Stack spacing={1}>
                 <TextField
                   id="position"
-                  value={values.position || ''}
+                  value={values.position?.toString() || ''}
                   name="position"
                   label="Position"
                   disabled

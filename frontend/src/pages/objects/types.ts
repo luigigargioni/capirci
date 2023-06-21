@@ -4,8 +4,9 @@ export interface ObjectType {
   shared: boolean
   force: number
   height: number | null
-  owner: string
-  keywords: string
+  owner: number
+  keywords: string[]
+  robot: number | null
 }
 
 export type ObjectDetailType = Omit<ObjectType, 'owner'>

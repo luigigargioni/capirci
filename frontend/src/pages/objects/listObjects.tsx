@@ -88,6 +88,17 @@ const ListObjects = () => {
       key: 'keywords',
       title: 'Keywords',
       dataIndex: 'keywords',
+      render: (keywords: string[]) => {
+        if (!keywords) return ''
+        return (
+          <ul style={{ marginBottom: 0 }}>
+            {keywords.map((keyword) => {
+              if (!keyword) return null
+              return <li key={keyword}>{keyword}</li>
+            })}
+          </ul>
+        )
+      },
     },
     {
       key: 'shared',

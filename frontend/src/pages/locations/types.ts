@@ -1,8 +1,18 @@
+export type PositionType = {
+  X: number
+  Y: number
+  Z: number
+  RX: number
+  RY: number
+  RZ: number
+  FIG: number
+}
+
 export interface LocationType {
   id: number
   name: string
   shared: boolean
-  position: string
+  position: PositionType | null
   owner: number
   owner__username: string
   robot: number | null
