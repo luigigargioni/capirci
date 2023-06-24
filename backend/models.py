@@ -60,6 +60,9 @@ class Object(models.Model):
     shared = models.BooleanField(default=False)
     force = models.IntegerField(default=2)
     height = models.FloatField(default=50)
+    photo = models.TextField(default=None, null=True, editable=True, blank=True)
+    contour = models.TextField(default=None, null=True, editable=True, blank=True)
+    shape = models.TextField(default=None, null=True, editable=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Objects"
@@ -84,6 +87,12 @@ class Object(models.Model):
                 response_data[key] = self.force
             elif key == "height":
                 response_data[key] = self.height
+            elif key == "photo":
+                response_data[key] = self.photo
+            elif key == "contour":
+                response_data[key] = self.contour
+            elif key == "shape":
+                response_data[key] = self.shape
         return response_data
 
 

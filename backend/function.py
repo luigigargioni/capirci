@@ -1607,6 +1607,7 @@ def search_object(
     )
     caoRobot = ctrl.AddRobot("robot0", "")
 
+    # TODO add converter image b64
     original = cv2.imread(
         "backend\\static\\images\\objects\\"
         + username
@@ -1615,6 +1616,7 @@ def search_object(
         + "_shape.png",
         cv2.IMREAD_GRAYSCALE,
     )
+
     (cnts, _) = cv2.findContours(
         original.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
     )

@@ -36,6 +36,12 @@ class CameraResolution(Enum):
     HEIGHT = 1080
 
 
+INITIAL_POSITION = """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
+                                    179.99584205147127, 261.0)"""
+DEFAULT_TIMEOUT = 14400
+MAX_SPEED = "SPEED=100"
+
+
 def polar_to_robot_coordinates(angle, robot_x, robot_y, module=CAMERA_ROBOT_DISTANCE):
     offset_x = module * cos(radians(angle))
     offset_y = -module * sin(radians(angle))

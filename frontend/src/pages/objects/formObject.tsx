@@ -1,7 +1,9 @@
 import React from 'react'
 import {
   Button,
+  CardMedia,
   Checkbox,
+  Divider,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -76,6 +78,30 @@ export const FormObject = ({
     })
   }
 
+  const handleGetPhoto = (
+    robot: number | null,
+    setFieldValue: (field: string, value: any) => void,
+    setFieldError: (field: string, value: any) => void,
+    setFieldTouched: (field: string, touched: any) => void
+  ) => {
+    if (!robot) {
+      setFieldTouched('robot', true)
+      setFieldError('robot', MessageText.requiredField)
+      return
+    }
+    fetchApi({
+      url: endpoints.home.libraries.getObjectPhoto,
+      method: MethodHTTP.POST,
+      body: { robot },
+    }).then((response) => {
+      if (response) {
+        setFieldValue('photo', response.photo)
+        setFieldValue('contour', response.contour)
+        setFieldValue('shape', response.shape)
+      }
+    })
+  }
+
   return (
     <Formik
       initialValues={{
@@ -86,6 +112,9 @@ export const FormObject = ({
         height: dataObject?.height || null,
         keywords: dataObject?.keywords || [],
         robot: dataObject?.robot || null,
+        photo: dataObject?.photo || '',
+        contour: dataObject?.contour || '',
+        shape: dataObject?.shape || '',
       }}
       validationSchema={YupObject().shape({
         name: YupString()
@@ -217,7 +246,7 @@ export const FormObject = ({
                 )}
               </Stack>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12}>
               <Stack spacing={1}>
                 <Typography id="slider-label">Force</Typography>
                 <Slider
@@ -247,6 +276,99 @@ export const FormObject = ({
                 />
               </Stack>
             </Grid>
+            <Grid item xs={12}>
+              <Divider textAlign="left">Images</Divider>
+            </Grid>
+            <Grid item xs={12}>
+              <Stack spacing={1}>
+                <Button
+                  onClick={() =>
+                    handleGetPhoto(
+                      values.robot,
+                      setFieldValue,
+                      setFieldError,
+                      setFieldTouched
+                    )
+                  }
+                  color="primary"
+                  aria-label="detail"
+                  size="medium"
+                  title="Get photo"
+                  startIcon={<AimOutlined style={{ fontSize: '2em' }} />}
+                >
+                  Get photo
+                </Button>
+              </Stack>
+            </Grid>
+            {values.photo && (
+              <Grid
+                item
+                xs={4}
+                container
+                direction="column"
+                alignItems="center"
+              >
+                <Stack spacing={1}>
+                  <CardMedia
+                    component="img"
+                    title="Photo"
+                    sx={{
+                      maxWidth: '500px',
+                      maxHeight: '500px',
+                      border: '1px solid',
+                    }}
+                    image={`data:image/png;base64,${values.photo}`}
+                    alt="Image"
+                  />
+                </Stack>
+              </Grid>
+            )}
+            {values.contour && (
+              <Grid
+                item
+                xs={4}
+                container
+                direction="column"
+                alignItems="center"
+              >
+                <Stack spacing={1}>
+                  <CardMedia
+                    component="img"
+                    title="Contour"
+                    sx={{
+                      maxWidth: '500px',
+                      maxHeight: '500px',
+                      border: '1px solid',
+                    }}
+                    image={`data:image/png;base64,${values.contour}`}
+                    alt="Image"
+                  />
+                </Stack>
+              </Grid>
+            )}
+            {values.shape && (
+              <Grid
+                item
+                xs={4}
+                container
+                direction="column"
+                alignItems="center"
+              >
+                <Stack spacing={1}>
+                  <CardMedia
+                    component="img"
+                    title="Shape"
+                    sx={{
+                      maxWidth: '500px',
+                      maxHeight: '500px',
+                      border: '1px solid',
+                    }}
+                    image={`data:image/png;base64,${values.shape}`}
+                    alt="Image"
+                  />
+                </Stack>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <Button
                 disableElevation

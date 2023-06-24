@@ -35,6 +35,7 @@ export const endpoints = {
       takePositionLocation: `${HOME_API}/takePositionLocation/`,
       takePointAction: `${HOME_API}/takePointAction/`,
       takeObjectHeight: `${HOME_API}/takeObjectHeight/`,
+      getObjectPhoto: `${HOME_API}/getObjectPhoto/`,
     },
     management: {
       users: `${HOME_API}/users/`,

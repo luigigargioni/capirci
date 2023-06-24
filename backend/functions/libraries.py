@@ -15,8 +15,16 @@ from .robot import (
     connect,
     disconnect,
     robot_getvar,
+    take_img,
+    INITIAL_POSITION,
+    DEFAULT_TIMEOUT,
+    MAX_SPEED,
 )
 from pythonping import ping
+from pythoncom import CoInitialize
+import cv2
+from numpy import zeros
+from base64 import b64encode
 
 
 def getTaskList(request: HttpRequest) -> HttpResponse:
@@ -119,7 +127,17 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 object_id = request.GET.get("id")
                 object = Object.objects.get(id=object_id)
                 object_fields = object.to_dict(
-                    ["id", "name", "keywords", "shared", "force", "height"]
+                    [
+                        "id",
+                        "name",
+                        "keywords",
+                        "shared",
+                        "force",
+                        "height",
+                        "contour",
+                        "photo",
+                        "shape",
+                    ]
                 )
                 return success_response(object_fields)
             if request.method == HttpMethod.DELETE.value:
@@ -135,6 +153,9 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 object_force = data.get("force")
                 object_height = data.get("height")
                 object_keywords = data.get("keywords")
+                object_contour = data.get("contour")
+                object_photo = data.get("photo")
+                object_shape = data.get("shape")
                 object_owner = User.objects.get(id=request.user.id)
                 Object.objects.create(
                     name=object_name,
@@ -143,6 +164,9 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                     force=object_force,
                     height=object_height,
                     keywords=object_keywords,
+                    contour=object_contour,
+                    photo=object_photo,
+                    shape=object_shape,
                 )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
@@ -153,12 +177,18 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
                 object_force = data.get("force")
                 object_height = data.get("height")
                 object_keywords = data.get("keywords")
+                object_contour = data.get("contour")
+                object_photo = data.get("photo")
+                object_shape = data.get("shape")
                 Object.objects.filter(id=object_id).update(
                     name=object_name,
                     shared=object_shared,
                     force=object_force,
                     height=object_height,
                     keywords=object_keywords,
+                    contour=object_contour,
+                    photo=object_photo,
+                    shape=object_shape,
                 )
                 return success_response()
             else:
@@ -482,6 +512,84 @@ def takeObjectHeight(request: HttpRequest) -> HttpResponse:
                     curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
                     response = {"height": str(curr_pos[2])}
                     disconnect(client, hCtrl, hRobot)
+                    return success_response(response)
+                else:
+                    return error_response(str("Robot not connected"))
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def getObjectPhoto(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                robot_id = data.get("robot")
+                user_robot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=user_robot.robot.id)
+                ResponseList = ping(robot.ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    CoInitialize()
+                    handles = connect(robot.ip, robot.port, DEFAULT_TIMEOUT)
+                    client = handles[0]
+                    hCtrl = handles[1]
+                    hRobot = handles[2]
+                    client.robot_move(
+                        hRobot,
+                        1,
+                        INITIAL_POSITION,
+                        MAX_SPEED,
+                    )
+                    disconnect(client, hCtrl, hRobot)
+                    image = take_img(wb=True, cameraip=robot.cameraip)
+
+                    # Photo
+                    photo = b64encode(image)
+
+                    # Contour
+                    shifted = cv2.pyrMeanShiftFiltering(image, 51, 71)
+                    gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
+                    thresh = cv2.threshold(
+                        gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU
+                    )[1]
+                    (cnts, _) = cv2.findContours(
+                        thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+                    )
+
+                    areaMax = 0
+                    areaMaxi = -1
+
+                    for i, cnt in enumerate(cnts):
+                        area = cv2.contourArea(cnt)
+                        if areaMax < area:
+                            areaMax = area
+                            areaMaxi = i
+
+                    contour_image = image.copy()
+                    cv2.drawContours(contour_image, cnts, areaMaxi, (0, 0, 255), 3)
+                    contour = b64encode(contour_image)
+
+                    # Shape
+                    outline = zeros(image.shape, dtype="uint8")
+                    (x, y, width, height) = cv2.boundingRect(cnts[areaMaxi])
+                    cv2.drawContours(outline, cnts, areaMaxi, (255, 255, 255), -1)
+                    roi = outline[y : y + height, x : x + width]
+                    shape_image = cv2.copyMakeBorder(
+                        roi, 15, 15, 15, 15, cv2.BORDER_CONSTANT, value=0
+                    )
+                    shape = b64encode(shape_image)
+
+                    response = {}
+                    response["photo"] = photo
+                    response["contour"] = contour
+                    response["shape"] = shape
                     return success_response(response)
                 else:
                     return error_response(str("Robot not connected"))

@@ -7,6 +7,9 @@ export interface ObjectType {
   owner: number
   keywords: string[]
   robot: number | null
+  photo: string
+  contour: string
+  shape: string
 }
 
 export type ObjectDetailType = Omit<ObjectType, 'owner'>
