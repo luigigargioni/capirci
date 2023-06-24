@@ -18,7 +18,7 @@ import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BuildOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
-import { activeItem } from 'store/reducers/menu'
+import { activeItem, openDrawer } from 'store/reducers/menu'
 import { TaskDetailType } from './types'
 
 export enum TypeNewTask {
@@ -49,10 +49,12 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
         setStatus({ success: true })
         toast.success(MessageText.success)
         if (type === TypeNewTask.CHAT) {
+          dispatch(openDrawer(false))
           navigate(`/chat/${newTaskId}`)
           return
         }
         if (type === TypeNewTask.GRAPHICAL) {
+          dispatch(openDrawer(false))
           navigate(`/graphical${newTaskId}`)
           return
         }
@@ -101,6 +103,7 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
                 <Stack spacing={1}>
                   <Button
                     onClick={() => {
+                      dispatch(openDrawer(false))
                       dispatch(activeItem('programminggraphical'))
                       navigate(`/graphic/${values.id}`)
                     }}

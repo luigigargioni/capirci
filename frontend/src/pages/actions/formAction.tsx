@@ -224,8 +224,8 @@ export const FormAction = ({
             {values.positions &&
               JSON.parse(values.positions).points.map(
                 (point: PositionType, index: number) => (
-                  <>
-                    <Grid item xs={10} key={JSON.stringify(point)}>
+                  <React.Fragment key={JSON.stringify(point)}>
+                    <Grid item xs={10}>
                       <Stack spacing={1}>
                         <TextField
                           id={`point-${index}`}
@@ -251,7 +251,7 @@ export const FormAction = ({
                         </Popconfirm>
                       </Stack>
                     </Grid>
-                  </>
+                  </React.Fragment>
                 )
               )}
             <Grid item xs={12}>
