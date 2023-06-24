@@ -1449,6 +1449,13 @@ def runTask(request: HttpRequest) -> HttpResponse:
             place_position = loads(place_position)
 
             if action is not None:
+                action_array = loads(action_point)
+                action_position = []
+                for item in action_array["points"]:
+                    action_position.append(
+                        ",".join(str(value) for value in item.values())
+                    )
+                """
                 action_point = action_point.split("::")
                 action_point = action_point[1:-1]
                 action_position = []
@@ -1456,6 +1463,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
                 while i < len(action_point):
                     action_position.append(action_point[i])
                     i = i + 2
+                """
 
             (client, hCtrl, hRobot) = connect(ip, port, 14400)
 

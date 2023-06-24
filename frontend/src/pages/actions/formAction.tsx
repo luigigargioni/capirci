@@ -2,6 +2,7 @@ import React from 'react'
 import {
   Button,
   Checkbox,
+  Divider,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -20,6 +21,10 @@ import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { MyRobotType } from 'pages/myrobots/types'
+import { AimOutlined } from '@ant-design/icons'
+import { Popconfirm } from 'antd'
+import { PositionType } from 'pages/locations/types'
+import { iconMap } from 'utils/iconMap'
 import { ActionDetailType } from './types'
 
 interface FormActionProps {
@@ -51,6 +56,44 @@ export const FormAction = ({
       })
   }
 
+  const handleGetPosition = (
+    robot: number | null,
+    point: string,
+    setFieldValue: (field: string, value: any) => void,
+    setFieldError: (field: string, value: any) => void,
+    setFieldTouched: (field: string, touched: any) => void
+  ) => {
+    if (robot === -1) {
+      setFieldTouched('robot', true)
+      setFieldError('robot', MessageText.requiredField)
+      return
+    }
+    fetchApi({
+      url: endpoints.home.libraries.takePositionLocation,
+      method: MethodHTTP.POST,
+      body: { robot },
+    }).then((response) => {
+      if (response) {
+        const newPoint = response.position
+        const pointObj = JSON.parse(point)
+        const newArray = [...pointObj.points, newPoint]
+        const newPointObj = { ...pointObj, points: newArray }
+        setFieldValue('point', JSON.stringify(newPointObj))
+      }
+    })
+  }
+
+  const handleDelete = (
+    point: string,
+    index: number,
+    setFieldValue: (field: string, value: any) => void
+  ) => {
+    const pointObj = JSON.parse(point)
+    const newArray = pointObj.points.filter((_item, i) => i !== index)
+    const newPointObj = { ...pointObj, points: newArray }
+    setFieldValue('point', JSON.stringify(newPointObj))
+  }
+
   return (
     <Formik
       initialValues={{
@@ -76,6 +119,8 @@ export const FormAction = ({
         touched,
         values,
         setFieldValue,
+        setFieldError,
+        setFieldTouched,
       }) => (
         <form
           noValidate
@@ -151,6 +196,64 @@ export const FormAction = ({
                 />
               </Stack>
             </Grid>
+            <Grid item xs={12}>
+              <Divider textAlign="left">Points</Divider>
+            </Grid>
+            <Grid item xs={12}>
+              <Stack spacing={1}>
+                <Button
+                  onClick={() =>
+                    handleGetPosition(
+                      values.robot,
+                      values.point,
+                      setFieldValue,
+                      setFieldError,
+                      setFieldTouched
+                    )
+                  }
+                  color="primary"
+                  aria-label="detail"
+                  size="medium"
+                  title="Get position"
+                  startIcon={<AimOutlined style={{ fontSize: '2em' }} />}
+                >
+                  Get point
+                </Button>
+              </Stack>
+            </Grid>
+            {values.point &&
+              JSON.parse(values.point).points.map(
+                (point: PositionType, index: number) => (
+                  <>
+                    <Grid item xs={10} key={JSON.stringify(point)}>
+                      <Stack spacing={1}>
+                        <TextField
+                          id={`point-${index}`}
+                          value={JSON.stringify(point)}
+                          name={`point-${index}`}
+                          label={`Point ${index + 1}`}
+                          disabled
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Stack spacing={1}>
+                        <Popconfirm
+                          title="Delete?"
+                          onConfirm={() =>
+                            handleDelete(values.point, index, setFieldValue)
+                          }
+                          okText="Ok"
+                          cancelText="Cancel"
+                          icon={iconMap.deleteCircle}
+                        >
+                          <Button color="error">Delete</Button>
+                        </Popconfirm>
+                      </Stack>
+                    </Grid>
+                  </>
+                )
+              )}
             <Grid item xs={12}>
               <Button
                 disableElevation
