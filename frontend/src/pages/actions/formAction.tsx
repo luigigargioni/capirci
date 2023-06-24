@@ -56,16 +56,16 @@ export const FormAction = ({
       })
   }
 
-  const handleGetPosition = (
+  const handleGetPosition = async (
     robot: number | null,
     point: string,
     setFieldValue: (field: string, value: any) => void,
     setFieldError: (field: string, value: any) => void,
     setFieldTouched: (field: string, touched: any) => void
   ) => {
-    if (robot === -1) {
-      setFieldTouched('robot', true)
-      setFieldError('robot', MessageText.requiredField)
+    if (!robot) {
+      await setFieldTouched('robot', true)
+      await setFieldError('robot', MessageText.requiredField)
       return
     }
     fetchApi({

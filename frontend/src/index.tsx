@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider as ReduxProvider } from 'react-redux'
@@ -24,20 +24,18 @@ const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container)
 
 root.render(
-  <StrictMode>
-    <ReduxProvider store={store}>
-      <BrowserRouter>
-        <SWRConfig value={swrParams}>
-          <ConfigProvider locale={enGB} theme={antdTheme}>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
-              <ThemeCustomization>
-                <Routes />
-              </ThemeCustomization>
-              <ToastContainerStyled />
-            </LocalizationProvider>
-          </ConfigProvider>
-        </SWRConfig>
-      </BrowserRouter>
-    </ReduxProvider>
-  </StrictMode>
+  <ReduxProvider store={store}>
+    <BrowserRouter>
+      <SWRConfig value={swrParams}>
+        <ConfigProvider locale={enGB} theme={antdTheme}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
+            <ThemeCustomization>
+              <Routes />
+            </ThemeCustomization>
+            <ToastContainerStyled />
+          </LocalizationProvider>
+        </ConfigProvider>
+      </SWRConfig>
+    </BrowserRouter>
+  </ReduxProvider>
 )

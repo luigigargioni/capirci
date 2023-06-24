@@ -61,37 +61,41 @@ export const FormObject = ({
       })
   }
 
-  const handleGetHeight = (
+  const handleGetHeight = async (
     robot: number | null,
     setFieldValue: (field: string, value: any) => void,
     setFieldError: (field: string, value: any) => void,
     setFieldTouched: (field: string, touched: any) => void
   ) => {
     if (!robot) {
-      setFieldTouched('robot', true)
-      setFieldError('robot', MessageText.requiredField)
+      await setFieldTouched('robot', true)
+      await setFieldError('robot', MessageText.requiredField)
       return
     }
     fetchApi({
-      url: endpoints.home.libraries.takeObjectHeight,
+      url: endpoints.home.libraries.takePosition,
       method: MethodHTTP.POST,
       body: { robot },
     }).then((response) => {
       if (response) {
-        setFieldValue('height', response.height)
+        setFieldValue('height', response.Z)
       }
     })
   }
 
-  const handleGetPhoto = (
+  const handleGetPhoto = async (
     robot: number | null,
     setFieldValue: (field: string, value: any) => void,
     setFieldError: (field: string, value: any) => void,
-    setFieldTouched: (field: string, touched: any) => void
+    setFieldTouched: (
+      field: string,
+      isTouched: boolean,
+      shouldValidate: boolean
+    ) => void
   ) => {
     if (!robot) {
-      setFieldTouched('robot', true)
-      setFieldError('robot', MessageText.requiredField)
+      await setFieldTouched('robot', true, true)
+      await setFieldError('robot', MessageText.requiredField)
       return
     }
     fetchApi({
@@ -183,7 +187,7 @@ export const FormObject = ({
                 />
               </Stack>
             </Grid>
-            <Grid item xs={9}>
+            <Grid item xs={2}>
               <Stack spacing={1}>
                 <FormControl fullWidth>
                   <InputLabel id="robot-id-label">Robot</InputLabel>
@@ -232,7 +236,7 @@ export const FormObject = ({
                 </Button>
               </Stack>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Stack spacing={1}>
                 <TextField
                   id="height"
@@ -251,53 +255,7 @@ export const FormObject = ({
                 )}
               </Stack>
             </Grid>
-            <Grid item xs={2}>
-              <Stack spacing={1}>
-                <TextField
-                  id="add_keyword"
-                  value={addKeyword || ''}
-                  name="add_keyword"
-                  label="Add keyword"
-                  onChange={(e) => setAddKeyword(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => {
-                            if (addKeyword) {
-                              const newKeywords = [...values.keywords]
-                              newKeywords.push(addKeyword)
-                              setFieldValue('keywords', newKeywords)
-                              setAddKeyword('')
-                            }
-                          }}
-                          edge="end"
-                        >
-                          <PlusOutlined />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Stack>
-            </Grid>
             <Grid item xs={3}>
-              <Stack spacing={1} direction="row">
-                {values.keywords.map((keyword, index) => (
-                  <Chip
-                    key={keyword}
-                    label={keyword}
-                    variant="outlined"
-                    onDelete={() => {
-                      const newKeywords = [...values.keywords]
-                      newKeywords.splice(index, 1)
-                      setFieldValue('keywords', newKeywords)
-                    }}
-                  />
-                ))}
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
               <Stack spacing={1}>
                 <Typography id="slider-label">Force</Typography>
                 <Slider
@@ -324,7 +282,64 @@ export const FormObject = ({
                   marks
                   min={1}
                   max={3}
+                  style={{ marginTop: 0 }}
                 />
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <TextField
+                  id="add_keyword"
+                  value={addKeyword || ''}
+                  name="add_keyword"
+                  label="Add keyword"
+                  onChange={(e) => setAddKeyword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      if (addKeyword) {
+                        const newKeywords = [...values.keywords]
+                        newKeywords.push(addKeyword)
+                        setFieldValue('keywords', newKeywords)
+                        setAddKeyword('')
+                      }
+                    }
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => {
+                            if (addKeyword) {
+                              const newKeywords = [...values.keywords]
+                              newKeywords.push(addKeyword)
+                              setFieldValue('keywords', newKeywords)
+                              setAddKeyword('')
+                            }
+                          }}
+                          edge="end"
+                        >
+                          <PlusOutlined />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={10}>
+              <Stack spacing={1} direction="row">
+                {values.keywords.map((keyword, index) => (
+                  <Chip
+                    key={keyword}
+                    label={keyword}
+                    variant="outlined"
+                    onDelete={() => {
+                      const newKeywords = [...values.keywords]
+                      newKeywords.splice(index, 1)
+                      setFieldValue('keywords', newKeywords)
+                    }}
+                  />
+                ))}
               </Stack>
             </Grid>
             <Grid item xs={12}>

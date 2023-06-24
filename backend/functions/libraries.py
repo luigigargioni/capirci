@@ -14,7 +14,6 @@ from django.contrib.auth.models import User
 from .robot import (
     connect,
     disconnect,
-    robot_getvar,
     take_img,
     INITIAL_POSITION,
     DEFAULT_TIMEOUT,
@@ -407,34 +406,6 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
                     name=myRobot_name,
                 )
                 return success_response()
-            else:
-                return invalid_request_method
-        else:
-            return unauthorized_request()
-    except Exception as e:
-        return error_response(str(e))
-
-
-def take_object_height(request: HttpRequest) -> HttpResponse:
-    try:
-        if request.user.is_authenticated:
-            if request.method == HttpMethod.POST.value:
-                data = loads(request.body)
-                robot_id = data.get("robot")
-                user_robot = UserRobot.objects.get(id=robot_id)
-                robot = Robot.objects.get(id=user_robot.robot.id)
-                ResponseList = ping(robot.ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
-                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
-                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-                    response = {"height": str(curr_pos[2])}
-                    disconnect(client, hCtrl, hRobot)
-                    return success_response(response)
-                else:
-                    return error_response(str("Robot not connected"))
             else:
                 return invalid_request_method
         else:
