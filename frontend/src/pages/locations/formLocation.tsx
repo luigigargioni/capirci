@@ -68,7 +68,7 @@ export const FormLocation = ({
       return
     }
     fetchApi({
-      url: endpoints.home.libraries.takePositionLocation,
+      url: endpoints.home.libraries.takePosition,
       method: MethodHTTP.POST,
       body: { robot },
     }).then((response) => {

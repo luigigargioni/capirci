@@ -27,7 +27,7 @@ from numpy import zeros
 from base64 import b64encode
 
 
-def getTaskList(request: HttpRequest) -> HttpResponse:
+def get_task_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -50,7 +50,7 @@ def getTaskList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def taskDetail(request: HttpRequest) -> HttpResponse:
+def task_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -102,7 +102,7 @@ def taskDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getObjectList(request: HttpRequest) -> HttpResponse:
+def get_object_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -120,7 +120,7 @@ def getObjectList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def objectDetail(request: HttpRequest) -> HttpResponse:
+def object_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -199,7 +199,7 @@ def objectDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getActionList(request: HttpRequest) -> HttpResponse:
+def get_action_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -209,7 +209,7 @@ def getActionList(request: HttpRequest) -> HttpResponse:
                     "id",
                     "name",
                     "shared",
-                    "point",
+                    "positions",
                     "robot",
                     "owner",
                     "owner__username",
@@ -224,14 +224,14 @@ def getActionList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def actionDetail(request: HttpRequest) -> HttpResponse:
+def action_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
                 action_id = request.GET.get("id")
                 action = Action.objects.get(id=action_id)
                 action_fields = action.to_dict(
-                    ["id", "name", "shared", "robot", "point"]
+                    ["id", "name", "shared", "robot", "positions"]
                 )
                 return success_response(action_fields)
             if request.method == HttpMethod.DELETE.value:
@@ -245,14 +245,14 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
                 action_name = data.get("name")
                 action_shared = data.get("shared")
                 action_robot = UserRobot.objects.get(id=data.get("robot"))
-                action_point = data.get("point")
+                action_positions = data.get("positions")
                 action_owner = User.objects.get(id=request.user.id)
                 Action.objects.create(
                     name=action_name,
                     owner=action_owner,
                     shared=action_shared,
                     robot=action_robot,
-                    point=action_point,
+                    positions=action_positions,
                 )
                 return success_response()
             if request.method == HttpMethod.PUT.value:
@@ -261,12 +261,12 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
                 action_name = data.get("name")
                 action_shared = data.get("shared")
                 action_robot = UserRobot.objects.get(id=data.get("robot"))
-                action_point = data.get("point")
+                action_positions = data.get("positions")
                 Action.objects.filter(id=action_id).update(
                     name=action_name,
                     shared=action_shared,
                     robot=action_robot,
-                    point=action_point,
+                    positions=action_positions,
                 )
                 return success_response()
             else:
@@ -277,7 +277,7 @@ def actionDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getLocationList(request: HttpRequest) -> HttpResponse:
+def get_location_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -303,7 +303,7 @@ def getLocationList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def locationDetail(request: HttpRequest) -> HttpResponse:
+def location_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -357,7 +357,7 @@ def locationDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getMyRobotList(request: HttpRequest) -> HttpResponse:
+def get_my_robot_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -375,7 +375,7 @@ def getMyRobotList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def myRobotDetail(request: HttpRequest) -> HttpResponse:
+def my_robot_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -415,87 +415,7 @@ def myRobotDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def takePositionLocation(request: HttpRequest) -> HttpResponse:
-    try:
-        if request.user.is_authenticated:
-            if request.method == HttpMethod.POST.value:
-                data = loads(request.body)
-                robot_id = data.get("robot")
-                user_robot = UserRobot.objects.get(id=robot_id)
-                robot = Robot.objects.get(id=user_robot.robot.id)
-                ResponseList = ping(robot.ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
-                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
-                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-                    position = {
-                        "X": +curr_pos[0],
-                        "Y": +curr_pos[1],
-                        "Z": +curr_pos[2],
-                        "RX": +curr_pos[3],
-                        "RY": +curr_pos[4],
-                        "RZ": +curr_pos[5],
-                        "FIG": +curr_pos[6],
-                    }
-                    disconnect(client, hCtrl, hRobot)
-                    return success_response(position)
-                else:
-                    return error_response(str("Robot not connected"))
-            else:
-                return invalid_request_method
-        else:
-            return unauthorized_request()
-    except Exception as e:
-        return error_response(str(e))
-
-
-def takePointAction(request: HttpRequest) -> HttpResponse:
-    try:
-        if request.user.is_authenticated:
-            if request.method == HttpMethod.POST.value:
-                data = loads(request.body)
-                robot_id = data.get("robot")
-                user_robot = UserRobot.objects.get(id=robot_id)
-                robot = Robot.objects.get(id=user_robot.robot.id)
-                ResponseList = ping(robot.ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
-                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
-                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-                    position = (
-                        "::"
-                        + str(curr_pos[0])
-                        + ","
-                        + str(curr_pos[1])
-                        + ","
-                        + str(curr_pos[2])
-                        + ","
-                        + str(curr_pos[3])
-                        + ","
-                        + str(curr_pos[4])
-                        + ","
-                        + str(curr_pos[5])
-                        + ","
-                        + str(curr_pos[6])
-                        + "::"
-                    )
-                    disconnect(client, hCtrl, hRobot)
-                    return success_response(position)
-                else:
-                    return error_response(str("Robot not connected"))
-            else:
-                return invalid_request_method
-        else:
-            return unauthorized_request()
-    except Exception as e:
-        return error_response(str(e))
-
-
-def takeObjectHeight(request: HttpRequest) -> HttpResponse:
+def take_object_height(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:
@@ -523,7 +443,7 @@ def takeObjectHeight(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getObjectPhoto(request: HttpRequest) -> HttpResponse:
+def get_object_photo(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:

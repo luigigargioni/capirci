@@ -6,6 +6,17 @@ from PIL import Image
 from io import BytesIO
 from cv2 import fitEllipse, cvtColor, COLOR_RGB2BGR
 from enum import Enum
+from backend.utils.response import (
+    HttpMethod,
+    invalid_request_method,
+    error_response,
+    success_response,
+    unauthorized_request,
+)
+from django.http import HttpResponse, HttpRequest
+from json import loads
+from pythonping import ping
+from backend.models import UserRobot, Robot
 
 PIX_MM_RATIO = 9.222
 CAMERA_ROBOT_DISTANCE = 52.38570925983608  # mm
@@ -249,3 +260,39 @@ def move_to_new_pos(client, hRobot, new_x, new_y, mode=2):
     curr_pos[0] = new_x
     curr_pos[1] = new_y
     client.robot_move(hRobot, mode, list_to_string_position(curr_pos), "SPEED=100")
+
+
+def take_position(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                robot_id = data.get("robot")
+                user_robot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=user_robot.robot.id)
+                ResponseList = ping(robot.ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
+                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                    position = {
+                        "X": +curr_pos[0],
+                        "Y": +curr_pos[1],
+                        "Z": +curr_pos[2],
+                        "RX": +curr_pos[3],
+                        "RY": +curr_pos[4],
+                        "RZ": +curr_pos[5],
+                        "FIG": +curr_pos[6],
+                    }
+                    disconnect(client, hCtrl, hRobot)
+                    return success_response(position)
+                else:
+                    return error_response(str("Robot not connected"))
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))

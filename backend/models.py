@@ -201,7 +201,7 @@ class Action(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    point = models.CharField(max_length=10000)
+    positions = models.CharField(max_length=10000)
     shared = models.BooleanField(default=False)
     robot = models.ForeignKey(
         UserRobot, on_delete=models.CASCADE, default=None, null=True, blank=True
@@ -222,8 +222,8 @@ class Action(models.Model):
                 response_data[key] = self.name
             elif key == "owner":
                 response_data[key] = self.owner
-            elif key == "point":
-                response_data[key] = self.point
+            elif key == "positions":
+                response_data[key] = self.positions
             elif key == "shared":
                 response_data[key] = self.shared
             elif key == "robot":

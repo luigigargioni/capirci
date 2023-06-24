@@ -13,7 +13,7 @@ from django.db.models import OuterRef, Subquery
 from django.contrib.auth import update_session_auth_hash
 
 
-def getUserList(request: HttpRequest) -> HttpResponse:
+def get_user_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -42,7 +42,7 @@ def getUserList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def userDetail(request: HttpRequest) -> HttpResponse:
+def user_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -116,7 +116,7 @@ def userDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getRobotList(request: HttpRequest) -> HttpResponse:
+def get_robot_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -132,7 +132,7 @@ def getRobotList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def robotDetail(request: HttpRequest) -> HttpResponse:
+def robot_detail(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -187,7 +187,7 @@ def robotDetail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def getGroupList(request: HttpRequest) -> HttpResponse:
+def get_group_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
@@ -201,7 +201,7 @@ def getGroupList(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def resetPassword(request: HttpRequest) -> HttpResponse:
+def reset_password(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:

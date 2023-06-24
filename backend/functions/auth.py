@@ -54,7 +54,7 @@ def logout_func(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def verifyToken(request: HttpRequest) -> HttpResponse:
+def verify_token(request: HttpRequest) -> HttpResponse:
     try:
         if request.method == HttpMethod.POST.value:
             data = loads(request.body)
@@ -81,7 +81,7 @@ def verifyToken(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def changePassword(request: HttpRequest) -> HttpResponse:
+def change_password(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:

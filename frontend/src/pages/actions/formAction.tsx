@@ -69,7 +69,7 @@ export const FormAction = ({
       return
     }
     fetchApi({
-      url: endpoints.home.libraries.takePositionLocation,
+      url: endpoints.home.libraries.takePosition,
       method: MethodHTTP.POST,
       body: { robot },
     }).then((response) => {
@@ -100,7 +100,7 @@ export const FormAction = ({
         id: dataAction?.id || -1,
         name: dataAction?.name || '',
         shared: dataAction?.shared || false,
-        point: dataAction?.point || '',
+        positions: dataAction?.positions || '',
         robot: dataAction?.robot || null,
       }}
       validationSchema={YupObject().shape({
@@ -205,7 +205,7 @@ export const FormAction = ({
                   onClick={() =>
                     handleGetPosition(
                       values.robot,
-                      values.point,
+                      values.positions,
                       setFieldValue,
                       setFieldError,
                       setFieldTouched
@@ -221,8 +221,8 @@ export const FormAction = ({
                 </Button>
               </Stack>
             </Grid>
-            {values.point &&
-              JSON.parse(values.point).points.map(
+            {values.positions &&
+              JSON.parse(values.positions).points.map(
                 (point: PositionType, index: number) => (
                   <>
                     <Grid item xs={10} key={JSON.stringify(point)}>
@@ -241,7 +241,7 @@ export const FormAction = ({
                         <Popconfirm
                           title="Delete?"
                           onConfirm={() =>
-                            handleDelete(values.point, index, setFieldValue)
+                            handleDelete(values.positions, index, setFieldValue)
                           }
                           okText="Ok"
                           cancelText="Cancel"

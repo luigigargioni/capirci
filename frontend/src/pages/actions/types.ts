@@ -1,7 +1,7 @@
 export interface ActionType {
   id: number
   name: string
-  point: string
+  positions: string
   shared: boolean
   owner: number
   owner__username: string

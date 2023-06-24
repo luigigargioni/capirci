@@ -3,7 +3,7 @@ from .models import Action, Task, Object, Robot, UserRobot, Location
 
 
 class ActionOption(admin.ModelAdmin):
-    list_display = ("name", "owner", "point", "shared")
+    list_display = ("id", "name", "owner", "positions", "shared", "robot")
 
 
 class TaskOption(admin.ModelAdmin):
@@ -19,7 +19,18 @@ class TaskOption(admin.ModelAdmin):
 
 
 class ObjectOption(admin.ModelAdmin):
-    list_display = ("id", "name", "owner", "keywords", "force", "shared", "height")
+    list_display = (
+        "id",
+        "name",
+        "owner",
+        "keywords",
+        "force",
+        "shared",
+        "height",
+        "photo",
+        "contour",
+        "shape",
+    )
 
 
 class RobotOption(admin.ModelAdmin):
