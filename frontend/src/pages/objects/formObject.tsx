@@ -3,11 +3,14 @@ import {
   Button,
   CardMedia,
   Checkbox,
+  Chip,
   Divider,
   FormControl,
   FormControlLabel,
   FormHelperText,
   Grid,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -23,7 +26,7 @@ import { string as YupString, object as YupObject } from 'yup'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
-import { AimOutlined } from '@ant-design/icons'
+import { AimOutlined, PlusOutlined } from '@ant-design/icons'
 import { MyRobotType } from 'pages/myrobots/types'
 import { ObjectDetailType } from './types'
 
@@ -40,6 +43,8 @@ export const FormObject = ({
   insertMode,
   backFunction,
 }: FormObjectProps) => {
+  const [addKeyword, setAddKeyword] = React.useState<string>('')
+
   const onSubmit = async (
     values: ObjectDetailType,
     { setStatus, setSubmitting }
@@ -244,6 +249,52 @@ export const FormObject = ({
                     {errors.height}
                   </FormHelperText>
                 )}
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <TextField
+                  id="add_keyword"
+                  value={addKeyword || ''}
+                  name="add_keyword"
+                  label="Add keyword"
+                  onChange={(e) => setAddKeyword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => {
+                            if (addKeyword) {
+                              const newKeywords = [...values.keywords]
+                              newKeywords.push(addKeyword)
+                              setFieldValue('keywords', newKeywords)
+                              setAddKeyword('')
+                            }
+                          }}
+                          edge="end"
+                        >
+                          <PlusOutlined />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={3}>
+              <Stack spacing={1} direction="row">
+                {values.keywords.map((keyword, index) => (
+                  <Chip
+                    key={keyword}
+                    label={keyword}
+                    variant="outlined"
+                    onDelete={() => {
+                      const newKeywords = [...values.keywords]
+                      newKeywords.splice(index, 1)
+                      setFieldValue('keywords', newKeywords)
+                    }}
+                  />
+                ))}
               </Stack>
             </Grid>
             <Grid item xs={12}>
