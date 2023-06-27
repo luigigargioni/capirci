@@ -10,6 +10,8 @@ import { useTheme } from '@emotion/react'
 import 'react-chat-elements/dist/main.css'
 import './customStyle.css'
 import { devServerUrl } from 'utils/constants'
+import { MethodHTTP, fetchApi } from 'services/api'
+import { endpoints } from 'services/endpoints'
 import { INITIAL_MESSAGE, MessageType, UserChatEnum } from './types'
 
 const { username } = getFromLocalStorage('user')
@@ -37,21 +39,36 @@ export const ChatWrapper = () => {
     setListMessages(messagesWithUserRequest)
     setIsProcessing(true)
     setMessage('')
-    // call api
-    // if (responser.endGraphic) navigate(`/graphic/${id}`)
-    setTimeout(() => {
-      setListMessages([
-        ...messagesWithUserRequest,
-        {
-          text: 'Hello',
-          id:
-            messagesWithUserRequest[messagesWithUserRequest.length - 1].id + 1,
-          user: UserChatEnum.ROBOT,
-          timestamp: formatTimeFrontend(dayjs().toString()),
-        },
-      ])
-      setIsProcessing(false)
-    }, 2000)
+
+    fetchApi({
+      url: endpoints.chat.newMessage,
+      method: MethodHTTP.POST,
+      body: { id, message },
+    })
+      .then((response) => {
+        if (response) {
+          setListMessages([
+            ...messagesWithUserRequest,
+            {
+              text: response.message,
+              id:
+                messagesWithUserRequest[messagesWithUserRequest.length - 1].id +
+                1,
+              user: UserChatEnum.ROBOT,
+              timestamp: formatTimeFrontend(dayjs().toString()),
+            },
+          ])
+
+          if (response.endGraphic) {
+            setTimeout(() => {
+              navigate(`/graphic/${id}`)
+            }, 2000)
+          }
+        }
+      })
+      .finally(() => {
+        setIsProcessing(false)
+      })
   }
 
   return (

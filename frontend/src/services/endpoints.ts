@@ -52,6 +52,6 @@ export const endpoints = {
     tasks: `${GRAPHIC_API}/getTaskList/`,
   },
   chat: {
-    messages: `${CHAT_API}/getMessages/`,
+    newMessage: `${CHAT_API}/newMessage/`,
   },
 }
