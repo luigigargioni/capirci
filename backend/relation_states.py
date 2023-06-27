@@ -71,7 +71,7 @@ class PickAndPlace:
         return cardinality
 
     # define all the elements of a pick and place task
-    def process_dependencies(self, lista, tokens, tagged, taskname, username):
+    def process_dependencies(self, lista, tokens, tagged, task_id):
         # definizione pick
         # CASO 1: take the obj and put it on place
         for i in range(0, len(lista)):
@@ -106,12 +106,9 @@ class PickAndPlace:
         # Controllo se esiste già in db
         root = None
 
-        if Task.objects.filter(name=taskname).filter(owner=username).exists():
+        if Task.objects.filter(id=task_id).exists():
             taskCode = (
-                Task.objects.filter(name=taskname)
-                .filter(owner=username)
-                .values_list("code", flat=True)
-                .first()
+                Task.objects.filter(id=task_id).values_list("code", flat=True).first()
             )
             if taskCode is not None and taskCode != "":
                 root = fromstring(taskCode)
@@ -122,7 +119,7 @@ class PickAndPlace:
 
         if root is not None:
             for child in root:
-                # solo figli diretti
+                # only direct children
                 tag = child.tag
                 if tag == "pick":
                     pick = child.text
@@ -131,13 +128,13 @@ class PickAndPlace:
                     place = child.text
 
         if (self.pick is None and pick is None) and self.place is not None:
-            create_XML_program(taskname, username, self)
+            create_XML_program(task_id, self)
             msg = "Which is the object to be taken?"
             end = "0"
             card = ""
             return msg, end, card
         elif (self.place is None and place is None) and (self.pick is not None):
-            create_XML_program(taskname, username, self)
+            create_XML_program(task_id, self)
             msg = "Where should I put the " + self.pick.object.name + "?"
             end = "0"
             card = self.pick.object.cardinality
@@ -150,7 +147,7 @@ class PickAndPlace:
             msg = "I have to put the " + pickData + " in the " + placeData + "."
             end = "1"
             card = self.pick.object.cardinality if pick is None else pick_card
-            create_XML_program(taskname, username, self)
+            create_XML_program(task_id, self)
             return msg, end, card
         elif (self.pick is None) and (self.place is None):
             msg = "I did not understand what you said. Tell me again what to do."

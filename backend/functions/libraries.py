@@ -31,14 +31,18 @@ def get_task_list(request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
                 username = request.user
-                tasks = Task.objects.filter(Q(owner=username) | Q(shared=True)).values(
-                    "id",
-                    "name",
-                    "description",
-                    "last_modified",
-                    "owner",
-                    "owner__username",
-                    "shared",
+                tasks = (
+                    Task.objects.filter(Q(owner=username) | Q(shared=True))
+                    .values(
+                        "id",
+                        "name",
+                        "description",
+                        "last_modified",
+                        "owner",
+                        "owner__username",
+                        "shared",
+                    )
+                    .order_by("-last_modified")
                 )
                 return success_response(tasks)
             else:
@@ -68,7 +72,7 @@ def task_detail(request: HttpRequest) -> HttpResponse:
                 task_name = data.get("name")
                 task_shared = data.get("shared")
                 task_description = data.get("description")
-                task_owner = request.user.id
+                task_owner = User.objects.get(id=request.user.id)
                 date = getDateTimeNow()
                 task_created = Task.objects.create(
                     name=task_name,

@@ -15,7 +15,7 @@ const Chat = () => {
     body: { id },
   })
 
-  const title = data ? `Chat: ${data.name}` : ''
+  const title = data ? `Chat to create the task: "${data.name}"` : ''
 
   return (
     <MainCard title={title}>

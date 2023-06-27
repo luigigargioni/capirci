@@ -13,13 +13,8 @@ def iterator(parents, nested=False):
 
 
 # This method add an external tag to existing XML file
-def add_external_tag_XML(taskname, username, newExtTag, newExtTagText):
-    taskCode = (
-        Task.objects.filter(name=taskname)
-        .filter(owner=username)
-        .values_list("code", flat=True)
-        .first()
-    )
+def add_external_tag_XML(task_id, newExtTag, newExtTagText):
+    taskCode = Task.objects.filter(id=task_id).values_list("code", flat=True).first()
     root = fromstring(taskCode)
     children = []
 
@@ -47,18 +42,15 @@ def add_external_tag_XML(taskname, username, newExtTag, newExtTagText):
 
     dump(root)
     mydata = tostring(root, encoding="unicode")
-    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
+    Task.objects.filter(id=task_id).update(code=mydata)
 
 
-def create_XML_program(taskname, username, pickPlace):
+def create_XML_program(task_id, pickPlace):
     root = None
 
-    if Task.objects.filter(name=taskname).filter(owner=username).exists():
+    if Task.objects.filter(id=task_id).exists():
         taskCode = (
-            Task.objects.filter(name=taskname)
-            .filter(owner=username)
-            .values_list("code", flat=True)
-            .first()
+            Task.objects.filter(id=task_id).values_list("code", flat=True).first()
         )
         if taskCode is not None and taskCode != "":
             root = fromstring(taskCode)
@@ -102,17 +94,12 @@ def create_XML_program(taskname, username, pickPlace):
         place.text = place_data.location.name
 
     mydata = tostring(data, encoding="unicode")
-    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
+    Task.objects.filter(id=task_id).update(code=mydata)
 
 
 # This method add an end tag to existing XML file
-def add_end_tag_XML(taskname, username, newExtTag, newExtTagText, newExtTagType):
-    taskCode = (
-        Task.objects.filter(name=taskname)
-        .filter(owner=username)
-        .values_list("code", flat=True)
-        .first()
-    )
+def add_end_tag_XML(task_id, newExtTag, newExtTagText, newExtTagType):
+    taskCode = Task.objects.filter(id=task_id).values_list("code", flat=True).first()
     root = fromstring(taskCode)
     c = Element(newExtTag)
 
@@ -140,4 +127,4 @@ def add_end_tag_XML(taskname, username, newExtTag, newExtTagText, newExtTagType)
 
     dump(root)
     mydata = tostring(root, encoding="unicode")
-    Task.objects.filter(name=taskname).filter(owner=username).update(code=mydata)
+    Task.objects.filter(id=task_id).update(code=mydata)

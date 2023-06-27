@@ -12,21 +12,27 @@ import './customStyle.css'
 import { devServerUrl } from 'utils/constants'
 import { MethodHTTP, fetchApi } from 'services/api'
 import { endpoints } from 'services/endpoints'
+import { useDispatch } from 'react-redux'
+import { activeItem, openDrawer } from 'store/reducers/menu'
 import { INITIAL_MESSAGE, MessageType, UserChatEnum } from './types'
 
 const { username } = getFromLocalStorage('user')
+const chatContainer = document.getElementById('chatContainer')
 
 export const ChatWrapper = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const theme: any = useTheme()
   const [listMessages, setListMessages] = React.useState<MessageType[]>([
     INITIAL_MESSAGE,
   ])
   const [message, setMessage] = React.useState('')
   const [isProcessing, setIsProcessing] = React.useState(false)
+  const [question, setQuestion] = React.useState(0)
+  const [end, setEnd] = React.useState(0)
 
-  const onMessageSend = () => {
+  const onMessageSend = async () => {
     const messagesWithUserRequest = [
       ...listMessages,
       {
@@ -36,18 +42,19 @@ export const ChatWrapper = () => {
         timestamp: formatTimeFrontend(dayjs().toString()),
       },
     ]
-    setListMessages(messagesWithUserRequest)
+    await setListMessages(messagesWithUserRequest)
+    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight
     setIsProcessing(true)
     setMessage('')
 
     fetchApi({
       url: endpoints.chat.newMessage,
       method: MethodHTTP.POST,
-      body: { id, message },
+      body: { id: Number(id), message, question, end },
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response) {
-          setListMessages([
+          await setListMessages([
             ...messagesWithUserRequest,
             {
               text: response.message,
@@ -59,15 +66,25 @@ export const ChatWrapper = () => {
             },
           ])
 
-          if (response.endGraphic) {
+          // TODO: fix scroll
+          if (chatContainer)
+            chatContainer.scrollTop = chatContainer.scrollHeight
+
+          setQuestion(response.question)
+          setEnd(response.end)
+
+          if (response.openGraphic) {
             setTimeout(() => {
               navigate(`/graphic/${id}`)
+              dispatch(activeItem('graphic'))
             }, 2000)
           }
 
           if (response.endTasks) {
             setTimeout(() => {
               navigate(`/tasks/${id}`)
+              dispatch(activeItem('tasks'))
+              dispatch(openDrawer(true))
             }, 2000)
           }
         }
@@ -79,7 +96,7 @@ export const ChatWrapper = () => {
 
   return (
     <div style={{ height: '76vh', position: 'relative' }}>
-      <div style={{ overflow: 'auto', height: '90%' }}>
+      <div style={{ overflow: 'auto', height: '90%' }} id="chatContainer">
         {listMessages.map((msg) => (
           <MessageBox
             position={msg.user === UserChatEnum.ROBOT ? 'left' : 'right'}
