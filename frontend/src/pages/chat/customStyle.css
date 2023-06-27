@@ -1,0 +1,16 @@
+.rce-mbox-status {
+    display: none;
+}
+
+.rce-mbox-title {
+    cursor: text;
+    user-select: auto;
+    font-size: larger;
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.rce-mbox-text {
+    font-size: larger;
+}
