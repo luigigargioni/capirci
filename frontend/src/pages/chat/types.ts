@@ -15,7 +15,7 @@ export interface MessageType {
 
 export const INITIAL_MESSAGE: MessageType = {
   id: 0,
-  text: 'INIT',
+  text: 'Hello! Tell me what to do',
   user: UserChatEnum.ROBOT,
   timestamp: formatTimeFrontend(dayjs().toString()),
 }

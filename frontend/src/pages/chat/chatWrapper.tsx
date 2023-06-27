@@ -64,6 +64,12 @@ export const ChatWrapper = () => {
               navigate(`/graphic/${id}`)
             }, 2000)
           }
+
+          if (response.endTasks) {
+            setTimeout(() => {
+              navigate(`/tasks/${id}`)
+            }, 2000)
+          }
         }
       })
       .finally(() => {
