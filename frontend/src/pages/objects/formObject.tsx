@@ -44,17 +44,24 @@ export const FormObject = ({
   backFunction,
 }: FormObjectProps) => {
   const [addKeyword, setAddKeyword] = React.useState<string>('')
+  const [keywordErrors, setKeywordErrors] = React.useState<string[]>([])
 
   const onSubmit = async (
     values: ObjectDetailType,
     { setStatus, setSubmitting, setFieldError, setFieldTouched }
   ) => {
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
+    setKeywordErrors([])
     fetchApi({ url: endpoints.home.libraries.object, method, body: values })
       .then(async (res) => {
         if (res && res.nameAlreadyExists) {
           await setFieldTouched('name', true)
           await setFieldError('name', MessageText.alreadyExists)
+          setStatus({ success: false })
+          return
+        }
+        if (res && res.keywordExist) {
+          setKeywordErrors(res.keywordFound)
           setStatus({ success: false })
           return
         }
@@ -322,6 +329,9 @@ export const FormObject = ({
                               setAddKeyword('')
                             }
                           }}
+                          disabled={
+                            !addKeyword || values.keywords.includes(addKeyword)
+                          }
                           edge="end"
                         >
                           <PlusOutlined />
@@ -343,7 +353,15 @@ export const FormObject = ({
                       const newKeywords = [...values.keywords]
                       newKeywords.splice(index, 1)
                       setFieldValue('keywords', newKeywords)
+
+                      const newKeywordErrors = keywordErrors.filter(
+                        (keywordError) => keywordError !== keyword
+                      )
+                      setKeywordErrors(newKeywordErrors)
                     }}
+                    color={
+                      keywordErrors.includes(keyword) ? 'error' : 'primary'
+                    }
                   />
                 ))}
               </Stack>

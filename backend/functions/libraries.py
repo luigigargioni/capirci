@@ -176,21 +176,36 @@ def object_detail(request: HttpRequest) -> HttpResponse:
                     return bad_request("Name already exists", data_result)
 
                 # check if object name is used as keyword
-                objectsOfUser = Object.objects.filter(
-                    Q(owner=request.user.id) | Q(shared=True)
-                )
+                if object_shared is True:
+                    objectsOfUser = Object.objects.all()
+                else:
+                    objectsOfUser = Object.objects.filter(
+                        Q(owner=request.user.id) | Q(shared=True)
+                    )
                 nameKeywordExist = False
+                keywordExist = False
+                keywordsFound = []
                 for object in objectsOfUser:
-                    keywords = object.keywords
-                    if keywords is None:
+                    keywordsOld = object.keywords
+                    if keywordsOld is None:
                         continue
-                    keywordsList = [keyword.strip() for keyword in keywords]
-                    if object_name in keywordsList:
+                    keywordsOld = [keyword.strip() for keyword in keywordsOld]
+                    keywordsNew = [keyword.strip() for keyword in object_keywords]
+                    if object_name in keywordsOld:
                         nameKeywordExist = True
+                    for keywordOld in keywordsOld:
+                        for keywordNew in keywordsNew:
+                            if keywordNew == keywordOld:
+                                keywordsFound.append(keywordNew)
+                                keywordExist = True
 
                 if nameKeywordExist:
                     data_result = {"nameAlreadyExists": True}
                     return bad_request("Name already exists", data_result)
+
+                if keywordExist:
+                    data_result = {"keywordExist": True, "keywordFound": keywordsFound}
+                    return bad_request("Keyword already exists", data_result)
 
                 Object.objects.create(
                     name=object_name,
@@ -233,21 +248,36 @@ def object_detail(request: HttpRequest) -> HttpResponse:
                     return bad_request("Name already exists", data_result)
 
                 # check if object name is used as keyword
-                objectsOfUser = Object.objects.filter(
-                    Q(owner=request.user.id) | Q(shared=True)
-                )
+                if object_shared is True:
+                    objectsOfUser = Object.objects.all()
+                else:
+                    objectsOfUser = Object.objects.filter(
+                        Q(owner=request.user.id) | Q(shared=True)
+                    )
                 nameKeywordExist = False
+                keywordExist = False
+                keywordsFound = []
                 for object in objectsOfUser:
-                    keywords = object.keywords
-                    if keywords is None:
+                    keywordsOld = object.keywords
+                    if keywordsOld is None:
                         continue
-                    keywordsList = [keyword.strip() for keyword in keywords]
-                    if object_name in keywordsList:
+                    keywordsOld = [keyword.strip() for keyword in keywordsOld]
+                    keywordsNew = [keyword.strip() for keyword in object_keywords]
+                    if object_name in keywordsOld:
                         nameKeywordExist = True
+                    for keywordOld in keywordsOld:
+                        for keywordNew in keywordsNew:
+                            if keywordNew == keywordOld:
+                                keywordsFound.append(keywordNew)
+                                keywordExist = True
 
                 if nameKeywordExist:
                     data_result = {"nameAlreadyExists": True}
                     return bad_request("Name already exists", data_result)
+
+                if keywordExist:
+                    data_result = {"keywordExist": True, "keywordFound": keywordsFound}
+                    return bad_request("Keyword already exists", data_result)
 
                 Object.objects.filter(id=object_id).update(
                     name=object_name,
