@@ -24,6 +24,7 @@ interface MainCardProps {
   contentSX?: any
   backFunction?: any
   additionalAction?: AdditionalAction[]
+  customElement?: any
 }
 
 export const MainCard = forwardRef(
@@ -40,6 +41,7 @@ export const MainCard = forwardRef(
       contentSX,
       backFunction,
       additionalAction,
+      customElement,
     }: MainCardProps,
     ref
   ) => {
@@ -97,6 +99,7 @@ export const MainCard = forwardRef(
                 {backFunction && (
                   <Button onClick={() => backFunction()}>Back</Button>
                 )}
+                {customElement}
               </>
             }
           />
@@ -123,4 +126,5 @@ MainCard.defaultProps = {
   contentSX: {},
   backFunction: null,
   additionalAction: [],
+  customElement: null,
 }

@@ -5,10 +5,14 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { endpoints } from 'services/endpoints'
 import useSWR from 'swr'
+import { SoundOutlined } from '@ant-design/icons'
+import { Palette } from 'themes/palette'
 import { ChatWrapper } from './chatWrapper'
 
 const Chat = () => {
   const { id } = useParams()
+  const [speaker, setSpeaker] = React.useState(false)
+  const themePalette = Palette('light')
 
   const { data, isLoading } = useSWR<TaskDetailType, Error>({
     url: endpoints.home.libraries.task,
@@ -18,10 +22,23 @@ const Chat = () => {
   const title = data ? `Chat to create the task: "${data.name}"` : ''
 
   return (
-    <MainCard title={title}>
+    <MainCard
+      title={title}
+      customElement={
+        <SoundOutlined
+          onClick={() => setSpeaker(!speaker)}
+          style={{
+            color: speaker
+              ? themePalette.palette.error.main
+              : themePalette.palette.primary.main,
+            fontSize: '2em',
+          }}
+        />
+      }
+    >
       {isLoading && <CircularProgress />}
       {data === null && <Typography>Task with ID {id} not found</Typography>}
-      {data && <ChatWrapper />}
+      {data && <ChatWrapper speaker={speaker} />}
     </MainCard>
   )
 }

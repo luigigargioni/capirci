@@ -18,7 +18,11 @@ import { activeItem, openDrawer } from 'store/reducers/menu'
 import { toast } from 'react-toastify'
 import { MessageText } from 'utils/messages'
 import { iconMap } from 'utils/iconMap'
-import { EyeOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import {
+  EyeOutlined,
+  PlayCircleOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons'
 import {
   defaultCurrentPage,
   defaultPageSizeSelection,
@@ -46,6 +50,10 @@ const ListTasks = () => {
     dispatch(openDrawer(false))
     dispatch(activeItem('programminggraphical'))
     navigate(`/graphic/${id}`)
+  }
+
+  const handleRun = (id: number) => {
+    navigate(`/run/${id}`)
   }
 
   const handleDelete = (id: number) => {
@@ -78,6 +86,21 @@ const ListTasks = () => {
           disabled={record.owner !== getFromLocalStorage('user')?.id}
         >
           <EyeOutlined style={{ fontSize: '2em' }} />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'run',
+      title: 'Run',
+      dataIndex: 'run',
+      width: 50,
+      render: (_, record) => (
+        <IconButton
+          onClick={() => handleRun(record.id)}
+          color="primary"
+          aria-label="detail"
+        >
+          <PlayCircleOutlined style={{ fontSize: '2em' }} />
         </IconButton>
       ),
     },

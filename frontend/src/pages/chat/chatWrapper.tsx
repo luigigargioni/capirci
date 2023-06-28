@@ -22,7 +22,11 @@ const scrollToBottom = () => {
   if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight
 }
 
-export const ChatWrapper = () => {
+interface ChatWrapperProps {
+  speaker: boolean
+}
+
+export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -57,15 +61,24 @@ export const ChatWrapper = () => {
       .then((response) => {
         if (response) {
           const newMessages = response.message.map(
-            (msg: string, index: number) => ({
-              text: msg,
-              id:
-                messagesWithUserRequest[messagesWithUserRequest.length - 1].id +
-                1 +
-                index,
-              user: UserChatEnum.ROBOT,
-              timestamp: formatTimeFrontend(dayjs().toString()),
-            })
+            (msg: string, index: number) => {
+              if (speaker) {
+                const utterance = new SpeechSynthesisUtterance(msg)
+                utterance.lang = 'en-GB'
+                window.speechSynthesis.speak(utterance)
+              }
+
+              return {
+                text: msg,
+                id:
+                  messagesWithUserRequest[messagesWithUserRequest.length - 1]
+                    .id +
+                  1 +
+                  index,
+                user: UserChatEnum.ROBOT,
+                timestamp: formatTimeFrontend(dayjs().toString()),
+              }
+            }
           )
 
           setListMessages([...messagesWithUserRequest, ...newMessages])
