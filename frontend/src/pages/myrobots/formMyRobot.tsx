@@ -45,7 +45,7 @@ export const FormMyRobot = ({
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.libraries.myRobot, method, body: values })
       .then(async (res) => {
-        if (res.nameAlreadyExists) {
+        if (res && res.nameAlreadyExists) {
           await setFieldTouched('name', true)
           await setFieldError('name', MessageText.alreadyExists)
           setStatus({ success: false })

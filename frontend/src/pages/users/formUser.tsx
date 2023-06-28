@@ -38,11 +38,17 @@ export const FormUser = ({
 }: FormUserProps) => {
   const onSubmit = async (
     values: UserDetailType,
-    { setStatus, setSubmitting }
+    { setStatus, setSubmitting, setFieldTouched, setFieldError }
   ) => {
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.management.user, method, body: values })
-      .then(() => {
+      .then(async (res) => {
+        if (res && res.usernameAlreadyExists) {
+          await setFieldTouched('username', true)
+          await setFieldError('username', MessageText.alreadyExists)
+          setStatus({ success: false })
+          return
+        }
         setStatus({ success: true })
         toast.success(MessageText.success)
         backFunction()

@@ -5,6 +5,7 @@ from backend.utils.response import (
     error_response,
     success_response,
     unauthorized_request,
+    bad_request,
 )
 from backend.models import Robot
 from json import loads
@@ -72,6 +73,11 @@ def user_detail(request: HttpRequest) -> HttpResponse:
                 user_first_name = data.get("first_name")
                 user_last_name = data.get("last_name")
                 user_role = data.get("role")
+                # check if the username already exists
+                if User.objects.filter(username=user_name).exists():
+                    data_result = {"usernameAlreadyExists": True}
+                    return bad_request("Username already exists", data_result)
+
                 new_user = User.objects.create(
                     username=user_name,
                     email=user_email,
@@ -92,6 +98,11 @@ def user_detail(request: HttpRequest) -> HttpResponse:
                 user_first_name = data.get("first_name")
                 user_last_name = data.get("last_name")
                 user_role = data.get("role")
+                # check if the username already exists
+                if User.objects.filter(username=user_name).exclude(id=user_id).exists():
+                    data_result = {"usernameAlreadyExists": True}
+                    return bad_request("Username already exists", data_result)
+
                 user = User.objects.filter(id=user_id)
                 user.update(
                     username=user_name,
@@ -155,6 +166,10 @@ def robot_detail(request: HttpRequest) -> HttpResponse:
                 robot_model = data.get("model")
                 robot_port = data.get("port")
                 robot_cameraip = data.get("cameraip")
+                # check if the name already exists
+                if Robot.objects.filter(name=robot_name).exists():
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
                 Robot.objects.create(
                     name=robot_name,
                     ip=robot_ip,
@@ -171,6 +186,11 @@ def robot_detail(request: HttpRequest) -> HttpResponse:
                 robot_model = data.get("model")
                 robot_port = data.get("port")
                 robot_cameraip = data.get("cameraip")
+                # check if the name already exists
+                if Robot.objects.filter(name=robot_name).exclude(id=robot_id).exists():
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Robot.objects.filter(id=robot_id).update(
                     name=robot_name,
                     ip=robot_ip,

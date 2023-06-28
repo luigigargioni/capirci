@@ -253,6 +253,18 @@ def action_detail(request: HttpRequest) -> HttpResponse:
                 action_robot = UserRobot.objects.get(id=data.get("robot"))
                 action_positions = data.get("positions")
                 action_owner = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if action_shared is True:
+                    actions = Action.objects.filter(name=action_name)
+                else:
+                    actions = Action.objects.filter(
+                        Q(owner=action_owner) | Q(shared=True)
+                    ).filter(name=action_name)
+
+                if actions:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Action.objects.create(
                     name=action_name,
                     owner=action_owner,
@@ -268,6 +280,23 @@ def action_detail(request: HttpRequest) -> HttpResponse:
                 action_shared = data.get("shared")
                 action_robot = UserRobot.objects.get(id=data.get("robot"))
                 action_positions = data.get("positions")
+                action_owner = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if action_shared is True:
+                    actions = Action.objects.filter(name=action_name).exclude(
+                        id=action_id
+                    )
+                else:
+                    actions = (
+                        Action.objects.filter(Q(owner=action_owner) | Q(shared=True))
+                        .filter(name=action_name)
+                        .exclude(id=action_id)
+                    )
+
+                if actions:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Action.objects.filter(id=action_id).update(
                     name=action_name,
                     shared=action_shared,
@@ -322,8 +351,7 @@ def location_detail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)
                 location_id = data.get("id")
-                user = User.objects.get(id=request.user.id)
-                location = Location.objects.filter(Q(id=location_id) & Q(owner=user))
+                location = Location.objects.filter(id=location_id)
                 location.delete()
                 return success_response()
             if request.method == HttpMethod.POST.value:
@@ -333,6 +361,19 @@ def location_detail(request: HttpRequest) -> HttpResponse:
                 location_position = data.get("position")
                 location_robot = Robot.objects.get(id=data.get("robot"))
                 location_owner = User.objects.get(id=request.user.id)
+
+                # check if the name already exists
+                if location_shared is True:
+                    locations = Location.objects.filter(name=location_name)
+                else:
+                    locations = Location.objects.filter(
+                        Q(owner=location_owner) | Q(shared=True)
+                    ).filter(name=location_name)
+
+                if locations:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Location.objects.create(
                     name=location_name,
                     owner=location_owner,
@@ -347,6 +388,26 @@ def location_detail(request: HttpRequest) -> HttpResponse:
                 location_name = data.get("name")
                 location_shared = data.get("shared")
                 location_position = data.get("position")
+                location_owner = User.objects.get(id=request.user.id)
+
+                # check if the name already exists
+                if location_shared is True:
+                    locations = Location.objects.filter(name=location_name).exclude(
+                        id=location_id
+                    )
+                else:
+                    locations = (
+                        Location.objects.filter(
+                            Q(owner=location_owner) | Q(shared=True)
+                        )
+                        .filter(name=location_name)
+                        .exclude(id=location_id)
+                    )
+
+                if locations:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 location_robot = UserRobot.objects.get(id=data.get("robot"))
                 Location.objects.filter(id=location_id).update(
                     name=location_name,
@@ -418,7 +479,11 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
                 myRobot_name = data.get("name")
                 user = User.objects.get(id=request.user.id)
                 # check if the name already exists
-                if UserRobot.objects.filter(name=myRobot_name, user=user).exists():
+                if (
+                    UserRobot.objects.filter(name=myRobot_name)
+                    .exclude(user=user)
+                    .exists()
+                ):
                     data_result = {"nameAlreadyExists": True}
                     return bad_request("Name already exists", data_result)
 

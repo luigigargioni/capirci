@@ -42,11 +42,17 @@ export const FormAction = ({
 }: FormActionProps) => {
   const onSubmit = async (
     values: ActionDetailType,
-    { setStatus, setSubmitting }
+    { setStatus, setSubmitting, setFieldError, setFieldTouched }
   ) => {
     const method = insertMode ? MethodHTTP.POST : MethodHTTP.PUT
     fetchApi({ url: endpoints.home.libraries.action, method, body: values })
-      .then(() => {
+      .then(async (res) => {
+        if (res && res.nameAlreadyExists) {
+          await setFieldTouched('name', true)
+          await setFieldError('name', MessageText.alreadyExists)
+          setStatus({ success: false })
+          return
+        }
         setStatus({ success: true })
         toast.success(MessageText.success)
         backFunction()
