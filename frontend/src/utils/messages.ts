@@ -13,7 +13,7 @@ export enum MessageText {
   logoutSuccess = 'Logged out successfully',
   noConnection = 'Server connection problem',
   passwordMismatch = 'Passwords do not match',
-  emailAlreadyExists = 'Email already exists',
+  alreadyExists = 'This value already exists',
   success = 'Operation completed successfully',
   valueNotValid = 'Invalid value',
   invalidDate = 'The start date must be before the end date',

@@ -49,3 +49,15 @@ def error_response(error, status=500):
         },
         status=status,
     )
+
+
+def bad_request(error, payload, status=400):
+    return JsonResponse(
+        {
+            "message": error,
+            "status": status,
+            "timestamp": getDateTimeNow(),
+            "payload": payload,
+        },
+        status=status,
+    )

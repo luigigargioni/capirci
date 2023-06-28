@@ -5,6 +5,7 @@ from backend.utils.response import (
     error_response,
     success_response,
     unauthorized_request,
+    bad_request,
 )
 from backend.models import Task, Object, UserRobot, Location, Action, Robot
 from django.db.models import Q
@@ -399,6 +400,13 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
                 myRobot_name = data.get("name")
                 myRobot_robot_id = data.get("robot")
                 myRobot_user = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if UserRobot.objects.filter(
+                    name=myRobot_name, user=myRobot_user
+                ).exists():
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 myRobot_robot = Robot.objects.get(id=myRobot_robot_id)
                 UserRobot.objects.create(
                     name=myRobot_name, user=myRobot_user, robot=myRobot_robot
@@ -408,6 +416,12 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
                 data = loads(request.body)
                 myRobot_id = data.get("id")
                 myRobot_name = data.get("name")
+                user = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if UserRobot.objects.filter(name=myRobot_name, user=user).exists():
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 UserRobot.objects.filter(id=myRobot_id).update(
                     name=myRobot_name,
                 )
