@@ -72,6 +72,7 @@ export const FormTask = ({ data, insertMode, backFunction }: FormTaskProps) => {
         name: data?.name || '',
         description: data?.description || '',
         shared: data?.shared || false,
+        code: data?.code || '',
       }}
       validationSchema={YupObject().shape({
         name: YupString()

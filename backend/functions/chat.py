@@ -46,33 +46,30 @@ def new_message(request: HttpRequest) -> HttpResponse:
                 end = data.get("end")
                 data_result = {}
                 if end == 0 and question == 0:
-                    response, end = question_pick_place(message, task_id)
-                    print(response, end)
+                    response, end, card = question_pick_place(message, task_id)
+                    data_result["message"] = [response]
                     if end == 1 and question == 0:
-                        data_result["question"] = 2
-                        data_result["end"] = 2
-                        data_result["message"] = CHAT_MESSAGE_ACTION
-                        # TODO to check
-                    elif end == 0 and question == 0:
-                        data_result["question"] = 0
-                        data_result["end"] = 0
-                        data_result["message"] = response
-                    else:
-                        data_result["question"] = 1
-                        data_result["end"] = 1
-                        data_result["message"] = response
+                        if card == "while" or card.isdigit():
+                            data_result["question"] = 2
+                            data_result["end"] = 2
+                            data_result["message"] = [response, CHAT_MESSAGE_ACTION]
+                        else:
+                            data_result["question"] = 1
+                            data_result["end"] = 1
+                            data_result["message"] = [response, CHAT_MESSAGE_TIMES]
                 elif end == 1 and question == 1:
                     response, end = question_times(message.lower(), task_id)
                     if end == 2 and response == "ok":
                         data_result["question"] = 2
                         data_result["end"] = 2
-                        data_result["message"] = CHAT_MESSAGE_ACTION
+                        data_result["message"] = [CHAT_MESSAGE_ACTION]
                     else:
                         data_result["question"] = 1
                         data_result["end"] = 1
-                        data_result["message"] = (
-                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND + CHAT_MESSAGE_TIMES
-                        )
+                        data_result["message"] = [
+                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND,
+                            CHAT_MESSAGE_TIMES,
+                        ]
                 elif end == 2 and question == 2:
                     response, end = question_action(
                         message.lower(), task_id, request.user.id
@@ -80,44 +77,45 @@ def new_message(request: HttpRequest) -> HttpResponse:
                     if end == 3 and (response == "ok" or response == "no"):
                         data_result["question"] = 3
                         data_result["end"] = 3
-                        data_result["message"] = CHAT_MESSAGE_EVENT
+                        data_result["message"] = [CHAT_MESSAGE_EVENT]
                     else:
                         data_result["question"] = 2
                         data_result["end"] = 2
-                        data_result["message"] = (
-                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND + CHAT_MESSAGE_ACTION
-                        )
+                        data_result["message"] = [
+                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND,
+                            CHAT_MESSAGE_ACTION,
+                        ]
                 elif end == 3 and question == 3:
                     response, end = question_event(message.lower(), task_id)
                     if end == 4 and (response == "ok" or response == "no"):
                         data_result["question"] = 4
                         data_result["end"] = 4
-                        data_result["message"] = CHAT_MESSAGE_QUESTION_GRAPHIC
+                        data_result["message"] = [CHAT_MESSAGE_QUESTION_GRAPHIC]
                     else:
                         data_result["question"] = 3
                         data_result["end"] = 3
-                        data_result["message"] = (
+                        data_result["message"] = [
                             CHAT_MESSAGE_MSG_NOT_UNDERSTAND + CHAT_MESSAGE_EVENT
-                        )
+                        ]
                 elif end == 4 and question == 4:
                     response, end = question_graphic(message.lower())
                     if end == 5 and response == "yes":
                         data_result["question"] = 5
                         data_result["end"] = 5
                         data_result["openGraphic"] = True
-                        data_result["message"] = CHAT_MESSAGE_OPEN_GRAPHIC
+                        data_result["message"] = [CHAT_MESSAGE_OPEN_GRAPHIC]
                     elif end == 5 and response == "no":
                         data_result["question"] = 5
                         data_result["end"] = 5
                         data_result["openTasks"] = True
-                        data_result["message"] = CHAT_MESSAGE_NOT_OPEN_GRAPHIC
+                        data_result["message"] = [CHAT_MESSAGE_NOT_OPEN_GRAPHIC]
                     else:
                         data_result["question"] = 4
                         data_result["end"] = 4
-                        data_result["message"] = (
-                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND
-                            + CHAT_MESSAGE_QUESTION_GRAPHIC
-                        )
+                        data_result["message"] = [
+                            CHAT_MESSAGE_MSG_NOT_UNDERSTAND,
+                            CHAT_MESSAGE_QUESTION_GRAPHIC,
+                        ]
 
                 return success_response(data_result)
             else:
@@ -171,7 +169,7 @@ def question_pick_place(message: str, task_id: int) -> dict:
                     "repeat",
                     pick_data_card,
                 )
-    return response, end
+    return data_result["response"], data_result["end"], data_result["card"]
 
 
 def main_dialog(text_to_parse, task_id):

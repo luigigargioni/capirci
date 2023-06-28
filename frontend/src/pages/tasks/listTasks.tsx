@@ -14,7 +14,7 @@ import useSWR from 'swr'
 import { MainCard } from 'components/MainCard'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
-import { activeItem } from 'store/reducers/menu'
+import { activeItem, openDrawer } from 'store/reducers/menu'
 import { toast } from 'react-toastify'
 import { MessageText } from 'utils/messages'
 import { iconMap } from 'utils/iconMap'
@@ -43,7 +43,8 @@ const ListTasks = () => {
   }
 
   const handleEdit = (id: number) => {
-    dispatch(activeItem(''))
+    dispatch(openDrawer(false))
+    dispatch(activeItem('programminggraphical'))
     navigate(`/graphic/${id}`)
   }
 

@@ -6,6 +6,7 @@ export interface TaskType {
   owner: string
   owner__username: string
   shared: boolean
+  code: string
 }
 
 export type TaskDetailType = Omit<

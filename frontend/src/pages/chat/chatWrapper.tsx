@@ -17,7 +17,10 @@ import { activeItem, openDrawer } from 'store/reducers/menu'
 import { INITIAL_MESSAGE, MessageType, UserChatEnum } from './types'
 
 const { username } = getFromLocalStorage('user')
-const chatContainer = document.getElementById('chatContainer')
+const scrollToBottom = () => {
+  const chatContainer = document.getElementById('chatContainer')
+  if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight
+}
 
 export const ChatWrapper = () => {
   const { id } = useParams()
@@ -32,7 +35,7 @@ export const ChatWrapper = () => {
   const [question, setQuestion] = React.useState(0)
   const [end, setEnd] = React.useState(0)
 
-  const onMessageSend = async () => {
+  const onMessageSend = () => {
     const messagesWithUserRequest = [
       ...listMessages,
       {
@@ -42,8 +45,7 @@ export const ChatWrapper = () => {
         timestamp: formatTimeFrontend(dayjs().toString()),
       },
     ]
-    await setListMessages(messagesWithUserRequest)
-    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight
+    setListMessages(messagesWithUserRequest)
     setIsProcessing(true)
     setMessage('')
 
@@ -52,35 +54,35 @@ export const ChatWrapper = () => {
       method: MethodHTTP.POST,
       body: { id: Number(id), message, question, end },
     })
-      .then(async (response) => {
+      .then((response) => {
         if (response) {
-          await setListMessages([
-            ...messagesWithUserRequest,
-            {
-              text: response.message,
+          const newMessages = response.message.map(
+            (msg: string, index: number) => ({
+              text: msg,
               id:
                 messagesWithUserRequest[messagesWithUserRequest.length - 1].id +
-                1,
+                1 +
+                index,
               user: UserChatEnum.ROBOT,
               timestamp: formatTimeFrontend(dayjs().toString()),
-            },
-          ])
+            })
+          )
 
-          // TODO: fix scroll
-          if (chatContainer)
-            chatContainer.scrollTop = chatContainer.scrollHeight
+          setListMessages([...messagesWithUserRequest, ...newMessages])
 
-          setQuestion(response.question)
-          setEnd(response.end)
+          if (response.question !== null && response.question !== undefined)
+            setQuestion(response.question)
+          if (response.end !== null && response.end !== undefined)
+            setEnd(response.end)
 
           if (response.openGraphic) {
             setTimeout(() => {
               navigate(`/graphic/${id}`)
-              dispatch(activeItem('graphic'))
+              dispatch(activeItem('programminggraphical'))
             }, 2000)
           }
 
-          if (response.endTasks) {
+          if (response.openTasks) {
             setTimeout(() => {
               navigate(`/tasks/${id}`)
               dispatch(activeItem('tasks'))
@@ -93,6 +95,10 @@ export const ChatWrapper = () => {
         setIsProcessing(false)
       })
   }
+
+  React.useEffect(() => {
+    scrollToBottom()
+  }, [listMessages])
 
   return (
     <div style={{ height: '76vh', position: 'relative' }}>

@@ -59,7 +59,9 @@ def task_detail(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.GET.value:
                 task_id = request.GET.get("id")
                 task = Task.objects.get(id=task_id)
-                task_fields = task.to_dict(["id", "name", "description", "shared"])
+                task_fields = task.to_dict(
+                    ["id", "name", "description", "shared", "code"]
+                )
                 return success_response(task_fields)
             if request.method == HttpMethod.DELETE.value:
                 data = loads(request.body)

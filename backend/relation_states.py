@@ -3,6 +3,12 @@ from xml.etree.ElementTree import fromstring
 from .dictionary import place_synonyms, pick_synonyms
 from .utils.xml import create_XML_program
 from .models import Task
+from .utils.string import (
+    CHAT_MESSAGE_MSG_NOT_UNDERSTAND,
+    CHAT_PROCESSING_OBJECT,
+    CHAT_PROCESSING_LOCATION,
+    CHAT_PROCESSING_PICK_PLACE,
+)
 
 
 class Object:
@@ -129,14 +135,14 @@ class PickAndPlace:
 
         if (self.pick is None and pick is None) and self.place is not None:
             create_XML_program(task_id, self)
-            msg = "Which is the object to be taken?"
-            end = "0"
+            msg = CHAT_PROCESSING_OBJECT
+            end = 0
             card = ""
             return msg, end, card
         elif (self.place is None and place is None) and (self.pick is not None):
             create_XML_program(task_id, self)
-            msg = "Where should I put the " + self.pick.object.name + "?"
-            end = "0"
+            msg = CHAT_PROCESSING_LOCATION.format(self.pick.object.name)
+            end = 0
             card = self.pick.object.cardinality
             return msg, end, card
         elif (self.pick is not None or pick is not None) and (
@@ -144,14 +150,14 @@ class PickAndPlace:
         ):
             pickData = self.pick.object.name if pick is None else pick
             placeData = self.place.location.name if place is None else place
-            msg = "I have to put the " + pickData + " in the " + placeData + "."
-            end = "1"
+            msg = CHAT_PROCESSING_PICK_PLACE.format(pickData, placeData)
+            end = 1
             card = self.pick.object.cardinality if pick is None else pick_card
             create_XML_program(task_id, self)
             return msg, end, card
         elif (self.pick is None) and (self.place is None):
-            msg = "I did not understand what you said. Tell me again what to do."
-            end = "0"
+            msg = CHAT_MESSAGE_MSG_NOT_UNDERSTAND
+            end = 0
             card = ""
             return msg, end, card
 
