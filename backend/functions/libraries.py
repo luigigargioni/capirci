@@ -163,6 +163,35 @@ def object_detail(request: HttpRequest) -> HttpResponse:
                 object_photo = data.get("photo")
                 object_shape = data.get("shape")
                 object_owner = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if object_shared is True:
+                    objects = Object.objects.filter(name=object_name)
+                else:
+                    objects = Object.objects.filter(
+                        Q(owner=object_owner) | Q(shared=True)
+                    ).filter(name=object_name)
+
+                if objects:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
+                # check if object name is used as keyword
+                objectsOfUser = Object.objects.filter(
+                    Q(owner=request.user.id) | Q(shared=True)
+                )
+                nameKeywordExist = False
+                for object in objectsOfUser:
+                    keywords = object.keywords
+                    if keywords is None:
+                        continue
+                    keywordsList = [keyword.strip() for keyword in keywords]
+                    if object_name in keywordsList:
+                        nameKeywordExist = True
+
+                if nameKeywordExist:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Object.objects.create(
                     name=object_name,
                     owner=object_owner,
@@ -186,6 +215,40 @@ def object_detail(request: HttpRequest) -> HttpResponse:
                 object_contour = data.get("contour")
                 object_photo = data.get("photo")
                 object_shape = data.get("shape")
+                object_owner = User.objects.get(id=request.user.id)
+                # check if the name already exists
+                if object_shared is True:
+                    objects = Object.objects.filter(name=object_name).exclude(
+                        id=object_id
+                    )
+                else:
+                    objects = (
+                        Object.objects.filter(Q(owner=object_owner) | Q(shared=True))
+                        .filter(name=object_name)
+                        .exclude(id=object_id)
+                    )
+
+                if objects:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
+                # check if object name is used as keyword
+                objectsOfUser = Object.objects.filter(
+                    Q(owner=request.user.id) | Q(shared=True)
+                )
+                nameKeywordExist = False
+                for object in objectsOfUser:
+                    keywords = object.keywords
+                    if keywords is None:
+                        continue
+                    keywordsList = [keyword.strip() for keyword in keywords]
+                    if object_name in keywordsList:
+                        nameKeywordExist = True
+
+                if nameKeywordExist:
+                    data_result = {"nameAlreadyExists": True}
+                    return bad_request("Name already exists", data_result)
+
                 Object.objects.filter(id=object_id).update(
                     name=object_name,
                     shared=object_shared,
