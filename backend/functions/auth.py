@@ -94,7 +94,7 @@ def change_password(request: HttpRequest) -> HttpResponse:
                 update_session_auth_hash(request, user)
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:

@@ -119,7 +119,7 @@ def new_message(request: HttpRequest) -> HttpResponse:
 
                 return success_response(data_result)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:

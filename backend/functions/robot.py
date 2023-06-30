@@ -15,7 +15,7 @@ from backend.utils.response import (
     unauthorized_request,
 )
 from django.http import HttpResponse, HttpRequest
-from json import loads, dumps
+from json import loads
 from pythonping import ping
 from backend.models import UserRobot, Robot, Task, Object, Location, Action
 from django.contrib.auth.models import User
@@ -58,6 +58,7 @@ INITIAL_POSITION = """@0 P(177.483268825558, -44.478627592948996, 254.9981517277
                                     179.99584205147127, 261.0)"""
 DEFAULT_TIMEOUT = 14400
 MAX_SPEED = "SPEED=100"
+HALF_SPEED = "SPEED=50"
 
 
 def polar_to_robot_coordinates(angle, robot_x, robot_y, module=CAMERA_ROBOT_DISTANCE):
@@ -298,7 +299,7 @@ def take_position(request: HttpRequest) -> HttpResponse:
                 else:
                     return error_response(str("Robot not connected"))
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -339,8 +340,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
                 force = None
 
                 taskCode = (
-                    Task.objects.get(id=task_id)
-                    .filter(owner=user)
+                    Task.objects.filter(id=task_id)
                     .values_list("code", flat=True)
                     .first()
                 )
@@ -412,8 +412,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
                     or not pickExist
                     or not placeExist
                 ):
-                    json_result = dumps(data_result)
-                    return HttpResponse(json_result)
+                    return success_response(data_result)
 
                 # Can access with: place_position['X'], place_position['Y'],... Z, RX, RY, RZ, FIG
                 place_position = loads(place_position)
@@ -437,14 +436,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
 
                 (client, hCtrl, hRobot) = connect(ip, port, 14400)
 
-                # Move to calibration position
-                client.robot_move(
-                    hRobot,
-                    1,
-                    """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                179.99584205147127, 261.0)""",
-                    "SPEED=100",
-                )
+                move_to_calibration_position(client, hRobot)
                 switch_bcap_to_orin(client, hRobot, caoRobot)
                 ctrl.Execute(
                     "HandMoveA", [30, 25]
@@ -481,17 +473,10 @@ def runTask(request: HttpRequest) -> HttpResponse:
                         curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
                         curr_pos[2] = "254.99815172770593"
                         client.robot_move(
-                            hRobot, 2, list_to_string_position(curr_pos), "SPEED=50"
+                            hRobot, 2, list_to_string_position(curr_pos), HALF_SPEED
                         )
 
-                        # Move to calibration position
-                        client.robot_move(
-                            hRobot,
-                            1,
-                            """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                        179.99584205147127, 261.0)""",
-                            "SPEED=100",
-                        )
+                        move_to_calibration_position(client, hRobot)
 
                         if action is not None:
                             for x in range(0, len(action_position)):
@@ -499,17 +484,10 @@ def runTask(request: HttpRequest) -> HttpResponse:
                                     hRobot,
                                     1,
                                     "@0 P(" + action_position[x] + ")",
-                                    "SPEED=100",
+                                    MAX_SPEED,
                                 )
 
-                        # Move to calibration position
-                        client.robot_move(
-                            hRobot,
-                            1,
-                            """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                        179.99584205147127, 261.0)""",
-                            "SPEED=100",
-                        )
+                        move_to_calibration_position(client, hRobot)
 
                         client.robot_move(
                             hRobot,
@@ -529,7 +507,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
                             + ", "
                             + str(place_position["FIG"])
                             + ")",
-                            "SPEED=100",
+                            MAX_SPEED,
                         )
 
                         switch_bcap_to_orin(client, hRobot, caoRobot)
@@ -540,22 +518,15 @@ def runTask(request: HttpRequest) -> HttpResponse:
                     else:
                         data_result["objectNotFound"] = True
                         break
-                # Move to calibration position
-                client.robot_move(
-                    hRobot,
-                    1,
-                    """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                179.99584205147127, 261.0)""",
-                    "SPEED=100",
-                )
+
+                move_to_calibration_position(client, hRobot)
                 disconnect(client, hCtrl, hRobot)
                 if data_result["objectNotFound"] is False:
                     data_result["finishTask"] = True
 
-                json_result = dumps(data_result)
-                return HttpResponse(json_result)
+                return success_response(data_result)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -593,7 +564,7 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
     areaOriginal = cv2.contourArea(cnts[0])
 
     while find is False and move < 6:
-        client.robot_move(hRobot, 1, Q[pos], "SPEED=100")
+        client.robot_move(hRobot, 1, Q[pos], MAX_SPEED)
 
         curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
         curr_joints = robot_getvar(client, hRobot, "@CURRENT_ANGLE")
@@ -663,10 +634,10 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
             curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
             curr_pos[0] = shape_x
             curr_pos[1] = shape_y
-            client.robot_move(hRobot, 2, list_to_string_position(curr_pos), "SPEED=100")
+            client.robot_move(hRobot, 2, list_to_string_position(curr_pos), MAX_SPEED)
 
             curr_pos[2] = objectHeight
-            client.robot_move(hRobot, 2, list_to_string_position(curr_pos), "SPEED=50")
+            client.robot_move(hRobot, 2, list_to_string_position(curr_pos), HALF_SPEED)
 
             switch_bcap_to_orin(client, hRobot, caoRobot)
             ctrl.Execute(
@@ -697,7 +668,7 @@ def ping_ip(request: HttpRequest) -> HttpResponse:
                 else:
                     return error_response(str("IP not reachable"))
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -716,3 +687,12 @@ def imread_base64(base64_string):
     img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
 
     return img
+
+
+def move_to_calibration_position(client: BCAPClient, hRobot):
+    client.robot_move(
+        hRobot,
+        1,
+        INITIAL_POSITION,
+        MAX_SPEED,
+    )

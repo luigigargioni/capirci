@@ -16,9 +16,8 @@ from .robot import (
     connect,
     disconnect,
     take_img,
-    INITIAL_POSITION,
+    move_to_calibration_position,
     DEFAULT_TIMEOUT,
-    MAX_SPEED,
 )
 from pythonping import ping
 from pythoncom import CoInitialize
@@ -47,7 +46,7 @@ def get_task_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(tasks)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -101,7 +100,7 @@ def task_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -119,7 +118,7 @@ def get_object_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(objects)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -291,7 +290,7 @@ def object_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -316,7 +315,7 @@ def get_action_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(actions)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -398,7 +397,7 @@ def action_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -424,7 +423,7 @@ def get_location_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(locations)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -510,7 +509,7 @@ def location_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -528,7 +527,7 @@ def get_my_robot_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(myRobots)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -585,7 +584,7 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -610,12 +609,7 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
                     client = handles[0]
                     hCtrl = handles[1]
                     hRobot = handles[2]
-                    client.robot_move(
-                        hRobot,
-                        1,
-                        INITIAL_POSITION,
-                        MAX_SPEED,
-                    )
+                    move_to_calibration_position(client, hRobot)
                     disconnect(client, hCtrl, hRobot)
                     image = take_img(wb=True, cameraip=robot.cameraip)
 
@@ -663,7 +657,7 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
                 else:
                     return error_response(str("Robot not connected"))
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:

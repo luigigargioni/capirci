@@ -36,7 +36,7 @@ def get_user_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(users)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -120,7 +120,7 @@ def user_detail(request: HttpRequest) -> HttpResponse:
                     new_group.user_set.add(user)
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -136,7 +136,7 @@ def get_robot_list(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response(robots)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -200,7 +200,7 @@ def robot_detail(request: HttpRequest) -> HttpResponse:
                 )
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -214,7 +214,7 @@ def get_group_list(request: HttpRequest) -> HttpResponse:
                 groups = Group.objects.values("id", "name")
                 return success_response(groups)
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
@@ -233,7 +233,7 @@ def reset_password(request: HttpRequest) -> HttpResponse:
                 update_session_auth_hash(request, user)
                 return success_response()
             else:
-                return invalid_request_method
+                return invalid_request_method()
         else:
             return unauthorized_request()
     except Exception as e:
