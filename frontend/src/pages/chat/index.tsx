@@ -29,8 +29,8 @@ const Chat = () => {
           onClick={() => setSpeaker(!speaker)}
           style={{
             color: speaker
-              ? themePalette.palette.error.main
-              : themePalette.palette.primary.main,
+              ? themePalette.palette.primary.main
+              : themePalette.palette.error.main,
             fontSize: '2em',
           }}
         />

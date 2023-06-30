@@ -668,3 +668,69 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
             return unauthorized_request()
     except Exception as e:
         return error_response(str(e))
+
+
+""" def checkLibrariesXML(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        data_result = {"pickExist": False, "placeExist": False, "actionExist": False}
+        taskname = request.POST.get("taskname")
+        username = request.POST.get("username")
+        # file = parse(fileName).getroot()
+        taskCode = (
+            Task.objects.filter(name=taskname)
+            .filter(owner=username)
+            .values_list("code", flat=True)
+            .first()
+        )
+        root = fromstring(taskCode)
+
+        pick = root.findall(".//pick")[0].text
+        place = root.findall(".//place")[0].text
+        action = root.findall(".//action")[0]
+
+        if action is not None:
+            action = action.text
+        else:
+            data_result["actionExist"] = True
+
+        data_result["pick"] = pick
+        data_result["place"] = place
+        data_result["action"] = action
+        user = User.objects.get(username=username)
+
+        objectUser = Object.objects.filter(Q(owner=user) | Q(shared=True))
+        for object in objectUser:
+            if pick == object.name:
+                data_result["pickExist"] = True
+                break
+            keywords = object.keywords
+            keywords = (
+                str(keywords)
+                .replace("[", "")
+                .replace("]", "")
+                .replace("'", "")
+                .replace(" ", "")
+            )
+            keywords = keywords.split(",")
+            for keyword in keywords:
+                if pick == keyword:
+                    data_result["pickExist"] = True
+                    break
+
+        objectPlace = Location.objects.filter(Q(owner=user) | Q(shared=True))
+        for object in objectPlace:
+            if place == object.name:
+                data_result["placeExist"] = True
+                break
+
+        if action is not None:
+            objectAction = Action.objects.filter(Q(owner=user) | Q(shared=True))
+            for object in objectAction:
+                if action == object.name:
+                    data_result["actionExist"] = True
+                    break
+
+        json_result = dumps(data_result)
+        return HttpResponse(json_result)
+    else:
+        return HttpResponse("ERROR") """

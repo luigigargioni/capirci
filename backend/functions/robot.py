@@ -19,10 +19,11 @@ from json import loads, dumps
 from pythonping import ping
 from backend.models import UserRobot, Robot, Task, Object, Location, Action
 from django.contrib.auth.models import User
-from numpy import zeros
+from numpy import zeros, frombuffer, uint8
 from xml.etree.ElementTree import fromstring
 from django.db.models import Q
 from math import inf
+import base64
 
 PIX_MM_RATIO = 9.222
 CAMERA_ROBOT_DISTANCE = 52.38570925983608  # mm
@@ -305,262 +306,270 @@ def take_position(request: HttpRequest) -> HttpResponse:
 
 
 def runTask(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        try:
-            taskname = request.POST.get("taskName")
-            username = request.POST.get("username")
-            robot = request.POST.get("robot")
-            user = User.objects.get(username=username)
-            userRobot = UserRobot.objects.filter(user=user).filter(name=robot)
-            robot = Robot.objects.get(name=userRobot[0].robot)
-            ip = robot.ip
-            port = robot.port
-            camera = robot.cameraip
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                task_id = data.get("task_id")
+                robot_id = data.get("robot_id")
+                user = User.objects.get(id=request.user.id)
+                userRobot = UserRobot.objects.get(id=robot_id)
+                robot = Robot.objects.get(id=userRobot.id)
+                ip = robot.ip
+                port = robot.port
+                camera = robot.cameraip
 
-            CoInitialize()
-            eng = Dispatch("CAO.CaoEngine")
-            ctrl = eng.Workspaces(0).AddController(
-                "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
-            )
-            caoRobot = ctrl.AddRobot("robot0", "")
-
-            data_result = {
-                "pickExist": False,
-                "placeExist": False,
-                "actionExist": False,
-                "objectNotFound": None,
-                "finishTask": None,
-            }
-            place_position = None
-            action_point = None
-            action_position = None
-            force = None
-
-            taskCode = (
-                Task.objects.filter(name=taskname)
-                .filter(owner=username)
-                .values_list("code", flat=True)
-                .first()
-            )
-            file = fromstring(taskCode)
-
-            if file.find("event") is None:
-                search = "repeat/"
-                times = file.find("repeat").get("times")
-            else:
-                search = "event/repeat/"
-                times = file.find("event/repeat").get("times")
-
-            pick = file.find(search + "pick").text
-            place = file.find(search + "place").text
-            action = file.find(search + "action")
-            if action is not None:
-                action = action.text
-
-            pickExist = False
-            objectUser = Object.objects.filter(Q(owner=user) | Q(shared=True))
-            for object in objectUser:
-                if pick == object.name:
-                    pickExist = True
-                    data_result["pickExist"] = True
-                    force = object.force
-                    height = object.height
-                    break
-                keywords = object.keywords
-                keywords = (
-                    str(keywords)
-                    .replace("[", "")
-                    .replace("]", "")
-                    .replace("'", "")
-                    .replace(" ", "")
+                CoInitialize()
+                eng = Dispatch("CAO.CaoEngine")
+                ctrl = eng.Workspaces(0).AddController(
+                    "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
                 )
-                keywords = keywords.split(",")
-                for keyword in keywords:
-                    if pick == keyword:
+                caoRobot = ctrl.AddRobot("robot0", "")
+
+                data_result = {
+                    "pickExist": False,
+                    "placeExist": False,
+                    "actionExist": False,
+                    "objectNotFound": None,
+                    "finishTask": None,
+                }
+                place_position = None
+                action_point = None
+                action_position = None
+                force = None
+
+                taskCode = (
+                    Task.objects.get(id=task_id)
+                    .filter(owner=user)
+                    .values_list("code", flat=True)
+                    .first()
+                )
+                file = fromstring(taskCode)
+
+                if file.find("event") is None:
+                    search = "repeat/"
+                    times = file.find("repeat").get("times")
+                else:
+                    search = "event/repeat/"
+                    times = file.find("event/repeat").get("times")
+
+                pick = file.find(search + "pick").text
+                place = file.find(search + "place").text
+                action = file.find(search + "action")
+                if action is not None:
+                    action = action.text
+
+                pickExist = False
+                objectUser = Object.objects.filter(Q(owner=user) | Q(shared=True))
+                for object in objectUser:
+                    if pick == object.name:
                         pickExist = True
                         data_result["pickExist"] = True
-                        pick = object.name
-                        force = object.force * 8
+                        force = object.force
+                        height = object.height
+                        break
+                    keywords = object.keywords
+                    keywords = (
+                        str(keywords)
+                        .replace("[", "")
+                        .replace("]", "")
+                        .replace("'", "")
+                        .replace(" ", "")
+                    )
+                    keywords = keywords.split(",")
+                    for keyword in keywords:
+                        if pick == keyword:
+                            pickExist = True
+                            data_result["pickExist"] = True
+                            pick = object.name
+                            force = object.force * 8
+                            break
+
+                placeExist = False
+                objectPlace = Location.objects.filter(Q(owner=user) | Q(shared=True))
+                for object in objectPlace:
+                    if place == object.name:
+                        placeExist = True
+                        data_result["placeExist"] = True
+                        place_position = object.position
                         break
 
-            placeExist = False
-            objectPlace = Location.objects.filter(Q(owner=user) | Q(shared=True))
-            for object in objectPlace:
-                if place == object.name:
-                    placeExist = True
-                    data_result["placeExist"] = True
-                    place_position = object.position
-                    break
+                actionExist = None
+                data_result["actionExist"] = None
+                if action is not None:
+                    actionExist = False
+                    data_result["actionExist"] = False
+                    objectAction = Action.objects.filter(Q(owner=user) | Q(shared=True))
+                    for object in objectAction:
+                        if action == object.name:
+                            actionExist = True
+                            data_result["actionExist"] = True
+                            action_point = object.point
+                            break
 
-            actionExist = None
-            data_result["actionExist"] = None
-            if action is not None:
-                actionExist = False
-                data_result["actionExist"] = False
-                objectAction = Action.objects.filter(Q(owner=user) | Q(shared=True))
-                for object in objectAction:
-                    if action == object.name:
-                        actionExist = True
-                        data_result["actionExist"] = True
-                        action_point = object.point
+                if (
+                    (actionExist is not None and not actionExist)
+                    or not pickExist
+                    or not placeExist
+                ):
+                    json_result = dumps(data_result)
+                    return HttpResponse(json_result)
+
+                # Can access with: place_position['X'], place_position['Y'],... Z, RX, RY, RZ, FIG
+                place_position = loads(place_position)
+
+                if action is not None:
+                    action_array = loads(action_point)
+                    action_position = []
+                    for item in action_array["points"]:
+                        action_position.append(
+                            ",".join(str(value) for value in item.values())
+                        )
+                    """
+                    action_point = action_point.split("::")
+                    action_point = action_point[1:-1]
+                    action_position = []
+                    i = 0
+                    while i < len(action_point):
+                        action_position.append(action_point[i])
+                        i = i + 2
+                    """
+
+                (client, hCtrl, hRobot) = connect(ip, port, 14400)
+
+                # Move to calibration position
+                client.robot_move(
+                    hRobot,
+                    1,
+                    """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
+                                179.99584205147127, 261.0)""",
+                    "SPEED=100",
+                )
+                switch_bcap_to_orin(client, hRobot, caoRobot)
+                ctrl.Execute(
+                    "HandMoveA", [30, 25]
+                )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
+                switch_orin_to_bcap(client, hRobot, caoRobot)
+
+                if times != "while":
+                    times = int(times)
+                else:
+                    times = inf
+
+                data_result["objectNotFound"] = False
+                data_result["finishTask"] = False
+
+                object_to_pick = Object.objects.filter(name=pick, owner=user).first()
+
+                i = 0
+                lastFind = 0
+                while i < times:
+                    find, lastFind = search_object(
+                        client,
+                        hRobot,
+                        object_to_pick.id,
+                        force,
+                        lastFind,
+                        camera,
+                        height,
+                        ip,
+                    )
+
+                    if find:
+                        i = i + 1
+
+                        curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                        curr_pos[2] = "254.99815172770593"
+                        client.robot_move(
+                            hRobot, 2, list_to_string_position(curr_pos), "SPEED=50"
+                        )
+
+                        # Move to calibration position
+                        client.robot_move(
+                            hRobot,
+                            1,
+                            """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
+                                        179.99584205147127, 261.0)""",
+                            "SPEED=100",
+                        )
+
+                        if action is not None:
+                            for x in range(0, len(action_position)):
+                                client.robot_move(
+                                    hRobot,
+                                    1,
+                                    "@0 P(" + action_position[x] + ")",
+                                    "SPEED=100",
+                                )
+
+                        # Move to calibration position
+                        client.robot_move(
+                            hRobot,
+                            1,
+                            """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
+                                        179.99584205147127, 261.0)""",
+                            "SPEED=100",
+                        )
+
+                        client.robot_move(
+                            hRobot,
+                            1,
+                            "@0 P("
+                            + str(place_position["X"])
+                            + ", "
+                            + str(place_position["Y"])
+                            + ", "
+                            + str(place_position["Z"])
+                            + ", "
+                            + str(place_position["RX"])
+                            + ", "
+                            + str(place_position["RY"])
+                            + ", "
+                            + str(place_position["RZ"])
+                            + ", "
+                            + str(place_position["FIG"])
+                            + ")",
+                            "SPEED=100",
+                        )
+
+                        switch_bcap_to_orin(client, hRobot, caoRobot)
+                        ctrl.Execute(
+                            "HandMoveA", [30, 25]
+                        )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
+                        switch_orin_to_bcap(client, hRobot, caoRobot)
+                    else:
+                        data_result["objectNotFound"] = True
                         break
+                # Move to calibration position
+                client.robot_move(
+                    hRobot,
+                    1,
+                    """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
+                                179.99584205147127, 261.0)""",
+                    "SPEED=100",
+                )
+                disconnect(client, hCtrl, hRobot)
+                if data_result["objectNotFound"] is False:
+                    data_result["finishTask"] = True
 
-            if (
-                (actionExist is not None and not actionExist)
-                or not pickExist
-                or not placeExist
-            ):
                 json_result = dumps(data_result)
                 return HttpResponse(json_result)
-
-            # Can access with: place_position['X'], place_position['Y'],... Z, RX, RY, RZ, FIG
-            place_position = loads(place_position)
-
-            if action is not None:
-                action_array = loads(action_point)
-                action_position = []
-                for item in action_array["points"]:
-                    action_position.append(
-                        ",".join(str(value) for value in item.values())
-                    )
-                """
-                action_point = action_point.split("::")
-                action_point = action_point[1:-1]
-                action_position = []
-                i = 0
-                while i < len(action_point):
-                    action_position.append(action_point[i])
-                    i = i + 2
-                """
-
-            (client, hCtrl, hRobot) = connect(ip, port, 14400)
-
-            # Move to calibration position
-            client.robot_move(
-                hRobot,
-                1,
-                """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                              179.99584205147127, 261.0)""",
-                "SPEED=100",
-            )
-            switch_bcap_to_orin(client, hRobot, caoRobot)
-            ctrl.Execute(
-                "HandMoveA", [30, 25]
-            )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
-            switch_orin_to_bcap(client, hRobot, caoRobot)
-
-            if times != "while":
-                times = int(times)
             else:
-                times = inf
-
-            data_result["objectNotFound"] = False
-            data_result["finishTask"] = False
-
-            i = 0
-            lastFind = 0
-            while i < times:
-                find, lastFind = search_object(
-                    client, hRobot, username, pick, force, lastFind, camera, height, ip
-                )
-
-                if find:
-                    i = i + 1
-
-                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-                    curr_pos[2] = "254.99815172770593"
-                    client.robot_move(
-                        hRobot, 2, list_to_string_position(curr_pos), "SPEED=50"
-                    )
-
-                    # Move to calibration position
-                    client.robot_move(
-                        hRobot,
-                        1,
-                        """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                      179.99584205147127, 261.0)""",
-                        "SPEED=100",
-                    )
-
-                    if action is not None:
-                        for x in range(0, len(action_position)):
-                            client.robot_move(
-                                hRobot,
-                                1,
-                                "@0 P(" + action_position[x] + ")",
-                                "SPEED=100",
-                            )
-
-                    # Move to calibration position
-                    client.robot_move(
-                        hRobot,
-                        1,
-                        """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                                      179.99584205147127, 261.0)""",
-                        "SPEED=100",
-                    )
-
-                    client.robot_move(
-                        hRobot,
-                        1,
-                        "@0 P("
-                        + str(place_position["X"])
-                        + ", "
-                        + str(place_position["Y"])
-                        + ", "
-                        + str(place_position["Z"])
-                        + ", "
-                        + str(place_position["RX"])
-                        + ", "
-                        + str(place_position["RY"])
-                        + ", "
-                        + str(place_position["RZ"])
-                        + ", "
-                        + str(place_position["FIG"])
-                        + ")",
-                        "SPEED=100",
-                    )
-
-                    switch_bcap_to_orin(client, hRobot, caoRobot)
-                    ctrl.Execute(
-                        "HandMoveA", [30, 25]
-                    )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
-                    switch_orin_to_bcap(client, hRobot, caoRobot)
-                else:
-                    data_result["objectNotFound"] = True
-                    break
-            # Move to calibration position
-            client.robot_move(
-                hRobot,
-                1,
-                """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
-                              179.99584205147127, 261.0)""",
-                "SPEED=100",
-            )
-            disconnect(client, hCtrl, hRobot)
-            if data_result["objectNotFound"] is False:
-                data_result["finishTask"] = True
-
-            json_result = dumps(data_result)
-            return HttpResponse(json_result)
-        except Exception as e:
-            data_result = {"exception": type(e).__name__, "codeException": str(e)}
-            json_result = dumps(data_result)
-            return HttpResponse(json_result)
-    else:
-        return HttpResponse("ERROR")
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
 
 
-def search_object(
-    client, hRobot, username, object_name, force, lastFind, camera, objectHeight, ip
-):
+def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeight, ip):
     DISTANCE_MAX = 0.075
     DIFF_AREA_MAX = 40000
     move = 0
     find = False
     pos = lastFind
 
-    # Quadranti usati per cercare oggetto
+    # Quadrants used to search for object
     Q0 = "@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0, 179.99584205147127, 261.0)"
     Q1 = "@0 P(124.8479084757812, 96.71132432510223, 254.93505849932905, 179.98326477675423, -0.021660598353600596, 179.9971873030206, 261.0)"
     Q2 = "@0 P(201.62729889242553, 96.71465770886049, 254.9352502844515, 179.98348831787996, -0.021534861588810798, 179.99838567272027, 261.0)"
@@ -575,15 +584,8 @@ def search_object(
     )
     caoRobot = ctrl.AddRobot("robot0", "")
 
-    # TODO add converter image b64
-    original = cv2.imread(
-        "backend\\static\\images\\objects\\"
-        + username
-        + "_"
-        + object_name
-        + "_shape.png",
-        cv2.IMREAD_GRAYSCALE,
-    )
+    object = Object.objects.get(id=object_id)
+    original = imread_base64(object.photo)
 
     (cnts, _) = cv2.findContours(
         original.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
@@ -669,7 +671,7 @@ def search_object(
             switch_bcap_to_orin(client, hRobot, caoRobot)
             ctrl.Execute(
                 "HandMoveH", [force * 6, 1]
-            )  # HandMoveH (forza (min 6, max 20), direzione (1 chiusura)
+            )  # HandMoveH (force (min 6, max 20), direction (1 closing)
             switch_orin_to_bcap(client, hRobot, caoRobot)
             break
         else:
@@ -678,3 +680,39 @@ def search_object(
             if pos == 6:
                 pos = 0
     return find, pos
+
+
+def ping_ip(request: HttpRequest) -> HttpResponse:
+    try:
+        if request.user.is_authenticated:
+            if request.method == HttpMethod.POST.value:
+                data = loads(request.body)
+                ip = data.get("ip")
+                ResponseList = ping(ip, count=1)
+                if (
+                    hasattr(ResponseList, "responses")
+                    and ResponseList.responses[0].success is True
+                ):
+                    return success_response()
+                else:
+                    return error_response(str("IP not reachable"))
+            else:
+                return invalid_request_method
+        else:
+            return unauthorized_request()
+    except Exception as e:
+        return error_response(str(e))
+
+
+def imread_base64(base64_string):
+    # Remove the header and decode the base64 string
+    encoded_data = base64_string.split(",")[1]
+    decoded_data = base64.b64decode(encoded_data)
+
+    # Convert the decoded data to a numpy array
+    nparr = frombuffer(decoded_data, uint8)
+
+    # Read the image using OpenCV
+    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+
+    return img

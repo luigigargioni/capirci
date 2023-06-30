@@ -21,9 +21,7 @@ from .functions.management import (
     get_group_list,
     reset_password,
 )
-from .functions.robot import (
-    take_position,
-)
+from .functions.robot import take_position, ping_ip
 from .functions.chat import (
     new_message,
 )
@@ -61,6 +59,7 @@ urlpatterns = [
         name="take_position",
     ),
     path(HOME + "getObjectPhoto/", get_object_photo, name="get_object_photo"),
+    path(HOME + "pingIp/", ping_ip, name="ping_ip"),
     # MANAGEMENT
     path(HOME + "robots/", get_robot_list, name="get_robot_list"),
     path(HOME + "robot/", robot_detail, name="robot_detail"),

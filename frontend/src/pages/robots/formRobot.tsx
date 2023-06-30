@@ -21,6 +21,7 @@ import {
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
+import { ApiOutlined } from '@ant-design/icons'
 import { RobotModel, RobotType } from './types'
 
 interface FormRobotProps {
@@ -56,6 +57,27 @@ export const FormRobot = ({
       })
   }
 
+  const handleCheckIp = async (
+    ip: string | null,
+    setFieldError: (field: string, value: any) => void,
+    setFieldTouched: (field: string, touched: any) => void
+  ) => {
+    if (!ip) {
+      await setFieldTouched('ip', true)
+      await setFieldError('ip', MessageText.requiredField)
+      return
+    }
+    fetchApi({
+      url: endpoints.home.libraries.pingIp,
+      method: MethodHTTP.POST,
+      body: { ip },
+    }).then((response) => {
+      if (response) {
+        toast.success('IP available')
+      }
+    })
+  }
+
   return (
     <Formik
       initialValues={{
@@ -89,6 +111,8 @@ export const FormRobot = ({
         isSubmitting,
         touched,
         values,
+        setFieldError,
+        setFieldTouched,
       }) => (
         <form
           noValidate
@@ -98,7 +122,7 @@ export const FormRobot = ({
           }}
         >
           <Grid container spacing={3} columns={{ xs: 1, sm: 6, md: 12 }}>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Stack spacing={1}>
                 <TextField
                   id="name"
@@ -116,7 +140,7 @@ export const FormRobot = ({
                 )}
               </Stack>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Stack spacing={1}>
                 <FormControl fullWidth>
                   <InputLabel id="model-label">Model</InputLabel>
@@ -163,6 +187,22 @@ export const FormRobot = ({
                     {errors.ip}
                   </FormHelperText>
                 )}
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <Button
+                  onClick={() =>
+                    handleCheckIp(values.ip, setFieldError, setFieldTouched)
+                  }
+                  color="primary"
+                  aria-label="detail"
+                  size="medium"
+                  title="Check connection"
+                  startIcon={<ApiOutlined style={{ fontSize: '2em' }} />}
+                >
+                  Check connection
+                </Button>
               </Stack>
             </Grid>
             <Grid item xs={2}>

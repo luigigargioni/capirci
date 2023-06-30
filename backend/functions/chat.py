@@ -407,6 +407,7 @@ def calcDependencies(program):
         "en",
         processors="tokenize, pos, lemma, depparse",
         download_method=DownloadMethod.REUSE_RESOURCES,
+        logging_level="WARN",
     )
     doc = nlp(program)
     dependencies = []
@@ -431,3 +432,46 @@ def findInlList(lista, word):
         if lista[i] == word:
             find = True
     return find
+
+
+""" def parseXmlToJson(xml):
+    response = {}
+    for child in list(xml):
+        if len(list(child)) > 0:
+            if child.tag == "repeat":
+                response[child.tag] = {
+                    "times": str(child.get("times")),
+                    "body": parseXmlToJson(child),
+                }
+                continue
+                # return response
+            else:
+                response[child.tag] = {"body": parseXmlToJson(child)}
+
+            if child.tag == "event":
+                if child.get("type") == "obj":
+                    response[child.tag] = {
+                        "type": child.get("type"),
+                        "obj": child.get("obj"),
+                        "adj": child.get("adj"),
+                        "body": parseXmlToJson(child),
+                    }
+                else:
+                    response[child.tag] = {
+                        "type": child.get("type"),
+                        "body": parseXmlToJson(child),
+                    }
+            else:
+                response[child.tag] = {"body": parseXmlToJson(child)}
+        else:
+            if child.tag == "pick" or child.tag == "place":
+                response[child.tag] = {
+                    "card": child.get("card"),
+                    "adj": child.get("adj"),
+                    "obj": child.text,
+                }
+            elif child.tag == "repeat":
+                response[child.tag] = {"times": child.get("times")}
+            else:
+                response[child.tag] = child.text or ""
+    return response """
