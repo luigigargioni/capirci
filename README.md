@@ -89,7 +89,7 @@ npm start
 ## :key: Credentials
 
 * Username: `operator1`  
-Password: `Passwordoperator2`  
+Password: `operator1`  
 Type: `Operator`  
 
 * Username: `manager1`  

@@ -9,9 +9,6 @@ export const getMenuItems = (): MenuItem[] => {
   const { group } = getFromLocalStorage(LocalStorageKey.USER)
   const defaultItems = [programming, libraries]
 
-  return [...defaultItems, management]
-
-  // TODO: restore this for user group management
   if (group === USER_GROUP.MANAGER) return [...defaultItems, management]
 
   return defaultItems

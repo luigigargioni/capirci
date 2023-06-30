@@ -61,6 +61,9 @@ export const fetchApi = async ({
           case 400:
             toast.error(err.message)
             return error.response.data.payload
+          case 401:
+            toast.error(err.message)
+            break
           case 403:
             toast.error(MessageText.forbidden)
             break

@@ -17,6 +17,7 @@ import { Routes } from 'routes'
 import { antdTheme } from 'themes/theme'
 import { locale } from 'dayjs'
 import { store } from './store'
+import 'regenerator-runtime'
 
 locale('en-gb')
 

@@ -4,13 +4,16 @@ import { Navigate } from 'react-router-dom'
 import { UserLoginInterface } from 'pages/login/LoginForm'
 import { fetchApi, MethodHTTP } from 'services/api'
 import { endpoints } from 'services/endpoints'
-import { defaultPath, USER_GROUP } from 'utils/constants'
+import { defaultOpenItem, defaultPath, USER_GROUP } from 'utils/constants'
 import {
   getFromLocalStorage,
   LocalStorageKey,
+  removeFromLocalStorage,
   setToLocalStorage,
 } from 'utils/localStorageUtils'
 import { LoadingSpinner } from 'components/loadingSpinner'
+import { useDispatch } from 'react-redux'
+import { activeItem } from 'store/reducers/menu'
 
 interface ProtectedRouteProps {
   children: JSX.Element
@@ -28,6 +31,7 @@ export const ProtectedRoute = ({
       method: MethodHTTP.POST,
       body: { id: getFromLocalStorage(LocalStorageKey.USER).id },
     }).then((res) => {
+      removeFromLocalStorage(LocalStorageKey.USER)
       if (res && !res.authError) {
         const userInfo: UserLoginInterface = {
           id: res.id,
@@ -51,8 +55,10 @@ export const ProtectedRoute = ({
 
 export const PublicRoute = ({ children }: ProtectedRouteProps) => {
   const user = getFromLocalStorage(LocalStorageKey.USER)
+  const dispatch = useDispatch()
 
   if (user) {
+    dispatch(activeItem(defaultOpenItem))
     return <Navigate to={defaultPath} replace />
   }
 
@@ -60,14 +66,13 @@ export const PublicRoute = ({ children }: ProtectedRouteProps) => {
 }
 
 export const GroupRoute = ({ children }: ProtectedRouteProps) => {
-  // TODO - implement group route
-  // const { role } = getFromLocalStorage(LocalStorageKey.USER)
+  const { group } = getFromLocalStorage(LocalStorageKey.USER)
+  const dispatch = useDispatch()
 
-  /*
-  if (role !== USER_GROUP.MANAGER) {
+  if (group !== USER_GROUP.MANAGER) {
+    dispatch(activeItem(defaultOpenItem))
     return <Navigate to={defaultPath} replace />
   }
-  */
 
   return children
 }

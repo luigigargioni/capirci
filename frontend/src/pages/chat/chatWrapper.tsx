@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { IconButton, InputAdornment, OutlinedInput } from '@mui/material'
 import dayjs from 'dayjs'
-import { SendOutlined } from '@ant-design/icons'
+import { AudioOutlined, BorderOutlined, SendOutlined } from '@ant-design/icons'
 import { formatTimeFrontend } from 'utils/date'
 import { MessageBox } from 'react-chat-elements'
 import { getFromLocalStorage } from 'utils/localStorageUtils'
@@ -14,6 +14,9 @@ import { MethodHTTP, fetchApi } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { useDispatch } from 'react-redux'
 import { activeItem, openDrawer } from 'store/reducers/menu'
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from 'react-speech-recognition'
 import { INITIAL_MESSAGE, MessageType, UserChatEnum } from './types'
 
 const { username } = getFromLocalStorage('user')
@@ -36,8 +39,27 @@ export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
   ])
   const [message, setMessage] = React.useState('')
   const [isProcessing, setIsProcessing] = React.useState(false)
+  const [isRecording, setIsRecording] = React.useState(false)
+  const {
+    transcript,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useSpeechRecognition()
   const [question, setQuestion] = React.useState(0)
   const [end, setEnd] = React.useState(0)
+
+  const startRecording = () => {
+    SpeechRecognition.startListening({ language: 'en-GB', continuous: true })
+    setIsRecording(true)
+  }
+
+  const stopRecording = () => {
+    SpeechRecognition.stopListening()
+    setMessage(transcript)
+    resetTranscript()
+    setIsRecording(false)
+  }
 
   const onMessageSend = () => {
     const messagesWithUserRequest = [
@@ -167,7 +189,8 @@ export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
       <OutlinedInput
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type a message..."
+        placeholder={isRecording ? 'Listening...' : 'Type a message...'}
+        disabled={isRecording}
         fullWidth
         style={{
           position: 'absolute',
@@ -178,15 +201,49 @@ export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
           if (e.key === 'Enter') onMessageSend()
         }}
         endAdornment={
-          <InputAdornment position="end">
-            <IconButton
-              onClick={() => onMessageSend()}
-              edge="end"
-              disabled={!message || isProcessing}
-            >
-              <SendOutlined />
-            </IconButton>
-          </InputAdornment>
+          <>
+            {message && !isProcessing && (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => onMessageSend()}
+                  edge="end"
+                  disabled={isProcessing}
+                >
+                  <SendOutlined />
+                </IconButton>
+              </InputAdornment>
+            )}
+            {!message && !isRecording && (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => startRecording()}
+                  edge="end"
+                  disabled={
+                    isProcessing ||
+                    !browserSupportsSpeechRecognition ||
+                    !isMicrophoneAvailable
+                  }
+                >
+                  <AudioOutlined />
+                </IconButton>
+              </InputAdornment>
+            )}
+            {!message && isRecording && (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => stopRecording()}
+                  edge="end"
+                  disabled={
+                    isProcessing ||
+                    !browserSupportsSpeechRecognition ||
+                    !isMicrophoneAvailable
+                  }
+                >
+                  <BorderOutlined />
+                </IconButton>
+              </InputAdornment>
+            )}
+          </>
         }
       />
     </div>
