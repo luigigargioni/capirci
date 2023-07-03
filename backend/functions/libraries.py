@@ -17,9 +17,9 @@ from .robot import (
     disconnect,
     take_img,
     move_to_calibration_position,
+    check_ip_response,
     DEFAULT_TIMEOUT,
 )
-from pythonping import ping
 from pythoncom import CoInitialize
 import cv2
 from numpy import zeros
@@ -451,7 +451,7 @@ def location_detail(request: HttpRequest) -> HttpResponse:
                 location_name = data.get("name")
                 location_shared = data.get("shared")
                 location_position = data.get("position")
-                location_robot = Robot.objects.get(id=data.get("robot"))
+                location_robot = UserRobot.objects.get(id=data.get("robot"))
                 location_owner = User.objects.get(id=request.user.id)
 
                 # check if the name already exists
@@ -599,11 +599,7 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
                 robot_id = data.get("robot")
                 user_robot = UserRobot.objects.get(id=robot_id)
                 robot = Robot.objects.get(id=user_robot.robot.id)
-                ResponseList = ping(robot.ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
+                if check_ip_response(robot.ip, robot.port):
                     CoInitialize()
                     handles = connect(robot.ip, robot.port, DEFAULT_TIMEOUT)
                     client = handles[0]

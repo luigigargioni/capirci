@@ -83,8 +83,8 @@ export const FormAction = ({
         const newPoint = response.position
         const pointObj = JSON.parse(point)
         const newArray = [...pointObj.points, newPoint]
-        const newPointObj = { ...pointObj, points: newArray }
-        setFieldValue('point', JSON.stringify(newPointObj))
+        const newPointObj = { points: newArray }
+        setFieldValue('positions', JSON.stringify(newPointObj))
       }
     })
   }
@@ -95,9 +95,9 @@ export const FormAction = ({
     setFieldValue: (field: string, value: any) => void
   ) => {
     const pointObj = JSON.parse(point)
-    const newArray = pointObj.points.filter((_item, i) => i !== index)
+    const newArray = pointObj.points.filter((item: PositionType, i: number) => i !== index)
     const newPointObj = { ...pointObj, points: newArray }
-    setFieldValue('point', JSON.stringify(newPointObj))
+    setFieldValue('positions', JSON.stringify(newPointObj))
   }
 
   return (
@@ -106,7 +106,7 @@ export const FormAction = ({
         id: dataAction?.id || -1,
         name: dataAction?.name || '',
         shared: dataAction?.shared || false,
-        positions: dataAction?.positions || '',
+        positions: dataAction?.positions || '{"points": []}',
         robot: dataAction?.robot || null,
       }}
       validationSchema={YupObject().shape({
@@ -230,7 +230,7 @@ export const FormAction = ({
             {values.positions &&
               JSON.parse(values.positions).points.map(
                 (point: PositionType, index: number) => (
-                  <React.Fragment key={JSON.stringify(point)}>
+                  <React.Fragment key={`${index}-${JSON.stringify(point)}`}>
                     <Grid item xs={10}>
                       <Stack spacing={1}>
                         <TextField

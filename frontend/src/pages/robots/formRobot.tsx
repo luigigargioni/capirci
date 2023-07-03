@@ -59,12 +59,19 @@ export const FormRobot = ({
 
   const handleCheckIp = async (
     ip: string | null,
+    port: number | null,
     setFieldError: (field: string, value: any) => void,
     setFieldTouched: (field: string, touched: any) => void
   ) => {
-    if (!ip) {
+    if (!ip || !port) {
+      if (!ip) {
       await setFieldTouched('ip', true)
       await setFieldError('ip', MessageText.requiredField)
+      }
+      if (!port) {
+        await setFieldTouched('port', true)
+        await setFieldError('port', MessageText.requiredField)
+      }
       return
     }
     fetchApi({
@@ -189,22 +196,7 @@ export const FormRobot = ({
                 )}
               </Stack>
             </Grid>
-            <Grid item xs={2}>
-              <Stack spacing={1}>
-                <Button
-                  onClick={() =>
-                    handleCheckIp(values.ip, setFieldError, setFieldTouched)
-                  }
-                  color="primary"
-                  aria-label="detail"
-                  size="medium"
-                  title="Check connection"
-                  startIcon={<ApiOutlined style={{ fontSize: '2em' }} />}
-                >
-                  Check connection
-                </Button>
-              </Stack>
-            </Grid>
+
             <Grid item xs={2}>
               <Stack spacing={1}>
                 <TextField
@@ -223,6 +215,22 @@ export const FormRobot = ({
                     {errors.port}
                   </FormHelperText>
                 )}
+              </Stack>
+            </Grid>
+            <Grid item xs={2}>
+              <Stack spacing={1}>
+                <Button
+                  onClick={() =>
+                    handleCheckIp(values.ip, values.port, setFieldError, setFieldTouched)
+                  }
+                  color="primary"
+                  aria-label="detail"
+                  size="medium"
+                  title="Check connection"
+                  startIcon={<ApiOutlined style={{ fontSize: '2em' }} />}
+                >
+                  Check connection
+                </Button>
               </Stack>
             </Grid>
             <Grid item xs={2}>

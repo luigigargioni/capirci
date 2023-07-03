@@ -16,7 +16,6 @@ from backend.utils.response import (
 )
 from django.http import HttpResponse, HttpRequest
 from json import loads
-from pythonping import ping
 from backend.models import UserRobot, Robot, Task, Object, Location, Action
 from django.contrib.auth.models import User
 from numpy import zeros, frombuffer, uint8
@@ -24,6 +23,7 @@ from xml.etree.ElementTree import fromstring
 from django.db.models import Q
 from math import inf
 import base64
+import socket
 
 PIX_MM_RATIO = 9.222
 CAMERA_ROBOT_DISTANCE = 52.38570925983608  # mm
@@ -172,26 +172,26 @@ def find_orientation(contour, robot_angle):
 
 
 def robot_take_arm(client, hRobot):
-    client.robot_execute(hRobot, RobotAction.TAKE_ARM, [0, 0])
+    client.robot_execute(hRobot, RobotAction.TAKE_ARM.value, [0, 0])
 
 
 def robot_give_arm(client, hRobot):
-    client.robot_execute(hRobot, RobotAction.GIVE_ARM)
+    client.robot_execute(hRobot, RobotAction.GIVE_ARM.value)
 
 
 def robot_give_arm_cao(caoRobot):
-    caoRobot.Execute(RobotAction.GIVE_ARM)
+    caoRobot.Execute(RobotAction.GIVE_ARM.value)
 
 
 def robot_motor(client, hRobot):
-    client.robot_execute(hRobot, RobotAction.MOTOR, [1, 0])
+    client.robot_execute(hRobot, RobotAction.MOTOR.value, [1, 0])
 
 
 def robot_motor_cao(caoRobot):
-    caoRobot.Execute(RobotAction.MOTOR, [1, 0])
+    caoRobot.Execute(RobotAction.MOTOR.value, [1, 0])
 
 
-def connect(host, port, timeout, provider=CaoParams.PROVIDER):
+def connect(host, port, timeout, provider=CaoParams.PROVIDER.value):
     client = BCAPClient(host, port, timeout)
     client.service_start("")
     Name = ""
@@ -199,7 +199,7 @@ def connect(host, port, timeout, provider=CaoParams.PROVIDER):
     Machine = BCAP_MACHINE_NAME
     Option = ""
     hCtrl = client.controller_connect(Name, Provider, Machine, Option)
-    hRobot = client.controller_getrobot(hCtrl, RobotAction.ARM_0)
+    hRobot = client.controller_getrobot(hCtrl, RobotAction.ARM_0.value)
     robot_take_arm(client, hRobot)
     robot_motor(client, hRobot)
     return (client, hCtrl, hRobot)
@@ -221,15 +221,20 @@ def robot_getvar(client, hRobot, name):
 
 
 def take_img(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
-    eng = Dispatch(CaoParams.ENGINE)
+    eng = Dispatch(CaoParams.ENGINE.value)
+    print(eng.Workspaces.Count)
     ctrl = eng.Workspaces(0).AddController(
-        "", CaoParams.CANON_CAMERA, "", "Server=" + str(cameraip) + ", Timeout=5000"
+        "",
+        CaoParams.CANON_CAMERA.value,
+        "",
+        "Server=" + str(cameraip) + ", Timeout=5000",
     )
+    print(1)
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:
-        ctrl.Execute(CameraAction.ONE_SHOT_WHITE_BALANCE)
+        ctrl.Execute(CameraAction.ONE_SHOT_WHITE_BALANCE.value)
     if oneshotfocus:
-        ctrl.Execute(CameraAction.ONE_SHOT_FOCUS)
+        ctrl.Execute(CameraAction.ONE_SHOT_FOCUS.value)
     image = image_handle.Value
     stream = BytesIO(image)
     img = Image.open(stream)
@@ -278,11 +283,7 @@ def take_position(request: HttpRequest) -> HttpResponse:
                 robot_id = data.get("robot")
                 user_robot = UserRobot.objects.get(id=robot_id)
                 robot = Robot.objects.get(id=user_robot.robot.id)
-                ResponseList = ping(robot.ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
+                if check_ip_response(robot.ip, robot.port):
                     (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
                     curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
                     position = {
@@ -295,7 +296,8 @@ def take_position(request: HttpRequest) -> HttpResponse:
                         "FIG": +curr_pos[6],
                     }
                     disconnect(client, hCtrl, hRobot)
-                    return success_response(position)
+                    response = {"position": position}
+                    return success_response(response)
                 else:
                     return error_response(str("Robot not connected"))
             else:
@@ -659,11 +661,8 @@ def ping_ip(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)
                 ip = data.get("ip")
-                ResponseList = ping(ip, count=1)
-                if (
-                    hasattr(ResponseList, "responses")
-                    and ResponseList.responses[0].success is True
-                ):
+                port = data.get("port")
+                if check_ip_response(ip, port):
                     return success_response()
                 else:
                     return error_response(str("IP not reachable"))
@@ -673,6 +672,30 @@ def ping_ip(request: HttpRequest) -> HttpResponse:
             return unauthorized_request()
     except Exception as e:
         return error_response(str(e))
+
+
+def check_ip_response(ip_address, port):
+    try:
+        # Create a socket object
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Set a timeout value in seconds
+        sock.settimeout(1)
+
+        # Try to connect to the IP address and port 80
+        result = sock.connect_ex((ip_address, port))
+
+        # Check if the connection was successful
+        if result == 0:
+            return True
+        else:
+            return False
+
+    except socket.error:
+        return False
+    finally:
+        # Close the socket
+        sock.close()
 
 
 def imread_base64(base64_string):

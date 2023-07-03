@@ -23,7 +23,7 @@ export default defineConfig(() => {
         },
       }),
       viteTsconfigPaths(),
-      eslint(),
+      eslint({rulePaths: ['./frontend']}),
       viteCompression(),
     ],
   }

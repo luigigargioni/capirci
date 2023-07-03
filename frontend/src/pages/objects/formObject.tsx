@@ -91,7 +91,7 @@ export const FormObject = ({
       body: { robot },
     }).then((response) => {
       if (response) {
-        setFieldValue('height', response.Z)
+        setFieldValue('height', response.position.Z)
       }
     })
   }

@@ -46,6 +46,10 @@ export const ProtectedRoute = ({
   }
 
   useEffect(() => {
+    if (!getFromLocalStorage(LocalStorageKey.USER)) {
+      setLoading(false)
+      return
+    }
     verifyToken()
   }, [])
 

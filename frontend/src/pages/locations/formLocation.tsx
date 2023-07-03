@@ -79,7 +79,7 @@ export const FormLocation = ({
       body: { robot },
     }).then((response) => {
       if (response) {
-        setFieldValue('position', response.position)
+        setFieldValue('position', JSON.stringify(response.position))
       }
     })
   }
