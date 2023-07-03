@@ -32,9 +32,10 @@ BCAP_MACHINE_NAME = "localhost"
 
 
 class CaoParams(Enum):
-    PROVIDER = "CaoProv.DENSO.VRC"
+    VRC = "CaoProv.DENSO.VRC"
     ENGINE = "CAO.CaoEngine"
     CANON_CAMERA = "CaoProv.Canon.N10-W02"
+    RC8 = "CaoProv.DENSO.RC8"
 
 
 class RobotAction(Enum):
@@ -42,6 +43,9 @@ class RobotAction(Enum):
     GIVE_ARM = "GiveArm"
     TAKE_ARM = "TakeArm"
     ARM_0 = "Arm0"
+    HAND_MOVE_A = "HandMoveA"
+    HAND_MOVE_H = "HandMoveH"
+    ROBOT_0 = "robot0"
 
 
 class CameraAction(Enum):
@@ -56,9 +60,12 @@ class CameraResolution(Enum):
 
 INITIAL_POSITION = """@0 P(177.483268825558, -44.478627592948996, 254.99815172770593, -179.98842099994923, 0,
                                     179.99584205147127, 261.0)"""
+CURRENT_POSITION = "@CURRENT_POSITION"
+CURRENT_ANGLE = "@CURRENT_ANGLE"
 DEFAULT_TIMEOUT = 14400
 MAX_SPEED = "SPEED=100"
 HALF_SPEED = "SPEED=50"
+CALIBRATION_HEIGHT = "254.99815172770593"
 
 
 def polar_to_robot_coordinates(angle, robot_x, robot_y, module=CAMERA_ROBOT_DISTANCE):
@@ -191,7 +198,7 @@ def robot_motor_cao(caoRobot):
     caoRobot.Execute(RobotAction.MOTOR.value, [1, 0])
 
 
-def connect(host, port, timeout, provider=CaoParams.PROVIDER.value):
+def connect(host, port, timeout, provider=CaoParams.VRC.value):
     client = BCAPClient(host, port, timeout)
     client.service_start("")
     Name = ""
@@ -222,14 +229,12 @@ def robot_getvar(client, hRobot, name):
 
 def take_img(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
     eng = Dispatch(CaoParams.ENGINE.value)
-    print(eng.Workspaces.Count)
     ctrl = eng.Workspaces(0).AddController(
         "",
         CaoParams.CANON_CAMERA.value,
         "",
         "Server=" + str(cameraip) + ", Timeout=5000",
     )
-    print(1)
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:
         ctrl.Execute(CameraAction.ONE_SHOT_WHITE_BALANCE.value)
@@ -269,10 +274,10 @@ def list_to_string_joints(pos):
 
 
 def move_to_new_pos(client, hRobot, new_x, new_y, mode=2):
-    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+    curr_pos = robot_getvar(client, hRobot, CURRENT_POSITION)
     curr_pos[0] = new_x
     curr_pos[1] = new_y
-    client.robot_move(hRobot, mode, list_to_string_position(curr_pos), "SPEED=100")
+    client.robot_move(hRobot, mode, list_to_string_position(curr_pos), MAX_SPEED)
 
 
 def take_position(request: HttpRequest) -> HttpResponse:
@@ -285,7 +290,7 @@ def take_position(request: HttpRequest) -> HttpResponse:
                 robot = Robot.objects.get(id=user_robot.robot.id)
                 if check_ip_response(robot.ip, robot.port):
                     (client, hCtrl, hRobot) = connect(robot.ip, robot.port, 14400)
-                    curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+                    curr_pos = robot_getvar(client, hRobot, CURRENT_POSITION)
                     position = {
                         "X": +curr_pos[0],
                         "Y": +curr_pos[1],
@@ -323,11 +328,11 @@ def runTask(request: HttpRequest) -> HttpResponse:
                 camera = robot.cameraip
 
                 CoInitialize()
-                eng = Dispatch("CAO.CaoEngine")
+                eng = Dispatch(CaoParams.ENGINE.value)
                 ctrl = eng.Workspaces(0).AddController(
-                    "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
+                    "", CaoParams.RC8.value, "", "Server=" + str(ip)
                 )
-                caoRobot = ctrl.AddRobot("robot0", "")
+                caoRobot = ctrl.AddRobot(RobotAction.ROBOT_0.value, "")
 
                 data_result = {
                     "pickExist": False,
@@ -441,7 +446,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
                 move_to_calibration_position(client, hRobot)
                 switch_bcap_to_orin(client, hRobot, caoRobot)
                 ctrl.Execute(
-                    "HandMoveA", [30, 25]
+                    RobotAction.HAND_MOVE_A.value, [30, 25]
                 )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
                 switch_orin_to_bcap(client, hRobot, caoRobot)
 
@@ -472,8 +477,8 @@ def runTask(request: HttpRequest) -> HttpResponse:
                     if find:
                         i = i + 1
 
-                        curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-                        curr_pos[2] = "254.99815172770593"
+                        curr_pos = robot_getvar(client, hRobot, CURRENT_POSITION)
+                        curr_pos[2] = CALIBRATION_HEIGHT
                         client.robot_move(
                             hRobot, 2, list_to_string_position(curr_pos), HALF_SPEED
                         )
@@ -514,7 +519,7 @@ def runTask(request: HttpRequest) -> HttpResponse:
 
                         switch_bcap_to_orin(client, hRobot, caoRobot)
                         ctrl.Execute(
-                            "HandMoveA", [30, 25]
+                            RobotAction.HAND_MOVE_A.value, [30, 25]
                         )  # Open hand for release object. HandMoveA (apertura in mm, velocità)
                         switch_orin_to_bcap(client, hRobot, caoRobot)
                     else:
@@ -551,11 +556,11 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
     Q5 = "@0 P(133.63413919141982, -131.393237172843, 254.87885013312, 179.9599341526348, -0.027773416827480392, 179.97129867455095, 261.0)"
     Q = [Q0, Q1, Q2, Q3, Q4, Q5]
 
-    eng = Dispatch("CAO.CaoEngine")
+    eng = Dispatch(CaoParams.ENGINE.value)
     ctrl = eng.Workspaces(0).AddController(
-        "", "CaoProv.DENSO.RC8", "", "Server=" + str(ip)
+        "", CaoParams.RC8.value, "", "Server=" + str(ip)
     )
-    caoRobot = ctrl.AddRobot("robot0", "")
+    caoRobot = ctrl.AddRobot(RobotAction.ROBOT_0.value, "")
 
     object = Object.objects.get(id=object_id)
     original = imread_base64(object.photo)
@@ -568,8 +573,8 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
     while find is False and move < 6:
         client.robot_move(hRobot, 1, Q[pos], MAX_SPEED)
 
-        curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
-        curr_joints = robot_getvar(client, hRobot, "@CURRENT_ANGLE")
+        curr_pos = robot_getvar(client, hRobot, CURRENT_POSITION)
+        curr_joints = robot_getvar(client, hRobot, CURRENT_ANGLE)
         curr_angle = -curr_joints[0]
         curr_x = curr_pos[0]
         curr_y = curr_pos[1]
@@ -626,14 +631,14 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
             (module, angle) = find_polar_coordinates(curr_angle, cX, cY)
 
             new_angle = find_orientation(cnts[areaMaxi], curr_angle)
-            curr_joints = robot_getvar(client, hRobot, "@CURRENT_ANGLE")
+            curr_joints = robot_getvar(client, hRobot, CURRENT_ANGLE)
             curr_joints[5] = new_angle + curr_joints[0]
             client.robot_move(hRobot, 1, list_to_string_joints(curr_joints))
 
             (shape_x, shape_y) = polar_to_robot_coordinates(
                 angle, curr_x, curr_y, module
             )
-            curr_pos = robot_getvar(client, hRobot, "@CURRENT_POSITION")
+            curr_pos = robot_getvar(client, hRobot, CURRENT_POSITION)
             curr_pos[0] = shape_x
             curr_pos[1] = shape_y
             client.robot_move(hRobot, 2, list_to_string_position(curr_pos), MAX_SPEED)
@@ -643,7 +648,7 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
 
             switch_bcap_to_orin(client, hRobot, caoRobot)
             ctrl.Execute(
-                "HandMoveH", [force * 6, 1]
+                RobotAction.HAND_MOVE_H.value, [force * 6, 1]
             )  # HandMoveH (force (min 6, max 20), direction (1 closing)
             switch_orin_to_bcap(client, hRobot, caoRobot)
             break
