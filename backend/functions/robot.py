@@ -230,10 +230,11 @@ def robot_getvar(client, hRobot, name):
 def take_img(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
     eng = Dispatch(CaoParams.ENGINE.value)
     ctrl = eng.Workspaces(0).AddController(
-        "",
+        "N10-W02",
         CaoParams.CANON_CAMERA.value,
         "",
-        "Server=" + str(cameraip) + ", Timeout=5000",
+        # "Server=" + str(cameraip) + ", Timeout=5000",
+        "Conn=eth:192.168.0.90",
     )
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:

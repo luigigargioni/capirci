@@ -30,9 +30,8 @@ def get_task_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                username = request.user
                 tasks = (
-                    Task.objects.filter(Q(owner=username) | Q(shared=True))
+                    Task.objects.filter(Q(owner=request.user) | Q(shared=True))
                     .values(
                         "id",
                         "name",
@@ -111,8 +110,7 @@ def get_object_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                username = request.user
-                user = User.objects.get(username=username)
+                user = User.objects.get(id=request.user.id)
                 objects = Object.objects.filter(Q(owner=user) | Q(shared=True)).values(
                     "id", "name", "shared", "force", "height", "owner", "keywords"
                 )
@@ -301,8 +299,7 @@ def get_action_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                username = request.user
-                user = User.objects.get(username=username)
+                user = User.objects.get(id=request.user.id)
                 actions = Action.objects.filter(Q(owner=user) | Q(shared=True)).values(
                     "id",
                     "name",
@@ -408,8 +405,7 @@ def get_location_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                username = request.user
-                user = User.objects.get(username=username)
+                user = User.objects.get(id=request.user.id)
                 locations = Location.objects.filter(
                     Q(owner=user) | Q(shared=True)
                 ).values(
@@ -520,8 +516,7 @@ def get_my_robot_list(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.GET.value:
-                username = request.user
-                user = User.objects.get(username=username)
+                user = User.objects.get(id=request.user.id)
                 myRobots = UserRobot.objects.filter(Q(user=user)).values(
                     "id", "name", "robot__name", "robot"
                 )
