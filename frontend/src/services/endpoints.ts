@@ -32,8 +32,8 @@ export const endpoints = {
       action: `${HOME_API}/action/`,
       myRobots: `${HOME_API}/myRobots/`,
       myRobot: `${HOME_API}/myRobot/`,
-      takePosition: `${HOME_API}/takePosition/`,
-      getObjectPhoto: `${HOME_API}/getObjectPhoto/`,
+      getPosition: `${HOME_API}/getPosition/`,
+      getPhoto: `${HOME_API}/getPhoto/`,
       pingIp: `${HOME_API}/pingIp/`,
     },
     management: {

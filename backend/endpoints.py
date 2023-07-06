@@ -11,7 +11,7 @@ from .functions.libraries import (
     action_detail,
     get_my_robot_list,
     my_robot_detail,
-    get_object_photo,
+    get_photo,
 )
 from .functions.management import (
     get_robot_list,
@@ -21,7 +21,7 @@ from .functions.management import (
     get_group_list,
     reset_password,
 )
-from .functions.robot import take_position, ping_ip
+from .functions.robot import get_position, ping_ip
 from .functions.chat import (
     new_message,
 )
@@ -54,11 +54,11 @@ urlpatterns = [
     path(HOME + "myRobots/", get_my_robot_list, name="get_my_robot_list"),
     path(HOME + "myRobot/", my_robot_detail, name="my_robot_detail"),
     path(
-        HOME + "takePosition/",
-        take_position,
-        name="take_position",
+        HOME + "getPosition/",
+        get_position,
+        name="get_position",
     ),
-    path(HOME + "getObjectPhoto/", get_object_photo, name="get_object_photo"),
+    path(HOME + "getPhoto/", get_photo, name="get_photo"),
     path(HOME + "pingIp/", ping_ip, name="ping_ip"),
     # MANAGEMENT
     path(HOME + "robots/", get_robot_list, name="get_robot_list"),

@@ -86,7 +86,7 @@ export const FormObject = ({
       return
     }
     fetchApi({
-      url: endpoints.home.libraries.takePosition,
+      url: endpoints.home.libraries.getPosition,
       method: MethodHTTP.POST,
       body: { robot },
     }).then((response) => {
@@ -112,7 +112,7 @@ export const FormObject = ({
       return
     }
     fetchApi({
-      url: endpoints.home.libraries.getObjectPhoto,
+      url: endpoints.home.libraries.getPhoto,
       method: MethodHTTP.POST,
       body: { robot },
     }).then((response) => {

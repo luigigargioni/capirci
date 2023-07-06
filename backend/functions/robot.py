@@ -227,14 +227,14 @@ def robot_getvar(client, hRobot, name):
     return value
 
 
-def take_img(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
+def acquire_photo(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
     eng = Dispatch(CaoParams.ENGINE.value)
     ctrl = eng.Workspaces(0).AddController(
         "N10-W02",
         CaoParams.CANON_CAMERA.value,
         "",
-        # "Server=" + str(cameraip) + ", Timeout=5000",
-        "Conn=eth:192.168.0.90",
+        "Server=" + str(cameraip) + ", Timeout=5000",
+        # "Conn=eth:192.168.0.90",
     )
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:
@@ -281,7 +281,7 @@ def move_to_new_pos(client, hRobot, new_x, new_y, mode=2):
     client.robot_move(hRobot, mode, list_to_string_position(curr_pos), MAX_SPEED)
 
 
-def take_position(request: HttpRequest) -> HttpResponse:
+def get_position(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:
@@ -580,7 +580,7 @@ def search_object(client, hRobot, object_id, force, lastFind, camera, objectHeig
         curr_x = curr_pos[0]
         curr_y = curr_pos[1]
 
-        test = take_img(wb=True, cameraip=camera)
+        test = acquire_photo(wb=True, cameraip=camera)
 
         shifted = cv2.pyrMeanShiftFiltering(test, 51, 71)
         gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)

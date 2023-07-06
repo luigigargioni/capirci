@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from .robot import (
     connect,
     disconnect,
-    take_img,
+    acquire_photo,
     move_to_calibration_position,
     check_ip_response,
     DEFAULT_TIMEOUT,
@@ -586,7 +586,7 @@ def my_robot_detail(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def get_object_photo(request: HttpRequest) -> HttpResponse:
+def get_photo(request: HttpRequest) -> HttpResponse:
     try:
         if request.user.is_authenticated:
             if request.method == HttpMethod.POST.value:
@@ -602,10 +602,9 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
                     hRobot = handles[2]
                     move_to_calibration_position(client, hRobot)
                     disconnect(client, hCtrl, hRobot)
-                    image = take_img(wb=True, cameraip=robot.cameraip)
-
+                    image = acquire_photo(wb=True, cameraip=robot.cameraip)
                     # Photo
-                    photo = b64encode(image)
+                    photo = b64encode(image).decode("utf-8")
 
                     # Contour
                     shifted = cv2.pyrMeanShiftFiltering(image, 51, 71)
@@ -628,7 +627,7 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
 
                     contour_image = image.copy()
                     cv2.drawContours(contour_image, cnts, areaMaxi, (0, 0, 255), 3)
-                    contour = b64encode(contour_image)
+                    contour = b64encode(contour_image).decode("utf-8")
 
                     # Shape
                     outline = zeros(image.shape, dtype="uint8")
@@ -638,7 +637,7 @@ def get_object_photo(request: HttpRequest) -> HttpResponse:
                     shape_image = cv2.copyMakeBorder(
                         roi, 15, 15, 15, 15, cv2.BORDER_CONSTANT, value=0
                     )
-                    shape = b64encode(shape_image)
+                    shape = b64encode(shape_image).decode("utf-8")
 
                     response = {}
                     response["photo"] = photo
