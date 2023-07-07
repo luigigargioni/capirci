@@ -28,6 +28,7 @@ import { endpoints } from 'services/endpoints'
 import { MessageText, MessageTextMaxLength } from 'utils/messages'
 import { AimOutlined, PlusOutlined } from '@ant-design/icons'
 import { MyRobotType } from 'pages/myrobots/types'
+import { Spin } from 'antd'
 import { ObjectDetailType } from './types'
 
 interface FormObjectProps {
@@ -45,6 +46,7 @@ export const FormObject = ({
 }: FormObjectProps) => {
   const [addKeyword, setAddKeyword] = React.useState<string>('')
   const [keywordErrors, setKeywordErrors] = React.useState<string[]>([])
+  const [loadingPhotos, setLoadingPhotos] = React.useState<boolean>(false)
 
   const onSubmit = async (
     values: ObjectDetailType,
@@ -111,6 +113,10 @@ export const FormObject = ({
       await setFieldError('robot', MessageText.requiredField)
       return
     }
+    setLoadingPhotos(true)
+    setFieldValue('photo', '')
+    setFieldValue('contour', '')
+    setFieldValue('shape', '')
     fetchApi({
       url: endpoints.home.libraries.getPhoto,
       method: MethodHTTP.POST,
@@ -121,6 +127,8 @@ export const FormObject = ({
         setFieldValue('contour', response.contour)
         setFieldValue('shape', response.shape)
       }
+    }).finally(() => {
+      setLoadingPhotos(false)
     })
   }
 
@@ -385,11 +393,25 @@ export const FormObject = ({
                   size="medium"
                   title="Get photo"
                   startIcon={<AimOutlined style={{ fontSize: '2em' }} />}
+                  disabled={loadingPhotos}
                 >
                   Get photo
                 </Button>
               </Stack>
             </Grid>
+            {loadingPhotos && (
+              <Grid item xs={12}>
+                <Stack spacing={1}>
+                <Spin
+                  size="large"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                  }}
+                />
+                </Stack>
+              </Grid>
+            )}
             {values.photo && (
               <Grid
                 item
@@ -407,7 +429,7 @@ export const FormObject = ({
                       maxHeight: '500px',
                       border: '1px solid',
                     }}
-                    image={`data:image/png;base64,${values.photo}`}
+                    image={`data:image/jpeg;base64,${values.photo}`}
                     alt="Image"
                   />
                 </Stack>
@@ -430,7 +452,7 @@ export const FormObject = ({
                       maxHeight: '500px',
                       border: '1px solid',
                     }}
-                    image={`data:image/png;base64,${values.contour}`}
+                    image={`data:image/jpeg;base64,${values.contour}`}
                     alt="Image"
                   />
                 </Stack>
@@ -453,7 +475,7 @@ export const FormObject = ({
                       maxHeight: '500px',
                       border: '1px solid',
                     }}
-                    image={`data:image/png;base64,${values.shape}`}
+                    image={`data:image/jpeg;base64,${values.shape}`}
                     alt="Image"
                   />
                 </Stack>
@@ -462,7 +484,7 @@ export const FormObject = ({
             <Grid item xs={12}>
               <Button
                 disableElevation
-                disabled={isSubmitting}
+                disabled={isSubmitting || loadingPhotos}
                 fullWidth
                 size="large"
                 type="submit"
