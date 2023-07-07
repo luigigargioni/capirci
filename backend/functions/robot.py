@@ -666,11 +666,10 @@ def ping_ip(request: HttpRequest) -> HttpResponse:
             if request.method == HttpMethod.POST.value:
                 data = loads(request.body)
                 ip = data.get("ip")
-                port = data.get("port")
-                if check_ip_response(ip, port):
+                if check_ip_response(ip):
                     return success_response()
                 else:
-                    return error_response(str("IP not reachable"))
+                    return error_response(str("Robot not connected"))
             else:
                 return invalid_request_method()
         else:
@@ -679,7 +678,7 @@ def ping_ip(request: HttpRequest) -> HttpResponse:
         return error_response(str(e))
 
 
-def check_ip_response(ip_address, port):
+def check_ip_response(ip_address, port=80):
     try:
         # Create a socket object
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
