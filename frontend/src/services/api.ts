@@ -75,7 +75,10 @@ export const fetchApi = async ({
         }
         throw err
       }
-      return null
+      toast.error(MessageText.noConnection)
+      const err = new Error(error.message || MessageText.noConnection)
+      err.name = error.code?.toString() || '500'
+      throw err
     })
 }
 
