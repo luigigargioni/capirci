@@ -234,7 +234,6 @@ def acquire_photo(CVconv=True, wb=False, oneshotfocus=False, cameraip=0):
         CaoParams.CANON_CAMERA.value,
         "",
         "Server=" + str(cameraip) + ", Timeout=5000",
-        # "Conn=eth:192.168.0.90",
     )
     image_handle = ctrl.AddVariable("IMAGE")
     if wb:
