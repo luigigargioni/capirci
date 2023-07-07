@@ -136,7 +136,7 @@ export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
   }, [listMessages])
 
   return (
-    <div style={{ height: '76vh', position: 'relative' }}>
+    <div style={{ height: '69vh', position: 'relative' }}>
       <div style={{ overflow: 'auto', height: '90%' }} id="chatContainer">
         {listMessages.map((msg) => (
           <MessageBox
