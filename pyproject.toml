@@ -13,7 +13,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-start = "backend.poetry_scripts.server:run"
+start = "backend.poetry_scripts.server:start"
 collectstatic = "backend.poetry_scripts.server:collectstatic"
 
 [tool.poetry.dependencies]

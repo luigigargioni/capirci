@@ -9,7 +9,6 @@ import { getFromLocalStorage } from 'utils/localStorageUtils'
 import { useTheme } from '@emotion/react'
 import 'react-chat-elements/dist/main.css'
 import './customStyle.css'
-import { devServerUrl } from 'utils/constants'
 import { MethodHTTP, fetchApi } from 'services/api'
 import { endpoints } from 'services/endpoints'
 import { useDispatch } from 'react-redux'
@@ -18,6 +17,8 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from 'react-speech-recognition'
 import { INITIAL_MESSAGE, MessageType, UserChatEnum } from './types'
+import user from './user.png'
+import robot from './robot.png'
 
 const { username } = getFromLocalStorage('user')
 const scrollToBottom = () => {
@@ -162,8 +163,8 @@ export const ChatWrapper = ({ speaker }: ChatWrapperProps) => {
             status="sent"
             avatar={
               msg.user === UserChatEnum.ROBOT
-                ? `${devServerUrl}/src/pages/chat/robot.png`
-                : `${devServerUrl}/src/pages/chat/user.png`
+                ? robot
+                : user
             }
             styles={
               msg.user === UserChatEnum.ROBOT

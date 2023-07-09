@@ -1,7 +1,7 @@
 import subprocess
 
 
-def run():
+def start():
     cmd = ["poetry", "run", "python", "manage.py", "runserver", "localhost:8000"]
     subprocess.run(cmd)
 

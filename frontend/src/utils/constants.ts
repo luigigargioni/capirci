@@ -20,5 +20,3 @@ export const defaultPaginationConfig: TablePaginationConfig = {
 
 export const timerTimeoutAutocomplete = 500
 export const minCharsAutocomplete = 1
-
-export const devServerUrl = 'http://localhost:3000'
