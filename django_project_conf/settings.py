@@ -7,7 +7,7 @@ BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 SECRET_KEY = "pe=ipw6q4g-2d+*7n76g70c#ps+!n=i3-d91i^l9adjh@o)8+!"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Application definition
 
