@@ -99,3 +99,13 @@ Type: `Manager`
 * Username: `admin`  
 Password: `adminpassword`  
 Type: `Administrator`/`Manager`
+
+## :whale: Docker
+
+* [Guide](https://awstip.com/setting-up-a-django-project-with-docker-and-poetry-f391d6cde2cf)
+
+### :computer: Command
+
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
