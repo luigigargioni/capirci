@@ -17,7 +17,7 @@ export interface ResponseInterface {
   payload: any
 }
 
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 15000 // 15 seconds
 axios.defaults.withCredentials = true
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'

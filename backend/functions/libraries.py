@@ -604,7 +604,8 @@ def get_photo(request: HttpRequest) -> HttpResponse:
                     disconnect(client, hCtrl, hRobot)
                     image = acquire_photo(wb=True, cameraip=robot.cameraip)
                     # Photo
-                    photo = b64encode(image).decode("utf-8")
+                    image_decoded = cv2.imencode(".jpg", image)
+                    photo = b64encode(image_decoded[1]).decode("utf-8")
 
                     # Contour
                     shifted = cv2.pyrMeanShiftFiltering(image, 51, 71)
@@ -627,7 +628,8 @@ def get_photo(request: HttpRequest) -> HttpResponse:
 
                     contour_image = image.copy()
                     cv2.drawContours(contour_image, cnts, areaMaxi, (0, 0, 255), 3)
-                    contour = b64encode(contour_image).decode("utf-8")
+                    contour_image_decoded = cv2.imencode(".jpg", contour_image)
+                    contour = b64encode(contour_image_decoded[1]).decode("utf-8")
 
                     # Shape
                     outline = zeros(image.shape, dtype="uint8")
@@ -637,7 +639,8 @@ def get_photo(request: HttpRequest) -> HttpResponse:
                     shape_image = cv2.copyMakeBorder(
                         roi, 15, 15, 15, 15, cv2.BORDER_CONSTANT, value=0
                     )
-                    shape = b64encode(shape_image).decode("utf-8")
+                    shape_image_decoded = cv2.imencode(".jpg", shape_image)
+                    shape = b64encode(shape_image_decoded[1]).decode("utf-8")
 
                     response = {}
                     response["photo"] = photo
