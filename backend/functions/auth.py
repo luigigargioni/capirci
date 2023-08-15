@@ -64,15 +64,16 @@ def verify_token(request: HttpRequest) -> HttpResponse:
             data = {"authError": authError}
 
             if request.user.is_authenticated:
-                authError = False
-                user = User.objects.get(id=user_id)
-                group = Group.objects.filter(user=user).first()
-                data = {
-                    "authError": authError,
-                    "username": user.username,
-                    "id": user.id,
-                    "group": group.name,
-                }
+                user = User.objects.filter(id=user_id).first()
+                if user is not None:
+                    authError = False
+                    group = Group.objects.filter(user=user).first()
+                    data = {
+                        "authError": authError,
+                        "username": user.username,
+                        "id": user.id,
+                        "group": group.name,
+                    }
 
             return success_response(data)
         else:
